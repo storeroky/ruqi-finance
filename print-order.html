@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طباعة العقد — رُقي</title>
+<style>
+
+/* ===== SCREEN STYLES ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: #e8e4de;
+  color: #1a1a1a;
+  direction: rtl;
+  min-height: 100vh;
+}
+
+.screen-toolbar {
+  background: #16182a;
+  color: #fff;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid #B8860B;
+}
+.tb-logo { font-size: 16px; font-weight: 700; color: #B8860B; margin-left: auto; }
+.tb-title { font-size: 13px; color: #aaa; }
+.tb-btns { display: flex; gap: 8px; margin-right: auto; }
+.btn-print {
+  background: #B8860B; color: #fff; border: none;
+  padding: 9px 20px; border-radius: 8px; font-size: 13px;
+  cursor: pointer; font-family: inherit; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+  transition: .15s;
+}
+.btn-print:hover { background: #D4A017; }
+.btn-back {
+  background: rgba(255,255,255,.1); color: #ccc; border: 1px solid rgba(255,255,255,.15);
+  padding: 9px 16px; border-radius: 8px; font-size: 13px;
+  cursor: pointer; font-family: inherit;
+  text-decoration: none; display: flex; align-items: center; gap: 6px;
+}
+.btn-back:hover { background: rgba(255,255,255,.18); color: #fff; }
+
+.page-wrap {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ===== CONTRACT PAPER ===== */
+.contract {
+  width: 794px; /* A4 width at 96dpi */
+  background: #fff;
+  box-shadow: 0 4px 40px rgba(0,0,0,.18);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Gold border frame */
+.contract::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1.5px solid #D4A017;
+  pointer-events: none;
+  z-index: 0;
+}
+.contract::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 0.5px solid rgba(212,160,23,.3);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== HEADER ===== */
+.c-header {
+  background: #16182a;
+  padding: 28px 40px 22px;
+  position: relative;
+  z-index: 1;
+}
+.c-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.c-brand { display: flex; align-items: center; gap: 14px; }
+.c-logo-circle {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, #B8860B, #D4A017);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 900; color: #fff;
+  border: 2px solid rgba(212,160,23,.5);
+  flex-shrink: 0;
+}
+.c-brand-text {}
+.c-brand-name {
+  font-size: 28px; font-weight: 900; color: #D4A017;
+  letter-spacing: -.5px;
+  font-family: 'Georgia', serif;
+}
+.c-brand-sub { font-size: 12px; color: #aaa; margin-top: 2px; }
+.c-brand-tagline {
+  font-size: 10px; color: rgba(212,160,23,.6);
+  letter-spacing: .1em; margin-top: 4px;
+}
+
+.c-contract-info { text-align: left; }
+.c-contract-num {
+  font-size: 22px; font-weight: 700; color: #D4A017;
+  font-family: 'Georgia', serif;
+}
+.c-contract-label { font-size: 10px; color: #888; margin-bottom: 4px; }
+.c-contract-date { font-size: 12px; color: #aaa; margin-top: 6px; }
+.c-contract-status {
+  display: inline-block; margin-top: 8px;
+  font-size: 11px; padding: 3px 12px; border-radius: 12px;
+  font-weight: 600;
+}
+.st-paid { background: #1a4a1a; color: #4ade80; }
+.st-partial { background: #1a2a4a; color: #60a5fa; }
+.st-pending { background: #4a3a1a; color: #fbbf24; }
+
+/* Gold divider */
+.c-divider {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #B8860B 20%, #D4A017 50%, #B8860B 80%, transparent);
+}
+
+/* ===== BODY ===== */
+.c-body { padding: 30px 40px; position: relative; z-index: 1; }
+
+/* Client section */
+.c-section-title {
+  font-size: 11px; font-weight: 700; color: #B8860B;
+  letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.c-section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, #D4A017, transparent);
+}
+
+.c-client-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+  background: #faf8f4;
+  border: 1px solid #e8e2d8;
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.c-field { }
+.c-field-label {
+  font-size: 10px; color: #888; font-weight: 600;
+  letter-spacing: .05em; margin-bottom: 4px;
+}
+.c-field-value {
+  font-size: 14px; font-weight: 600; color: #1a1a1a;
+}
+.c-field-value.large {
+  font-size: 16px;
+}
+
+/* Details table */
+.c-details-wrap {
+  margin-bottom: 28px;
+}
+.c-details-table {
+  width: 100%; border-collapse: collapse;
+}
+.c-details-table thead th {
+  background: #16182a; color: #D4A017;
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  padding: 10px 14px; text-align: right;
+}
+.c-details-table thead th:first-child { border-radius: 8px 0 0 0; }
+.c-details-table thead th:last-child { border-radius: 0 8px 0 0; }
+.c-details-table tbody tr:nth-child(even) td { background: #faf8f4; }
+.c-details-table tbody td {
+  padding: 11px 14px; border-bottom: 1px solid #f0ede8;
+  font-size: 13px; vertical-align: middle;
+}
+.c-details-table tbody td.label-col {
+  color: #666; font-size: 12px; font-weight: 500; width: 30%;
+}
+.c-details-table tbody td.value-col {
+  color: #1a1a1a; font-weight: 500;
+}
+.acc-tag {
+  display: inline-block; background: #faf0d8; border: 1px solid #e8d49a;
+  color: #7a5a08; font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  margin: 2px;
+}
+
+/* Financial summary */
+.c-financial {
+  background: #16182a;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+}
+.c-fin-title {
+  font-size: 11px; color: #D4A017; font-weight: 700;
+  letter-spacing: .1em; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.c-fin-title::after { content: ''; flex: 1; height: 1px; background: rgba(212,160,23,.25); }
+.c-fin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.c-fin-item { }
+.c-fin-label { font-size: 10px; color: #888; margin-bottom: 4px; }
+.c-fin-value { font-size: 20px; font-weight: 700; }
+.c-fin-value.gold { color: #D4A017; }
+.c-fin-value.green { color: #4ade80; }
+.c-fin-value.orange { color: #fb923c; }
+.c-fin-currency { font-size: 11px; color: #888; margin-top: 2px; }
+
+/* Progress bar */
+.c-payment-prog {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.c-prog-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: #aaa; margin-bottom: 6px;
+}
+.c-prog-track {
+  height: 6px; background: rgba(255,255,255,.1);
+  border-radius: 3px; overflow: hidden;
+}
+.c-prog-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, #B8860B, #D4A017);
+  transition: width .5s;
+}
+
+/* Notes */
+.c-notes-box {
+  background: #faf8f4;
+  border: 1px solid #e8e2d8;
+  border-right: 3px solid #D4A017;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  font-size: 13px;
+  color: #444;
+  min-height: 56px;
+  line-height: 1.6;
+}
+
+/* Signatures */
+.c-signatures {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.c-sig-box {
+  border: 1px solid #e0dbd2;
+  border-radius: 10px;
+  padding: 16px 20px;
+  text-align: center;
+  background: #faf8f4;
+}
+.c-sig-title { font-size: 12px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.c-sig-sub { font-size: 11px; color: #888; margin-bottom: 20px; }
+.c-sig-line {
+  border-bottom: 1.5px solid #D4A017;
+  width: 80%; margin: 0 auto;
+}
+.c-sig-sep {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.c-sig-sep-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: #16182a; border: 2px solid #B8860B;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 900; color: #D4A017;
+  font-family: 'Georgia', serif;
+}
+.c-sig-sep-line { width: 1px; height: 20px; background: #e0dbd2; }
+
+/* Terms */
+.c-terms {
+  background: #faf8f4;
+  border: 1px solid #e8e2d8;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 8px;
+}
+.c-terms-title {
+  font-size: 11px; font-weight: 700; color: #B8860B;
+  margin-bottom: 10px; letter-spacing: .06em;
+}
+.c-terms-list {
+  list-style: none; display: flex; flex-direction: column; gap: 5px;
+}
+.c-terms-list li {
+  font-size: 11px; color: #555; display: flex; gap: 8px; align-items: flex-start;
+  line-height: 1.5;
+}
+.c-terms-list li::before {
+  content: '◆'; color: #D4A017; font-size: 7px; margin-top: 4px; flex-shrink: 0;
+}
+
+/* ===== FOOTER ===== */
+.c-footer {
+  background: #16182a;
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+.c-footer-brand { font-size: 13px; color: #D4A017; font-weight: 700; font-family: 'Georgia', serif; }
+.c-footer-contact { font-size: 11px; color: #888; text-align: center; line-height: 1.7; }
+.c-footer-watermark { font-size: 11px; color: rgba(212,160,23,.4); }
+
+/* Decorative corner ornaments */
+.ornament {
+  position: absolute; color: #D4A017; opacity: .15;
+  font-size: 32px; z-index: 2; pointer-events: none;
+}
+.orn-tl { top: 20px; right: 20px; }
+.orn-tr { top: 20px; left: 20px; transform: scaleX(-1); }
+.orn-bl { bottom: 20px; right: 20px; transform: scaleY(-1); }
+.orn-br { bottom: 20px; left: 20px; transform: scale(-1,-1); }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    background: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .screen-toolbar { display: none !important; }
+  .page-wrap { padding: 0; gap: 0; }
+
+  .contract {
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+    page-break-after: avoid;
+  }
+
+  .contract::before,
+  .contract::after {
+    display: none;
+  }
+
+  /* Preserve dark backgrounds in print */
+  .c-header, .c-financial, .c-footer {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  .c-header { background: #16182a !important; }
+  .c-financial { background: #16182a !important; }
+  .c-footer { background: #16182a !important; }
+  .c-details-table thead { background: #16182a !important; }
+  .c-details-table thead th { background: #16182a !important; }
+
+  /* Hide second contract if only one order */
+  .second-copy { display: none !important; }
+}
+
+/* ===== COPY SEPARATOR ===== */
+.copy-separator {
+  width: 794px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+.copy-sep-line { flex: 1; border-top: 2px dashed #aaa; }
+.copy-sep-text {
+  font-size: 11px; color: #888;
+  background: #e8e4de;
+  padding: 4px 12px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* No order state */
+.no-order {
+  width: 794px; text-align: center;
+  padding: 60px 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+}
+.no-order-ic { font-size: 48px; margin-bottom: 16px; }
+.no-order-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
+.no-order-sub { font-size: 14px; color: #888; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN TOOLBAR (hidden on print) -->
+<div class="screen-toolbar">
+  <a href="javascript:history.back()" class="btn-back">← رجوع</a>
+  <div>
+    <div class="tb-logo">رُقي</div>
+    <div class="tb-title" id="tb-title">طباعة العقد</div>
+  </div>
+  <div class="tb-btns">
+    <button class="btn-print" onclick="window.print()">🖨️ طباعة العقد</button>
+  </div>
+</div>
+
+<div class="page-wrap" id="page-wrap">
+  <div class="no-order" id="no-order">
+    <div class="no-order-ic">📋</div>
+    <div class="no-order-title">لا توجد طلبية للطباعة</div>
+    <div class="no-order-sub">ارجع إلى صفحة الطلبيات واضغط زر الطباعة بجانب أي طلبية</div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+const STATUS_MAP = {
+  paid:    { label: 'مدفوعة بالكامل', cls: 'st-paid' },
+  partial: { label: 'دفعة أولى',       cls: 'st-partial' },
+  pending: { label: 'لم يُدفع بعد',   cls: 'st-pending' },
+  cancel:  { label: 'ملغية',           cls: 'st-pending' }
+};
+
+const PAY_MAP = { 'كاش': '💵 كاش', 'تحويل بنكي': '🏦 تحويل بنكي', 'دفعات': '📅 دفعات' };
+
+function fmt(n) {
+  return Math.round(n || 0).toLocaleString('ar-LY');
+}
+
+function today() {
+  return new Date().toLocaleDateString('ar-LY', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+}
+
+function pct(paid, total) {
+  return total > 0 ? Math.round((paid / total) * 100) : 0;
+}
+
+function buildAccTags(acc) {
+  if (!acc) return '—';
+  return acc.split(/[,،]/).map(a => a.trim()).filter(Boolean)
+    .map(a => `<span class="acc-tag">${a}</span>`).join(' ');
+}
+
+function renderContract(order, copyNum) {
+  const st = STATUS_MAP[order.status] || STATUS_MAP.pending;
+  const paid = order.paid || 0;
+  const total = order.total || 0;
+  const rem = total - paid;
+  const p = pct(paid, total);
+  const copyLabel = copyNum === 1 ? 'نسخة العميل' : 'نسخة المصنع';
+
+  return `
+<div class="contract" id="contract-${copyNum}">
+
+  <!-- Ornaments -->
+  <div class="ornament orn-tl">❧</div>
+  <div class="ornament orn-tr">❧</div>
+  <div class="ornament orn-bl">❧</div>
+  <div class="ornament orn-br">❧</div>
+
+  <!-- HEADER -->
+  <div class="c-header">
+    <div class="c-header-inner">
+      <div class="c-brand">
+        <div class="c-logo-circle">ر</div>
+        <div class="c-brand-text">
+          <div class="c-brand-name">رُقي</div>
+          <div class="c-brand-sub">للمطابخ والديكورات وغرف النوم</div>
+          <div class="c-brand-tagline">RUQI KITCHENS & DECOR — TRIPOLI, LIBYA</div>
+        </div>
+      </div>
+      <div class="c-contract-info">
+        <div class="c-contract-label">رقم العقد</div>
+        <div class="c-contract-num">#${String(order.orderNum || '').padStart(3, '0')}</div>
+        <div class="c-contract-date">📅 ${order.date || today()}</div>
+        <div>
+          <span class="c-contract-status ${st.cls}">${st.label}</span>
+        </div>
+        <div style="font-size:10px;color:rgba(212,160,23,.5);margin-top:6px">${copyLabel}</div>
+      </div>
+    </div>
+  </div>
+  <div class="c-divider"></div>
+
+  <!-- BODY -->
+  <div class="c-body">
+
+    <!-- CLIENT INFO -->
+    <div class="c-section-title">بيانات العميل</div>
+    <div class="c-client-grid">
+      <div class="c-field">
+        <div class="c-field-label">الاسم الكامل</div>
+        <div class="c-field-value large">${order.name || '—'}</div>
+      </div>
+      <div class="c-field">
+        <div class="c-field-label">رقم الهاتف</div>
+        <div class="c-field-value">${order.phone || '—'}</div>
+      </div>
+      <div class="c-field">
+        <div class="c-field-label">العنوان</div>
+        <div class="c-field-value">${order.addr || '—'}</div>
+      </div>
+    </div>
+
+    <!-- ORDER DETAILS -->
+    <div class="c-section-title">تفاصيل الطلبية</div>
+    <div class="c-details-wrap">
+      <table class="c-details-table">
+        <thead>
+          <tr>
+            <th style="width:30%">البند</th>
+            <th>التفاصيل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="label-col">نوع المنتج</td>
+            <td class="value-col" style="font-size:14px;font-weight:700">${order.type || '—'}</td>
+          </tr>
+          ${order.facade ? `<tr><td class="label-col">الواجهة</td><td class="value-col">${order.facade}</td></tr>` : ''}
+          ${order.frame ? `<tr><td class="label-col">الهيكل</td><td class="value-col">${order.frame}</td></tr>` : ''}
+          ${order.height ? `<tr><td class="label-col">ارتفاع الدواليب</td><td class="value-col">${order.height}</td></tr>` : ''}
+          ${order.acc ? `<tr><td class="label-col">الاكسسوارات</td><td class="value-col">${buildAccTags(order.acc)}</td></tr>` : ''}
+          <tr>
+            <td class="label-col">تاريخ التسليم المتوقع</td>
+            <td class="value-col" style="color:#B8860B;font-weight:700">📅 ${order.date || '—'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">طريقة الدفع</td>
+            <td class="value-col">${PAY_MAP[order.pay] || order.pay || '—'}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NOTES -->
+    ${order.notes ? `
+    <div class="c-section-title">ملاحظات خاصة</div>
+    <div class="c-notes-box">${order.notes}</div>
+    ` : ''}
+
+    <!-- FINANCIAL SUMMARY -->
+    <div class="c-financial">
+      <div class="c-fin-title">الملخص المالي</div>
+      <div class="c-fin-grid">
+        <div class="c-fin-item">
+          <div class="c-fin-label">قيمة العقد الإجمالية</div>
+          <div class="c-fin-value gold">${fmt(total)}</div>
+          <div class="c-fin-currency">دينار ليبي</div>
+        </div>
+        <div class="c-fin-item">
+          <div class="c-fin-label">المبلغ المدفوع</div>
+          <div class="c-fin-value green">${fmt(paid)}</div>
+          <div class="c-fin-currency">دينار ليبي</div>
+        </div>
+        <div class="c-fin-item">
+          <div class="c-fin-label">المبلغ المتبقي</div>
+          <div class="c-fin-value ${rem > 0 ? 'orange' : 'green'}">${fmt(rem)}</div>
+          <div class="c-fin-currency">دينار ليبي</div>
+        </div>
+      </div>
+      <div class="c-payment-prog">
+        <div class="c-prog-label">
+          <span>نسبة السداد</span>
+          <span>${p}%</span>
+        </div>
+        <div class="c-prog-track">
+          <div class="c-prog-fill" style="width:${p}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGNATURES -->
+    <div class="c-section-title">التوقيعات</div>
+    <div class="c-signatures">
+      <div class="c-sig-box">
+        <div class="c-sig-title">توقيع العميل</div>
+        <div class="c-sig-sub">الموافقة على التصميم والمواصفات</div>
+        <div class="c-sig-line"></div>
+        <div style="font-size:11px;color:#aaa;margin-top:6px">${order.name || ''}</div>
+      </div>
+      <div class="c-sig-sep">
+        <div class="c-sig-sep-line"></div>
+        <div class="c-sig-sep-circle">ر</div>
+        <div class="c-sig-sep-line"></div>
+      </div>
+      <div class="c-sig-box">
+        <div class="c-sig-title">توقيع العميل</div>
+        <div class="c-sig-sub">الاستلام بعد التسليم والتركيب</div>
+        <div class="c-sig-line"></div>
+        <div style="font-size:11px;color:#aaa;margin-top:6px">تاريخ الاستلام: .............</div>
+      </div>
+    </div>
+
+    <!-- TERMS -->
+    <div class="c-terms">
+      <div class="c-terms-title">الشروط والأحكام</div>
+      <ul class="c-terms-list">
+        <li>يُعدّ هذا العقد ملزماً لكلا الطرفين بعد التوقيع عليه.</li>
+        <li>تاريخ التسليم تقديري وقد يتأخر بسبب ظروف خارجة عن إرادة المصنع (توفر المواد، الطلبات السابقة).</li>
+        <li>في حال إلغاء الطلبية بعد بدء التصنيع، لا يُسترد المبلغ المدفوع جزئياً أو كلياً.</li>
+        <li>يلتزم المصنع بضمان جودة التصنيع والتركيب لمدة سنة من تاريخ الاستلام.</li>
+        <li>أي تعديل على المواصفات بعد بدء العمل يستوجب موافقة كتابية وقد يؤثر على السعر والموعد.</li>
+      </ul>
+    </div>
+
+  </div><!-- /c-body -->
+
+  <!-- FOOTER -->
+  <div class="c-footer">
+    <div class="c-footer-brand">رُقي</div>
+    <div class="c-footer-contact">
+      📍 طرابلس — سوق الجمعة، بالقرب من الإشارة الضوئية الفتح — مسجد الرأس<br>
+      📞 0923124913
+    </div>
+    <div class="c-footer-watermark">
+      طُبع: ${today()}
+    </div>
+  </div>
+
+</div>`;
+}
+
+// ===== LOAD ORDER =====
+async function loadOrder() {
+  // Get order ID from URL param
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get('id');
+
+  if (!orderId) {
+    // Check localStorage for last printed order
+    const last = localStorage.getItem('ruqi_print_order');
+    if (last) {
+      renderPage(JSON.parse(last));
+    }
+    return;
+  }
+
+  // Try Firebase first
+  const db = new RuqiDB();
+  let order = null;
+
+  try {
+    const orders = await db.getOrders();
+    order = orders.find(o => o.id === orderId);
+  } catch (e) {
+    console.warn('Firebase unavailable, checking localStorage');
+  }
+
+  if (!order) {
+    // Try localStorage
+    const orders = JSON.parse(localStorage.getItem('ruqi_orders') || '[]');
+    order = orders.find(o => o.id === orderId);
+  }
+
+  if (order) {
+    localStorage.setItem('ruqi_print_order', JSON.stringify(order));
+    renderPage(order);
+  }
+}
+
+function renderPage(order) {
+  const wrap = document.getElementById('page-wrap');
+  document.getElementById('no-order').style.display = 'none';
+  document.getElementById('tb-title').textContent =
+    `عقد #${String(order.orderNum || '').padStart(3,'0')} — ${order.name}`;
+
+  // Client copy
+  wrap.insertAdjacentHTML('beforeend', renderContract(order, 1));
+
+  // Separator
+  wrap.insertAdjacentHTML('beforeend', `
+    <div class="copy-separator">
+      <div class="copy-sep-line"></div>
+      <div class="copy-sep-text">✂️ قص هنا — نسخة المصنع</div>
+      <div class="copy-sep-line"></div>
+    </div>
+  `);
+
+  // Factory copy
+  wrap.insertAdjacentHTML('beforeend', renderContract(order, 2));
+}
+
+loadOrder();
+</script>
+</body>
+</html>
