@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="رُقي">
+<meta name="theme-color" content="#16182a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="shortcut icon" href="favicon.ico">
+<title>رُقي</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#C49A2A;--gold-l:#E0B84A;--gold-dim:#8a6a10;
+  --dark:#16182a;--dark2:#1e2035;--dark3:#252740;
+  --bg:#F5F2EE;--surface:#FFFFFF;--surface2:#F9F7F4;
+  --border:#E8E3DC;--border2:#D4CCBF;
+  --text:#1C1A17;--t2:#6B6456;--t3:#A89D8E;
+  --green:#1E8A4A;--green-bg:#E8F7EE;
+  --blue:#1A5CBF;--blue-bg:#E8F0FC;
+  --amber:#B86A00;--amber-bg:#FEF3E2;
+  --red:#C0392B;--red-bg:#FDECEA;
+  --r:14px;--r-lg:20px;--r-xl:24px;
+}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;color:var(--text);overflow:hidden}
+
+/* ── APP SHELL ── */
+.app{height:100dvh;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+
+/* ── STATUS AREA ── */
+.status-area{height:env(safe-area-inset-top,0);background:var(--dark)}
+
+/* ── HEADER ── */
+.header{background:var(--dark);padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between}
+.h-brand{display:flex;align-items:center;gap:10px}
+.h-avatar{width:36px;height:36px;border-radius:10px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;flex-shrink:0;font-family:Georgia,serif}
+.h-name{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.h-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px}
+.h-actions{display:flex;align-items:center;gap:8px}
+.h-sync{width:8px;height:8px;border-radius:50%;background:#4ADE80;flex-shrink:0}
+.h-sync.off{background:var(--amber);animation:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.h-sync.on{animation:blink 2s infinite}
+.h-icon-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:#fff}
+
+/* ── SCROLL AREA ── */
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;display:flex;flex-direction:column;gap:14px}
+
+/* ── PAGES ── */
+.page{display:none;flex-direction:column;gap:14px;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page.active{display:flex}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{background:var(--dark);border-top:1px solid rgba(255,255,255,.07);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom,0)}
+.nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;cursor:pointer;border:none;background:transparent;gap:3px;position:relative}
+.nav-btn .n-ic{font-size:22px;transition:.2s}
+.nav-btn .n-lbl{font-size:10px;color:rgba(255,255,255,.4);transition:.2s;font-weight:500}
+.nav-btn.active .n-ic{transform:translateY(-2px)}
+.nav-btn.active .n-lbl{color:var(--gold-l)}
+.nav-btn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--gold);border-radius:1px}
+.nav-fab{width:52px;height:52px;border-radius:16px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:26px;margin-top:-16px;box-shadow:0 4px 16px rgba(196,154,42,.5);transition:.15s}
+.nav-btn:active .nav-fab{transform:scale(.93)}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-pad{padding:16px}
+
+/* ── HOME: BALANCE HERO ── */
+.balance-hero{background:var(--dark);border-radius:var(--r-xl);padding:22px 20px;position:relative;overflow:hidden}
+.balance-hero::before{content:'';position:absolute;top:-40px;left:-40px;width:180px;height:180px;border-radius:50%;background:rgba(196,154,42,.07);pointer-events:none}
+.balance-hero::after{content:'';position:absolute;bottom:-30px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(196,154,42,.05);pointer-events:none}
+.bh-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.05em;margin-bottom:6px}
+.bh-amount{font-size:36px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1}
+.bh-currency{font-size:14px;color:rgba(255,255,255,.5);margin-top:4px}
+.bh-divider{height:1px;background:rgba(255,255,255,.08);margin:18px 0}
+.bh-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bh-item{}
+.bh-item-lbl{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:3px}
+.bh-item-val{font-size:15px;font-weight:700}
+.bh-item-val.green{color:#4ADE80}
+.bh-item-val.amber{color:#FBB040}
+.bh-item-val.red{color:#F87171}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-tile{background:var(--surface);border-radius:var(--r);padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.st-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.st-ic{font-size:22px}
+.st-badge{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-amber{background:var(--amber-bg);color:var(--amber)}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.st-val{font-size:20px;font-weight:800;color:var(--text)}
+.st-lbl{font-size:11px;color:var(--t2);margin-top:2px}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 2px}
+.sec-title{font-size:15px;font-weight:700;color:var(--text)}
+.sec-link{font-size:13px;color:var(--gold);font-weight:600}
+
+/* ── ACTIVITY LIST ── */
+.act-list{display:flex;flex-direction:column}
+.act-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.act-row:last-child{border:none}
+.act-row:active{background:var(--surface2)}
+.act-ic-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.act-body{flex:1;min-width:0}
+.act-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-sub{font-size:12px;color:var(--t2);margin-top:1px}
+.act-right{text-align:left;flex-shrink:0}
+.act-amt{font-size:14px;font-weight:700}
+.act-date{font-size:11px;color:var(--t3);margin-top:1px}
+
+/* ── ORDER CARD ── */
+.order-card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.oc-stripe{height:4px}
+.oc-stripe.paid{background:var(--green)}
+.oc-stripe.partial{background:var(--blue)}
+.oc-stripe.pending{background:var(--amber)}
+.oc-stripe.cancel{background:var(--red)}
+.oc-body{padding:14px 16px}
+.oc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.oc-name{font-size:16px;font-weight:700}
+.oc-num{font-size:11px;color:var(--t3);margin-top:2px}
+.status-pill{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;white-space:nowrap}
+.pill-paid{background:var(--green-bg);color:var(--green)}
+.pill-partial{background:var(--blue-bg);color:var(--blue)}
+.pill-pending{background:var(--amber-bg);color:var(--amber)}
+.pill-cancel{background:var(--red-bg);color:var(--red)}
+.oc-type{font-size:13px;color:var(--t2);margin-bottom:12px}
+.oc-money{display:flex;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.oc-money-item{flex:1;padding:10px 12px;background:var(--surface2)}
+.oc-money-item:not(:last-child){border-left:1px solid var(--border)}
+.oc-m-lbl{font-size:10px;color:var(--t3);margin-bottom:2px}
+.oc-m-val{font-size:13px;font-weight:700}
+.oc-actions{display:flex;gap:8px;padding:12px 16px;background:var(--surface2);border-top:1px solid var(--border)}
+.oc-btn{flex:1;padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s}
+.oc-btn:active{transform:scale(.96)}
+.oc-btn-edit{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.oc-btn-print{background:var(--amber-bg);color:var(--amber);border:1px solid #F5D9A8}
+.oc-btn-call{background:var(--green-bg);color:var(--green);border:1px solid #A8DFB8}
+
+/* ── FORM STYLES ── */
+.form-section{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.form-section-header{padding:14px 16px 0;display:flex;align-items:center;gap:8px}
+.fsh-ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.fsh-title{font-size:14px;font-weight:700}
+.form-fields{padding:14px 16px}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;letter-spacing:.02em}
+.field input,.field select,.field textarea{
+  width:100%;padding:13px 14px;
+  border-radius:10px;border:1.5px solid var(--border);
+  background:var(--surface2);color:var(--text);
+  font-size:15px;font-family:inherit;
+  direction:rtl;transition:.2s;
+  -webkit-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--gold);background:#fff;
+  box-shadow:0 0 0 4px rgba(196,154,42,.1);
+}
+.field textarea{resize:none;height:80px}
+.field input[readonly]{background:var(--bg);color:var(--t2);border-style:dashed}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── BIG SUBMIT BUTTON ── */
+.big-btn{width:100%;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s;margin-bottom:8px}
+.big-btn:active{transform:scale(.97)}
+.big-btn-gold{background:var(--gold);color:#fff;box-shadow:0 4px 14px rgba(196,154,42,.35)}
+.big-btn-outline{background:var(--surface);color:var(--t2);border:1.5px solid var(--border)}
+
+/* ── PROGRESS BAR ── */
+.prog{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:var(--gold);transition:width .4s}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:40px 20px}
+.empty-ic{font-size:48px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:700;margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--t2)}
+
+/* ── FILTER CHIPS ── */
+.filter-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filter-chips::-webkit-scrollbar{display:none}
+.chip{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--t2);white-space:nowrap;transition:.15s;font-family:inherit}
+.chip.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;z-index:9999;opacity:0;transition:.3s;border-right:3px solid var(--gold);white-space:nowrap;pointer-events:none;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── SHEET ── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:flex-end}
+.sheet-overlay.open{display:flex}
+.sheet{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:0 0 calc(20px + env(safe-area-inset-bottom,0))}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:14px auto}
+.sheet-title{font-size:17px;font-weight:700;padding:0 20px 16px;display:flex;justify-content:space-between;align-items:center}
+.sheet-close{width:30px;height:30px;border-radius:50%;background:var(--surface2);border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sheet-body{padding:0 20px}
+
+/* ── INSTALL MODAL ── */
+.install-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .35s}
+.install-overlay.show{opacity:1;pointer-events:all}
+.install-modal{background:var(--surface);border-radius:28px 28px 0 0;width:100%;padding:0 0 calc(28px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .42s cubic-bezier(.34,1.2,.64,1)}
+.install-overlay.show .install-modal{transform:translateY(0)}
+.im-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:16px auto 0}
+.im-body{padding:20px 24px 8px}
+.im-logo{width:80px;height:80px;border-radius:22px;background:var(--dark);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:var(--gold-l);border:2px solid rgba(196,154,42,.3);font-family:Georgia,serif;box-shadow:0 8px 24px rgba(22,24,42,.3)}
+.im-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
+.im-sub{font-size:14px;color:var(--t2);text-align:center;line-height:1.6;margin-bottom:22px}
+.im-feats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.im-feat{background:var(--surface2);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid var(--border)}
+.im-feat-ic{font-size:26px;margin-bottom:5px}
+.im-feat-txt{font-size:12px;color:var(--t2);font-weight:500;line-height:1.4}
+.im-ios{background:var(--amber-bg);border-radius:14px;padding:14px;margin-bottom:18px;display:none}
+.im-ios.show{display:block}
+.im-ios-title{font-size:12px;font-weight:700;color:var(--amber);margin-bottom:10px}
+.im-ios-step{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px}
+.im-ios-step:last-child{margin:0}
+.im-ios-num{width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── EXPENSE ITEM ── */
+.exp-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.exp-item:last-child{border:none}
+.exp-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.exp-body{flex:1;min-width:0}
+.exp-name{font-size:14px;font-weight:600}
+.exp-meta{font-size:12px;color:var(--t2);margin-top:1px}
+.exp-right{text-align:left;flex-shrink:0}
+.exp-amt{font-size:15px;font-weight:700;color:var(--red)}
+.exp-del{font-size:12px;color:var(--t3);margin-top:2px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- STATUS AREA -->
+  <div class="status-area"></div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="h-brand">
+      <div class="h-avatar">ر</div>
+      <div>
+        <div class="h-name">رُقي</div>
+        <div class="h-sub">للمطابخ والديكورات</div>
+      </div>
+    </div>
+    <div class="h-actions">
+      <div class="h-sync off" id="sync-dot" title="حالة الاتصال"></div>
+      <button class="h-icon-btn" onclick="forceSync()" title="تحديث">↻</button>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+
+  <!-- ══ HOME ══ -->
+  <div id="pg-home" class="page active">
+
+    <div class="balance-hero">
+      <div class="bh-label">إجمالي الإيرادات</div>
+      <div class="bh-amount" id="h-rev">0</div>
+      <div class="bh-currency">دينار ليبي</div>
+      <div class="bh-divider"></div>
+      <div class="bh-row">
+        <div class="bh-item">
+          <div class="bh-item-lbl">صافي الربح</div>
+          <div class="bh-item-val green" id="h-profit">0 د.ل</div>
+        </div>
+        <div class="bh-item">
+          <div class="bh-item-lbl">مدفوعات معلقة</div>
+          <div class="bh-item-val amber" id="h-pending">0 د.ل</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-tile">
+        <div class="st-top">
+          <div class="st-ic">📋</div>
+          <div class="st-badge badge-blue" id="h-orders-badge">0</div>
+        </div>
+        <div class="st-val" id="h-orders">0</div>
+        <div class="st-lbl">طلبية إجمالي</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-top">
+          <div class="st-ic">📉</div>
+          <div class="st-badge badge-red">مصروف</div>
+        </div>
+        <div class="st-val" id="h-exp">0</div>
+        <div class="st-lbl">دينار مصروفات</div>
+      </div>
+    </div>
+
+    <div class="sec-hdr">
+      <div class="sec-title">آخر العمليات</div>
+      <div class="sec-link" onclick="goTo('orders')">الكل ←</div>
+    </div>
+
+    <div class="card">
+      <div class="act-list" id="h-activity">
+        <div class="empty-state" style="padding:24px">
+          <div style="font-size:32px;margin-bottom:8px">📭</div>
+          <div style="font-size:13px;color:var(--t2)">لا توجد عمليات بعد</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ ORDERS ══ -->
+  <div id="pg-orders" class="page">
+
+    <div class="filter-chips" id="order-filters">
+      <button class="chip active" onclick="filterOrders('all',this)">الكل</button>
+      <button class="chip" onclick="filterOrders('pending',this)">معلقة ⏳</button>
+      <button class="chip" onclick="filterOrders('partial',this)">جزئية 🔵</button>
+      <button class="chip" onclick="filterOrders('paid',this)">مدفوعة ✅</button>
+    </div>
+
+    <div id="orders-list">
+      <div class="empty-state">
+        <div class="empty-ic">📋</div>
+        <div class="empty-title">لا توجد طلبيات</div>
+        <div class="empty-sub">اضغط + لإضافة أول طلبية</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ NEW ORDER ══ -->
+  <div id="pg-new" class="page">
+
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="fsh-ic" style="background:#EEF2FF">👤</div>
+        <div class="fsh-title">بيانات العميل</div>
+      </div>
+      <div class="form-fields">
+        <div class="field"><label>الاسم الكامل *</label><input id="n-name" type="text" placeholder="اسم العميل" autocomplete="name"></div>
+        <div class="field-row">
+          <div class="field"><label>رقم الهاتف *</label><input id="n-phone" type="tel" placeholder="09XX..."></div>
+          <div class="field"><label>العنوان</label><input id="n-addr" type="text" placeholder="الحي"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="fsh-ic" style="background:#FFF7ED">🔧</div>
+        <div class="fsh-title">تفاصيل الطلبية</div>
+      </div>
+      <div class="form-fields">
+        <div class="field"><label>نوع المنتج *</label>
+          <select id="n-type">
+            <option>مطبخ</option><option>غرفة نوم</option><option>ديكور وأثاث</option><option>دولاب ملابس</option><option>أخرى</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>الواجهة</label><input id="n-facade" type="text" placeholder="MDF / لاكيه"></div>
+          <div class="field"><label>الهيكل</label><input id="n-frame" type="text" placeholder="النوع"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>ارتفاع الدواليب</label><input id="n-height" type="text" placeholder="90 سم"></div>
+          <div class="field"><label>تاريخ التسليم</label><input id="n-date" type="date"></div>
+        </div>
+        <div class="field"><label>الاكسسوارات</label><input id="n-acc" type="text" placeholder="مقبض، سكة، سيكلو..."></div>
+        <div class="field"><label>ملاحظات</label><textarea id="n-notes" placeholder="أي تفاصيل إضافية..."></textarea></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="fsh-ic" style="background:#F0FDF4">💰</div>
+        <div class="fsh-title">المعلومات المالية</div>
+      </div>
+      <div class="form-fields">
+        <div class="field-row">
+          <div class="field"><label>قيمة العقد (د.ل) *</label><input id="n-total" type="number" inputmode="decimal" placeholder="0" oninput="calcRem()"></div>
+          <div class="field"><label>الدفعة الأولى (د.ل)</label><input id="n-dep" type="number" inputmode="decimal" placeholder="0" oninput="calcRem()"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>طريقة الدفع</label>
+            <select id="n-pay"><option>كاش</option><option>تحويل بنكي</option><option>دفعات</option></select>
+          </div>
+          <div class="field"><label>المتبقي (د.ل)</label><input id="n-rem" type="number" readonly placeholder="0"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="big-btn big-btn-gold" onclick="saveOrder()">✅ حفظ الطلبية</button>
+    <button class="big-btn big-btn-outline" onclick="clearForm()">🗑 مسح الحقول</button>
+
+  </div>
+
+  <!-- ══ EXPENSES ══ -->
+  <div id="pg-exp" class="page">
+
+    <div class="card card-pad" style="background:var(--dark)">
+      <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px">إجمالي المصروفات</div>
+      <div style="font-size:30px;font-weight:800;color:#F87171" id="exp-total">0 د.ل</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="fsh-ic" style="background:#FEF2F2">➕</div>
+        <div class="fsh-title">تسجيل مصروف جديد</div>
+      </div>
+      <div class="form-fields">
+        <div class="field"><label>البند / الوصف *</label><input id="e-name" type="text" placeholder="مثال: خشب MDF"></div>
+        <div class="field-row">
+          <div class="field"><label>الفئة</label>
+            <select id="e-cat"><option>مواد خام</option><option>رواتب</option><option>تشغيل</option><option>نقل</option><option>أخرى</option></select>
+          </div>
+          <div class="field"><label>المبلغ (د.ل) *</label><input id="e-amount" type="number" inputmode="decimal" placeholder="0"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>التاريخ</label><input id="e-date" type="date"></div>
+          <div class="field"><label>ملاحظة</label><input id="e-note" type="text" placeholder="اختياري"></div>
+        </div>
+        <button class="big-btn big-btn-gold" style="margin-top:4px" onclick="saveExp()">✅ حفظ المصروف</button>
+      </div>
+    </div>
+
+    <div class="sec-hdr"><div class="sec-title">سجل المصروفات</div></div>
+    <div class="card" id="exp-list">
+      <div class="empty-state" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">💸</div>
+        <div style="font-size:13px;color:var(--t2)">لا توجد مصروفات بعد</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-home" onclick="goTo('home')">
+      <div class="n-ic">🏠</div>
+      <div class="n-lbl">الرئيسية</div>
+    </button>
+    <button class="nav-btn" id="nav-orders" onclick="goTo('orders')">
+      <div class="n-ic">📋</div>
+      <div class="n-lbl">الطلبيات</div>
+    </button>
+    <button class="nav-btn" id="nav-new" onclick="goTo('new')">
+      <div class="nav-fab">＋</div>
+      <div class="n-lbl" style="color:var(--gold-l);font-size:10px">جديد</div>
+    </button>
+    <button class="nav-btn" id="nav-exp" onclick="goTo('exp')">
+      <div class="n-ic">💸</div>
+      <div class="n-lbl">مصروفات</div>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- EDIT SHEET -->
+<div class="sheet-overlay" id="edit-sheet" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">
+      تعديل الطلبية
+      <button class="sheet-close" onclick="closeSheet()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="field"><label>المبلغ المدفوع (د.ل)</label><input id="es-paid" type="number" inputmode="decimal"></div>
+      <div class="field"><label>الحالة</label>
+        <select id="es-status">
+          <option value="paid">مدفوعة كامل ✅</option>
+          <option value="partial">دفعة جزئية 🔵</option>
+          <option value="pending">لم يُدفع ⏳</option>
+          <option value="cancel">ملغية ❌</option>
+        </select>
+      </div>
+      <div class="field"><label>ملاحظة</label><input id="es-note" type="text" placeholder="اختياري"></div>
+      <button class="big-btn big-btn-gold" onclick="saveEdit()">✅ حفظ التعديل</button>
+      <button class="big-btn" style="background:var(--red-bg);color:var(--red);border:none;margin-bottom:16px" onclick="deleteOrder()">🗑 حذف الطلبية</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL MODAL -->
+<div class="install-overlay" id="install-overlay" onclick="if(event.target===this)dismissInstall()">
+  <div class="install-modal">
+    <div class="im-handle"></div>
+    <div class="im-body">
+      <div class="im-logo">ر</div>
+      <div class="im-title">ثبّت تطبيق رُقي</div>
+      <div class="im-sub">أضف التطبيق على شاشتك الرئيسية للوصول الفوري — يعمل حتى بدون إنترنت</div>
+      <div class="im-feats">
+        <div class="im-feat"><div class="im-feat-ic">⚡</div><div class="im-feat-txt">وصول فوري بدون متصفح</div></div>
+        <div class="im-feat"><div class="im-feat-ic">📶</div><div class="im-feat-txt">يعمل أوف لاين</div></div>
+        <div class="im-feat"><div class="im-feat-ic">🔄</div><div class="im-feat-txt">مزامنة تلقائية</div></div>
+        <div class="im-feat"><div class="im-feat-ic">🖨️</div><div class="im-feat-txt">طباعة العقود</div></div>
+      </div>
+      <!-- iOS steps -->
+      <div class="im-ios" id="im-ios">
+        <div class="im-ios-title">⬇️ طريقة التثبيت على iPhone / iPad</div>
+        <div class="im-ios-step"><div class="im-ios-num">1</div><span>اضغط زر المشاركة <strong>□↑</strong> في أسفل Safari</span></div>
+        <div class="im-ios-step"><div class="im-ios-num">2</div><span>اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong></span></div>
+        <div class="im-ios-step"><div class="im-ios-num">3</div><span>اضغط <strong>"إضافة"</strong> في أعلى الشاشة</span></div>
+      </div>
+      <button class="big-btn big-btn-gold" id="im-install-btn">📲 تثبيت الآن</button>
+      <button class="big-btn big-btn-outline" onclick="dismissInstall()">ليس الآن</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+// ══ STATE ══
+const db = new RuqiDB();
+let orders = [], expenses = [], editId = null;
+
+// ══ UTILS ══
+const fmt = n => Math.round(n||0).toLocaleString('ar-LY');
+const today = () => new Date().toISOString().slice(0,10);
+function toast(msg, dur=2600) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+function setSync(s) {
+  const d = document.getElementById('sync-dot');
+  d.className = 'h-sync ' + s;
+}
+
+// ══ SW ══
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ══ NAVIGATION ══
+function goTo(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pg-' + id).classList.add('active');
+  const nb = document.getElementById('nav-' + id);
+  if (nb) nb.classList.add('active');
+  if (id === 'home') renderHome();
+  if (id === 'orders') renderOrders('all');
+  if (id === 'exp') renderExp();
+  // scroll to top
+  document.getElementById('pg-' + id).scrollTop = 0;
+  // set date defaults for forms
+  if (id === 'new') { document.getElementById('n-date').value = today(); }
+  if (id === 'exp') { document.getElementById('e-date').value = today(); }
+}
+
+// ══ LOAD DATA ══
+async function loadAll() {
+  orders = await db.getOrders();
+  expenses = await db.getExpenses();
+  renderHome(); renderOrders('all'); renderExp();
+}
+
+db.onOrdersChange(d => { orders = d; setSync('on'); renderHome(); renderOrders('all'); });
+db.onExpensesChange(d => { expenses = d; renderExp(); renderHome(); });
+window.addEventListener('online',  () => { setSync('on'); toast('✅ متصل بالإنترنت'); loadAll(); });
+window.addEventListener('offline', () => { setSync('off'); toast('⚠️ أوف لاين — البيانات محلية'); });
+setSync(navigator.onLine ? 'on' : 'off');
+function forceSync() { loadAll(); toast('🔄 جاري التحديث...'); }
+
+// ══ HOME ══
+function renderHome() {
+  const rev   = orders.reduce((s,o) => s + o.total, 0);
+  const paid  = orders.reduce((s,o) => s + o.paid, 0);
+  const exp   = expenses.reduce((s,e) => s + e.amount, 0);
+  const pend  = rev - paid;
+  const profit = rev - exp;
+
+  document.getElementById('h-rev').textContent = fmt(rev);
+  document.getElementById('h-profit').textContent = fmt(profit) + ' د.ل';
+  document.getElementById('h-profit').style.color = profit >= 0 ? '#4ADE80' : '#F87171';
+  document.getElementById('h-pending').textContent = fmt(pend) + ' د.ل';
+  document.getElementById('h-orders').textContent = orders.length;
+  document.getElementById('h-orders-badge').textContent = orders.filter(o=>o.status==='paid').length + '✓';
+  document.getElementById('h-exp').textContent = fmt(exp);
+
+  // Activity
+  const all = [
+    ...orders.map(o  => ({ name: o.name,  sub: o.type,  amt: '+'+fmt(o.total), color:'#4ADE80', ic:'📋', icBg:'#E8F7EE', d: o.dateAdded||'' })),
+    ...expenses.map(e => ({ name: e.name,  sub: e.cat,   amt: '-'+fmt(e.amount), color:'#F87171', ic:'💸', icBg:'#FDECEA', d: e.dateAdded||'' }))
+  ].sort((a,b) => new Date(b.d) - new Date(a.d)).slice(0,6);
+
+  const el = document.getElementById('h-activity');
+  if (!all.length) { el.innerHTML = '<div class="empty-state" style="padding:24px"><div style="font-size:32px;margin-bottom:8px">📭</div><div style="font-size:13px;color:var(--t2)">لا توجد عمليات بعد</div></div>'; return; }
+  el.innerHTML = all.map(a => `
+    <div class="act-row">
+      <div class="act-ic-wrap" style="background:${a.icBg}">${a.ic}</div>
+      <div class="act-body">
+        <div class="act-name">${a.name}</div>
+        <div class="act-sub">${a.sub}</div>
+      </div>
+      <div class="act-right">
+        <div class="act-amt" style="color:${a.color}">${a.amt}</div>
+        <div class="act-date">${(a.d||'').slice(0,10)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ══ ORDERS ══
+function renderOrders(filter) {
+  const statusColor = { paid:'paid', partial:'partial', pending:'pending', cancel:'cancel' };
+  const statusLabel = { paid:'مدفوعة', partial:'جزئية', pending:'معلقة', cancel:'ملغية' };
+  const pillCls    = { paid:'pill-paid', partial:'pill-partial', pending:'pill-pending', cancel:'pill-cancel' };
+  let data = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+  data = [...data].reverse();
+  const el = document.getElementById('orders-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-ic">📋</div><div class="empty-title">لا توجد طلبيات</div><div class="empty-sub">اضغط + لإضافة طلبية</div></div>';
+    return;
+  }
+  el.innerHTML = data.map(o => `
+    <div class="order-card">
+      <div class="oc-stripe ${statusColor[o.status]||'pending'}"></div>
+      <div class="oc-body">
+        <div class="oc-top">
+          <div>
+            <div class="oc-name">${o.name}</div>
+            <div class="oc-num">#${String(o.orderNum||'').padStart(3,'0')} · ${o.date||''}</div>
+          </div>
+          <span class="status-pill ${pillCls[o.status]||'pill-pending'}">${statusLabel[o.status]||''}</span>
+        </div>
+        <div class="oc-type">${o.type}${o.facade?' · '+o.facade:''}</div>
+        <div class="oc-money">
+          <div class="oc-money-item">
+            <div class="oc-m-lbl">العقد</div>
+            <div class="oc-m-val">${fmt(o.total)}</div>
+          </div>
+          <div class="oc-money-item">
+            <div class="oc-m-lbl">المدفوع</div>
+            <div class="oc-m-val" style="color:var(--green)">${fmt(o.paid)}</div>
+          </div>
+          <div class="oc-money-item">
+            <div class="oc-m-lbl">المتبقي</div>
+            <div class="oc-m-val" style="color:${o.total-o.paid>0?'var(--amber)':'var(--t3)'}">${fmt(o.total-o.paid)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="oc-actions">
+        <button class="oc-btn oc-btn-edit" onclick="openEdit('${o.id}')">✏️ تعديل</button>
+        <button class="oc-btn oc-btn-print" onclick="printOrder('${o.id}')">🖨️ طباعة</button>
+        ${o.phone ? `<a class="oc-btn oc-btn-call" href="tel:${o.phone}" style="text-decoration:none">📞 اتصال</a>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function filterOrders(f, btn) {
+  document.querySelectorAll('#order-filters .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrders(f);
+}
+
+// ══ NEW ORDER ══
+function calcRem() {
+  const t = parseFloat(document.getElementById('n-total').value) || 0;
+  const d = parseFloat(document.getElementById('n-dep').value)   || 0;
+  document.getElementById('n-rem').value = Math.max(t - d, 0);
+}
+
+async function saveOrder() {
+  const name  = document.getElementById('n-name').value.trim();
+  const total = parseFloat(document.getElementById('n-total').value) || 0;
+  if (!name)  { toast('⚠️ أدخل اسم العميل'); return; }
+  if (!total) { toast('⚠️ أدخل قيمة العقد'); return; }
+  const dep    = parseFloat(document.getElementById('n-dep').value) || 0;
+  const status = dep >= total ? 'paid' : dep > 0 ? 'partial' : 'pending';
+  const num    = db.nextOrderNum();
+  const order  = {
+    id: db.newId(), orderNum: num,
+    name, phone: document.getElementById('n-phone').value,
+    addr:   document.getElementById('n-addr').value,
+    type:   document.getElementById('n-type').value,
+    facade: document.getElementById('n-facade').value,
+    frame:  document.getElementById('n-frame').value,
+    height: document.getElementById('n-height').value,
+    acc:    document.getElementById('n-acc').value,
+    notes:  document.getElementById('n-notes').value,
+    total, paid: dep, remaining: Math.max(total - dep, 0), status,
+    pay:  document.getElementById('n-pay').value,
+    date: document.getElementById('n-date').value || today(),
+    dateAdded: new Date().toISOString()
+  };
+  try {
+    await db.saveOrder(order);
+    orders.push(order);
+    toast('✅ تم حفظ الطلبية #' + String(num).padStart(3,'0'));
+    // Ask to print
+    if (confirm('هل تريد طباعة العقد الآن؟')) printOrder(order.id);
+    clearForm();
+    goTo('orders');
+  } catch(e) { toast('❌ خطأ في الحفظ'); }
+}
+
+function clearForm() {
+  ['n-name','n-phone','n-addr','n-facade','n-frame','n-height','n-acc','n-date','n-notes','n-total','n-dep','n-rem']
+    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('n-date').value = today();
+}
+
+// ══ PRINT ══
+function printOrder(id) {
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+  localStorage.setItem('ruqi_print_order', JSON.stringify(o));
+  window.open('print-order.html?id=' + id, '_blank');
+}
+
+// ══ EDIT SHEET ══
+function openEdit(id) {
+  editId = id;
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+  document.getElementById('es-paid').value   = o.paid;
+  document.getElementById('es-status').value = o.status;
+  document.getElementById('es-note').value   = o.notes || '';
+  document.getElementById('edit-sheet').classList.add('open');
+}
+function closeSheet() { document.getElementById('edit-sheet').classList.remove('open'); editId = null; }
+async function saveEdit() {
+  const o = orders.find(o => o.id === editId);
+  if (!o) return;
+  o.paid      = parseFloat(document.getElementById('es-paid').value) || o.paid;
+  o.remaining = o.total - o.paid;
+  o.status    = document.getElementById('es-status').value;
+  o.notes     = document.getElementById('es-note').value;
+  await db.saveOrder(o);
+  closeSheet(); renderOrders('all'); renderHome();
+  toast('✅ تم تحديث الطلبية');
+}
+async function deleteOrder() {
+  if (!confirm('حذف هذه الطلبية نهائياً؟')) return;
+  await db.deleteOrder(editId);
+  orders = orders.filter(o => o.id !== editId);
+  closeSheet(); renderOrders('all'); renderHome();
+  toast('🗑 تم الحذف');
+}
+
+// ══ EXPENSES ══
+function renderExp() {
+  const total = expenses.reduce((s,e) => s + e.amount, 0);
+  document.getElementById('exp-total').textContent = fmt(total) + ' د.ل';
+  const catIc = { 'مواد خام':'📦','رواتب':'👷','تشغيل':'⚡','نقل':'🚚','أخرى':'📎' };
+  const catBg = { 'مواد خام':'#FEF3E2','رواتب':'#E8F7EE','تشغيل':'#EEF2FF','نقل':'#FDF2F8','أخرى':'#F9F7F4' };
+  const el = document.getElementById('exp-list');
+  if (!expenses.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:24px"><div style="font-size:32px;margin-bottom:8px">💸</div><div style="font-size:13px;color:var(--t2)">لا توجد مصروفات بعد</div></div>';
+    return;
+  }
+  el.innerHTML = [...expenses].reverse().slice(0,30).map(e => `
+    <div class="exp-item">
+      <div class="exp-ic" style="background:${catBg[e.cat]||'#F9F7F4'}">${catIc[e.cat]||'📎'}</div>
+      <div class="exp-body">
+        <div class="exp-name">${e.name}</div>
+        <div class="exp-meta">${e.cat} · ${e.date||''}</div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-amt">${fmt(e.amount)} د.ل</div>
+        <div class="exp-del" onclick="delExp('${e.id}')">🗑 حذف</div>
+      </div>
+    </div>`).join('');
+}
+
+async function saveExp() {
+  const name   = document.getElementById('e-name').value.trim();
+  const amount = parseFloat(document.getElementById('e-amount').value) || 0;
+  if (!name)   { toast('⚠️ أدخل اسم البند'); return; }
+  if (!amount) { toast('⚠️ أدخل المبلغ'); return; }
+  const exp = {
+    id: db.newId(), name,
+    cat:    document.getElementById('e-cat').value,
+    amount, date: document.getElementById('e-date').value || today(),
+    note:   document.getElementById('e-note').value,
+    dateAdded: new Date().toISOString()
+  };
+  await db.saveExpense(exp); expenses.push(exp);
+  ['e-name','e-amount','e-date','e-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('e-date').value = today();
+  renderExp(); renderHome(); toast('✅ تم تسجيل المصروف');
+}
+
+async function delExp(id) {
+  if (!confirm('حذف هذا المصروف؟')) return;
+  await db.deleteExpense(id);
+  expenses = expenses.filter(e => e.id !== id);
+  renderExp(); renderHome(); toast('🗑 تم الحذف');
+}
+
+// ══ INSTALL PWA ══
+let deferredPrompt = null;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+function showInstallModal() {
+  if (isStandalone) return;
+  const last = parseInt(localStorage.getItem('ruqi_install_dismissed') || '0');
+  if (last && (Date.now() - last) < 3 * 86400000) return; // 3 days
+  if (isIOS) document.getElementById('im-ios').classList.add('show');
+  document.getElementById('install-overlay').classList.add('show');
+}
+function dismissInstall() {
+  document.getElementById('install-overlay').classList.remove('show');
+  localStorage.setItem('ruqi_install_dismissed', Date.now());
+}
+async function triggerInstall() {
+  if (!deferredPrompt) { dismissInstall(); return; }
+  deferredPrompt.prompt();
+  const r = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  dismissInstall();
+  if (r.outcome === 'accepted') toast('🎉 تم تثبيت رُقي بنجاح!');
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  setTimeout(showInstallModal, 2000);
+});
+window.addEventListener('appinstalled', () => { toast('🎉 تم التثبيت!'); dismissInstall(); });
+document.getElementById('im-install-btn').addEventListener('click', triggerInstall);
+if (isIOS && !isStandalone) setTimeout(showInstallModal, 2000);
+
+// ══ INIT ══
+document.getElementById('n-date').value = today();
+document.getElementById('e-date').value = today();
+loadAll();
+</script>
+</body>
+</html>
