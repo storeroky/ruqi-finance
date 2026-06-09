@@ -1,0 +1,40 @@
+{
+  "name": "رُقي — إدارة الطلبيات",
+  "short_name": "رُقي",
+  "description": "منظومة رُقي المالية للمطابخ والديكورات",
+  "start_url": "./mobile.html",
+  "display": "standalone",
+  "background_color": "#16182a",
+  "theme_color": "#B8860B",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["business", "finance"],
+  "shortcuts": [
+    {
+      "name": "طلبية جديدة",
+      "url": "./mobile.html#new",
+      "description": "أضف طلبية جديدة مباشرة"
+    },
+    {
+      "name": "مصروف جديد",
+      "url": "./mobile.html#expense",
+      "description": "سجّل مصروف جديد"
+    }
+  ]
+}
