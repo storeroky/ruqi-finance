@@ -1,527 +1,206 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>عقد رُقي</title>
+<title>عقد رُقي — طباعة</title>
 <style>
-@page {
-  size: A4;
-  margin: 18mm 20mm 18mm 20mm;
-}
+@page { size:A4; margin:16mm 18mm; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1a1a1a;direction:rtl;background:#fff;font-size:13px;line-height:1.5}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* PRINT ACTIONS */
+.print-actions{position:fixed;top:14px;left:14px;display:flex;gap:7px;z-index:999}
+.btn-p{background:#B8860B;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
+.btn-p:hover{background:#D4A017}
+.btn-c{background:#fff;color:#555;border:1px solid #ccc;padding:9px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit}
+@media print{.print-actions{display:none!important}}
 
-body {
-  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-  color: #1a1a1a;
-  direction: rtl;
-  background: #fff;
-  font-size: 13px;
-  line-height: 1.5;
-}
+/* COPY DIVIDER */
+.copy-break{page-break-before:always}
+.copy-label{text-align:center;font-size:11px;font-weight:700;color:#fff;background:#16182a;padding:5px 0;margin-bottom:14px;border-radius:5px;letter-spacing:.1em}
+.copy-label.factory{background:#3b1f6b}
 
-/* ═══════════════════════════════
-   HEADER
-═══════════════════════════════ */
-.contract-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding-bottom: 16px;
-  border-bottom: 3px solid #B8860B;
-  margin-bottom: 20px;
-}
+/* HEADER */
+.contract-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:3px solid #B8860B;margin-bottom:18px}
+.brand-name{font-size:30px;font-weight:900;color:#B8860B;letter-spacing:-1px;line-height:1;font-family:Georgia,serif}
+.brand-sub{font-size:11px;color:#888;margin-top:2px}
+.brand-contact{font-size:10px;color:#555;margin-top:7px;line-height:1.8}
+.contract-meta{text-align:left;background:#faf8f0;border:1px solid #e0d8c0;border-radius:9px;padding:11px 14px;min-width:175px}
+.meta-row{display:flex;justify-content:space-between;gap:12px;font-size:11px;margin-bottom:4px}
+.meta-row:last-child{margin-bottom:0}
+.meta-key{color:#888}
+.meta-val{font-weight:700;color:#1a1a1a}
+.contract-num{font-size:18px;font-weight:800;color:#B8860B;text-align:center;margin-bottom:7px}
 
-.brand-block {}
-.brand-name {
-  font-size: 32px;
-  font-weight: 900;
-  color: #B8860B;
-  letter-spacing: -1px;
-  line-height: 1;
-  font-family: Georgia, serif;
-}
-.brand-sub {
-  font-size: 12px;
-  color: #888;
-  margin-top: 3px;
-}
-.brand-contact {
-  font-size: 11px;
-  color: #555;
-  margin-top: 8px;
-  line-height: 1.8;
-}
+/* SECTION TITLE */
+.sec-t{font-size:11px;font-weight:700;color:#B8860B;letter-spacing:.07em;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.sec-t::after{content:'';flex:1;height:1px;background:#e0d8c0}
 
-.contract-meta {
-  text-align: left;
-  background: #faf8f0;
-  border: 1px solid #e0d8c0;
-  border-radius: 10px;
-  padding: 12px 16px;
-  min-width: 190px;
-}
-.meta-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-.meta-row:last-child { margin-bottom: 0; }
-.meta-key { color: #888; }
-.meta-val { font-weight: 700; color: #1a1a1a; }
-.contract-num { font-size: 20px; font-weight: 800; color: #B8860B; }
+/* INFO GRID */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;margin-bottom:16px;background:#faf8f0;border:1px solid #e0d8c0;border-radius:9px;padding:12px 14px}
+.ik{font-size:9px;color:#888;font-weight:600;letter-spacing:.03em;margin-bottom:1px}
+.iv{font-size:12px;font-weight:600;color:#1a1a1a}
+.full{grid-column:1/-1}
+.hl .iv{color:#B8860B;font-size:13px;font-weight:700}
 
-/* ═══════════════════════════════
-   SECTION TITLE
-═══════════════════════════════ */
-.section-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #B8860B;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e0d8c0;
-}
+/* FIN TABLE */
+.fin-table{width:100%;border-collapse:collapse;margin-bottom:16px;border-radius:9px;overflow:hidden;border:1px solid #e0d8c0}
+.fin-table th{background:#16182a;color:#fff;padding:9px 12px;text-align:right;font-size:11px;font-weight:600}
+.fin-table td{padding:9px 12px;border-bottom:1px solid #f0ebe0;font-size:12px;vertical-align:middle}
+.fin-table tr:last-child td{border-bottom:none}
+.fin-table tr:nth-child(even) td{background:#faf8f0}
+.row-total td{background:#B8860B!important;color:#fff;font-weight:700;font-size:13px}
+.row-paid td{background:#dcfce7!important;color:#15803d;font-weight:700}
+.row-rem td{background:#fff8f0!important;color:#c2410c;font-weight:700}
 
-/* ═══════════════════════════════
-   INFO GRID
-═══════════════════════════════ */
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 20px;
-  margin-bottom: 20px;
-  background: #faf8f0;
-  border: 1px solid #e0d8c0;
-  border-radius: 10px;
-  padding: 14px 16px;
-}
-.info-item {}
-.info-key { font-size: 10px; color: #888; font-weight: 600; letter-spacing: .03em; margin-bottom: 2px; }
-.info-val { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-.info-item.full { grid-column: 1/-1; }
-.info-item.highlighted .info-val { color: #B8860B; font-size: 14px; font-weight: 700; }
+/* STATUS */
+.status-badge{display:inline-block;padding:4px 12px;border-radius:18px;font-size:11px;font-weight:700}
+.s-paid{background:#dcfce7;color:#15803d}.s-partial{background:#dbeafe;color:#1e40af}
+.s-pending{background:#fef3c7;color:#92400e}.s-cancel{background:#fee2e2;color:#991b1b}
 
-/* ═══════════════════════════════
-   FINANCIAL TABLE
-═══════════════════════════════ */
-.fin-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #e0d8c0;
-}
-.fin-table th {
-  background: #16182a;
-  color: #fff;
-  padding: 10px 14px;
-  text-align: right;
-  font-size: 12px;
-  font-weight: 600;
-}
-.fin-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #f0ebe0;
-  font-size: 13px;
-  vertical-align: middle;
-}
-.fin-table tr:last-child td { border-bottom: none; }
-.fin-table tr:nth-child(even) td { background: #faf8f0; }
-.fin-table .row-total td {
-  background: #B8860B !important;
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-}
-.fin-table .row-paid td {
-  background: #dcfce7 !important;
-  color: #15803d;
-  font-weight: 700;
-}
-.fin-table .row-remaining td {
-  background: #fff8f0 !important;
-  color: #c2410c;
-  font-weight: 700;
-}
+/* NOTES */
+.notes-box{background:#fef9ee;border:1px solid #f5d78e;border-radius:9px;padding:10px 12px;margin-bottom:18px;font-size:11px;color:#555;line-height:1.7}
 
-/* ═══════════════════════════════
-   STATUS BADGE
-═══════════════════════════════ */
-.status-badge {
-  display: inline-block;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-}
-.status-paid     { background: #dcfce7; color: #15803d; }
-.status-partial  { background: #dbeafe; color: #1e40af; }
-.status-pending  { background: #fef3c7; color: #92400e; }
-.status-cancel   { background: #fee2e2; color: #991b1b; }
+/* SIGNATURE */
+.sig-area{margin-top:22px;page-break-inside:avoid}
+.sig-t{font-size:11px;font-weight:700;color:#B8860B;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sig-t::after{content:'';flex:1;height:1px;background:#e0d8c0}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.sig-box{border:1.5px dashed #ccc;border-radius:9px;padding:12px 12px 10px;min-height:84px;display:flex;flex-direction:column;background:#fafaf8}
+.sig-box-lbl{font-size:10px;font-weight:700;color:#888;letter-spacing:.05em;margin-bottom:6px}
+.sig-line{border-bottom:1.5px solid #ccc;margin:18px 0 5px}
+.sig-name{font-size:9px;color:#aaa;text-align:center}
+.sig-clause{background:#fef9ee;border:1px solid #f5d78e;border-radius:7px;padding:9px 12px;margin-bottom:14px;font-size:10px;color:#7a5a08;line-height:1.8}
 
-/* ═══════════════════════════════
-   NOTES
-═══════════════════════════════ */
-.notes-box {
-  background: #fef9ee;
-  border: 1px solid #f5d78e;
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 24px;
-  font-size: 12px;
-  color: #555;
-  line-height: 1.7;
-}
 
-/* ═══════════════════════════════
-   SIGNATURE AREA — PAGE 1 FOOTER
-═══════════════════════════════ */
-.signature-area {
-  margin-top: 28px;
-  page-break-inside: avoid;
-}
+/* FOOTER */
+.page-footer{margin-top:16px;padding-top:10px;border-top:2px solid #B8860B;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#aaa}
+.pf-brand{color:#B8860B;font-weight:700;font-size:11px}
 
-.sig-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #B8860B;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.sig-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e0d8c0;
-}
-
-.sig-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
-}
-
-.sig-box {
-  border: 1.5px dashed #ccc;
-  border-radius: 10px;
-  padding: 14px 14px 12px;
-  min-height: 90px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: #fafaf8;
-}
-
-.sig-box-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: #888;
-  letter-spacing: .05em;
-  margin-bottom: 8px;
-}
-
-.sig-line {
-  border-bottom: 1.5px solid #ccc;
-  margin: 20px 0 6px;
-}
-
-.sig-name-field {
-  font-size: 10px;
-  color: #aaa;
-  text-align: center;
-}
-
-/* ═══════════════════════════════
-   FOOTER STRIP
-═══════════════════════════════ */
-.page-footer {
-  margin-top: 20px;
-  padding-top: 12px;
-  border-top: 2px solid #B8860B;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 10px;
-  color: #aaa;
-}
-.page-footer .brand { color: #B8860B; font-weight: 700; font-size: 12px; }
-
-/* ═══════════════════════════════
-   PRINT BUTTON
-═══════════════════════════════ */
-.print-actions {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  display: flex;
-  gap: 8px;
-  z-index: 999;
-}
-.btn-print {
-  background: #B8860B;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-}
-.btn-print:hover { background: #D4A017; }
-.btn-close {
-  background: #fff;
-  color: #555;
-  border: 1px solid #ccc;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: inherit;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-@media print {
-  .print-actions { display: none !important; }
-  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .contract-header { page-break-after: avoid; }
-  .signature-area { page-break-inside: avoid; }
-}
-
-/* ═══════════════════════════════
-   WATERMARK for cancelled
-═══════════════════════════════ */
-.watermark {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%) rotate(-35deg);
-  font-size: 90px;
-  font-weight: 900;
-  color: rgba(220,38,38,.07);
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 0;
-  font-family: Georgia, serif;
-}
+/* WATERMARK */
+.watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:80px;font-weight:900;color:rgba(220,38,38,.06);pointer-events:none;z-index:0;font-family:Georgia,serif}
 </style>
 </head>
 <body>
 
 <div class="print-actions">
-  <button class="btn-print" onclick="window.print()">🖨️ طباعة العقد</button>
-  <button class="btn-close" onclick="window.close()">✕ إغلاق</button>
+  <button class="btn-p" onclick="window.print()">🖨️ طباعة النسختين</button>
+  <button class="btn-c" onclick="window.close()">✕ إغلاق</button>
 </div>
 
 <div id="watermark" class="watermark" style="display:none">ملغي</div>
-
 <div id="contract"></div>
 
 <script>
-const MONTHS_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const MA=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const fmt=n=>Math.round(n||0).toLocaleString('ar-LY')+' د.ل';
+function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'})}catch{return d}}
+const siMap={paid:{label:'مدفوعة بالكامل ✅',cls:'s-paid'},partial:{label:'دفعة جزئية 🔵',cls:'s-partial'},pending:{label:'لم يُدفع بعد ⏳',cls:'s-pending'},cancel:{label:'ملغية ❌',cls:'s-cancel'}};
 
-function fmt(n){ return Math.round(n||0).toLocaleString('ar-LY') + ' د.ل'; }
+function buildCopy(o, copyType) {
+  const si = siMap[o.status] || {label:o.status,cls:''};
+  const remaining = (o.total||0)-(o.paid||0);
+  const printDate = new Date().toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'});
+  const isClient = copyType === 'client';
 
-function statusInfo(s){
-  const m = {
-    paid:    { label:'مدفوعة بالكامل ✅', cls:'status-paid' },
-    partial: { label:'دفعة جزئية 🔵',     cls:'status-partial' },
-    pending: { label:'لم يُدفع بعد ⏳',    cls:'status-pending' },
-    cancel:  { label:'ملغية ❌',           cls:'status-cancel' }
-  };
-  return m[s] || { label: s, cls: '' };
+  return `
+  <div class="copy-label ${isClient?'':'factory'}">${isClient?'📋 نسخة العميل':'🏭 نسخة المصنع'}</div>
+
+  <div class="contract-header">
+    <div>
+      <div class="brand-name">رُقي</div>
+      <div class="brand-sub">للمطابخ والديكورات</div>
+      <div class="brand-contact">📞 هاتف المحل<br>📍 عنوان المحل</div>
+    </div>
+    <div class="contract-meta">
+      <div class="contract-num">#${String(o.orderNum||'').padStart(3,'0')}</div>
+      <div class="meta-row"><span class="meta-key">تاريخ الإصدار</span><span class="meta-val">${printDate}</span></div>
+      <div class="meta-row"><span class="meta-key">تاريخ التسليم</span><span class="meta-val">${fmtDate(o.date)}</span></div>
+      <div class="meta-row"><span class="meta-key">طريقة الدفع</span><span class="meta-val">${o.pay||'—'}</span></div>
+      <div style="text-align:center;margin-top:7px"><span class="status-badge ${si.cls}">${si.label}</span></div>
+    </div>
+  </div>
+
+  <div class="sec-t">👤 بيانات العميل</div>
+  <div class="info-grid">
+    <div class="hl"><div class="ik">اسم العميل</div><div class="iv">${o.name||'—'}</div></div>
+    <div><div class="ik">رقم الهاتف</div><div class="iv">${o.phone||'—'}</div></div>
+    <div class="full"><div class="ik">العنوان</div><div class="iv">${o.addr||'—'}</div></div>
+  </div>
+
+  <div class="sec-t">🔧 تفاصيل الطلبية</div>
+  <div class="info-grid">
+    <div><div class="ik">نوع المنتج</div><div class="iv">${o.type||'—'}</div></div>
+    <div><div class="ik">نوع الواجهة</div><div class="iv">${o.facade||'—'}</div></div>
+    <div><div class="ik">نوع الهيكل</div><div class="iv">${o.frame||'—'}</div></div>
+    <div><div class="ik">ارتفاع الدواليب</div><div class="iv">${o.height||'—'}</div></div>
+    ${o.acc?`<div class="full"><div class="ik">الاكسسوارات</div><div class="iv">${o.acc}</div></div>`:''}
+  </div>
+
+  <div class="sec-t">💰 التفاصيل المالية</div>
+  <table class="fin-table">
+    <thead><tr><th style="width:50%">البند</th><th style="width:25%;text-align:center">المبلغ</th><th>ملاحظة</th></tr></thead>
+    <tbody>
+      <tr class="row-total"><td><strong>قيمة العقد</strong></td><td style="text-align:center;font-size:14px"><strong>${fmt(o.total)}</strong></td><td></td></tr>
+      <tr class="row-paid"><td>المبلغ المدفوع</td><td style="text-align:center">${fmt(o.paid)}</td><td style="font-size:10px;color:#15803d">تم الاستلام ✓</td></tr>
+      <tr class="row-rem"><td>المبلغ المتبقي</td><td style="text-align:center">${fmt(remaining)}</td><td style="font-size:10px;color:#c2410c">${remaining>0?'يُسدَّد عند التسليم':'مسدَّد بالكامل ✓'}</td></tr>
+    </tbody>
+  </table>
+
+  ${o.notes ? `
+  <div class="sec-t">📝 ملاحظات</div>
+  <div class="notes-box">${o.notes}</div>
+  ` : ''}
+
+  <!-- SIGNATURE -->
+  <div class="sig-area">
+    <div class="sig-t">✍️ ${isClient?'التوقيعات والإقرار':'توقيعات المصنع'}</div>
+    <div class="sig-clause">
+      ${isClient
+        ? 'أقرّ الطرف الثاني باستلام نسخة من هذا العقد والاطلاع على جميع بنوده والموافقة عليها. وتلتزم شركة رُقي بتنفيذ الطلبية وفق المواصفات المذكورة في تاريخ التسليم المحدد.'
+        : 'تُسلَّم هذه النسخة للمصنع للبدء في التصنيع وفق المواصفات المذكورة أعلاه، مع الالتزام بتاريخ التسليم المحدد.'
+      }
+    </div>
+    <div class="sig-grid">
+      <div class="sig-box">
+        <div class="sig-box-lbl">${isClient?'العميل / الطرف الثاني':'مدير المصنع'}</div>
+        ${isClient?`<div style="font-size:12px;font-weight:600">${o.name||'—'}</div>${o.phone?`<div style="font-size:10px;color:#888">${o.phone}</div>`:''}`:''}
+        <div style="flex:1"></div>
+        <div class="sig-line"></div><div class="sig-name">${isClient?'التوقيع':'الاسم والتوقيع'}</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-box-lbl">${isClient?'المندوب / منفذ الطلب':'تاريخ بدء التصنيع'}</div>
+        <div style="flex:1"></div>
+        <div class="sig-line"></div><div class="sig-name">${isClient?'الاسم والتوقيع':'التاريخ والتوقيع'}</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-box-lbl">${isClient?'مدير رُقي':'تاريخ انتهاء التصنيع'}</div>
+        <div style="flex:1"></div>
+        <div class="sig-line"></div><div class="sig-name">${isClient?'التوقيع والختم':'التاريخ والتوقيع'}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div class="pf-brand">رُقي للمطابخ والديكورات</div>
+    <div>عقد #${String(o.orderNum||'').padStart(3,'0')} — ${isClient?'نسخة العميل':'نسخة المصنع'}</div>
+    <div>طُبع: ${printDate}</div>
+  </div>`;
 }
 
-function fmtDate(d) {
-  if (!d) return '—';
-  try {
-    const dt = new Date(d);
-    return dt.toLocaleDateString('ar-LY', { year:'numeric', month:'long', day:'numeric' });
-  } catch { return d; }
+function render(){
+  const raw=localStorage.getItem('ruqi_print_order');
+  if(!raw){document.getElementById('contract').innerHTML='<div style="text-align:center;padding:3rem;color:#999">لم يُعثر على بيانات<br><a href="javascript:history.back()">← رجوع</a></div>';return}
+  const o=JSON.parse(raw);
+  if(o.status==='cancel')document.getElementById('watermark').style.display='block';
+  document.getElementById('contract').innerHTML=
+    buildCopy(o,'client') +
+    `<div class="copy-break"></div>` +
+    buildCopy(o,'factory');
+  document.title=`عقد رُقي #${String(o.orderNum||'').padStart(3,'0')}`;
 }
-
-function render() {
-  const raw = localStorage.getItem('ruqi_print_order');
-  if (!raw) { document.getElementById('contract').innerHTML = '<div style="text-align:center;padding:3rem;color:#999">لم يُعثر على بيانات الطلبية<br><a href="javascript:history.back()">← رجوع</a></div>'; return; }
-  const o = JSON.parse(raw);
-
-  if (o.status === 'cancel') document.getElementById('watermark').style.display = 'block';
-
-  const si = statusInfo(o.status);
-  const remaining = (o.total || 0) - (o.paid || 0);
-  const printDate = new Date().toLocaleDateString('ar-LY', { year:'numeric', month:'long', day:'numeric' });
-
-  document.getElementById('contract').innerHTML = `
-
-    <!-- ══ HEADER ══ -->
-    <div class="contract-header">
-      <div class="brand-block">
-        <div class="brand-name">رُقي</div>
-        <div class="brand-sub">للمطابخ والديكورات</div>
-        <div class="brand-contact">
-          📞 هاتف المحل<br>
-          📍 عنوان المحل<br>
-          🌐 ruqi-finance.web.app
-        </div>
-      </div>
-      <div class="contract-meta">
-        <div style="text-align:center;margin-bottom:8px">
-          <span class="contract-num">#${String(o.orderNum||'').padStart(3,'0')}</span>
-        </div>
-        <div class="meta-row"><span class="meta-key">تاريخ الإصدار</span><span class="meta-val">${printDate}</span></div>
-        <div class="meta-row"><span class="meta-key">تاريخ التسليم</span><span class="meta-val">${fmtDate(o.date)}</span></div>
-        <div class="meta-row"><span class="meta-key">طريقة الدفع</span><span class="meta-val">${o.pay||'—'}</span></div>
-        <div style="text-align:center;margin-top:8px">
-          <span class="status-badge ${si.cls}">${si.label}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ CLIENT INFO ══ -->
-    <div class="section-title">👤 بيانات العميل</div>
-    <div class="info-grid">
-      <div class="info-item highlighted">
-        <div class="info-key">اسم العميل</div>
-        <div class="info-val">${o.name || '—'}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-key">رقم الهاتف</div>
-        <div class="info-val">${o.phone || '—'}</div>
-      </div>
-      <div class="info-item full">
-        <div class="info-key">العنوان</div>
-        <div class="info-val">${o.addr || '—'}</div>
-      </div>
-    </div>
-
-    <!-- ══ ORDER DETAILS ══ -->
-    <div class="section-title">🔧 تفاصيل الطلبية</div>
-    <div class="info-grid">
-      <div class="info-item">
-        <div class="info-key">نوع المنتج</div>
-        <div class="info-val">${o.type || '—'}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-key">نوع الواجهة</div>
-        <div class="info-val">${o.facade || '—'}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-key">نوع الهيكل</div>
-        <div class="info-val">${o.frame || '—'}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-key">ارتفاع الدواليب</div>
-        <div class="info-val">${o.height || '—'}</div>
-      </div>
-      ${o.acc ? `<div class="info-item full"><div class="info-key">الاكسسوارات</div><div class="info-val">${o.acc}</div></div>` : ''}
-    </div>
-
-    <!-- ══ FINANCIAL TABLE ══ -->
-    <div class="section-title">💰 التفاصيل المالية</div>
-    <table class="fin-table">
-      <thead>
-        <tr>
-          <th style="width:50%">البند</th>
-          <th style="width:25%;text-align:center">المبلغ</th>
-          <th style="width:25%">ملاحظة</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="row-total">
-          <td><strong>قيمة العقد الإجمالية</strong></td>
-          <td style="text-align:center;font-size:15px"><strong>${fmt(o.total)}</strong></td>
-          <td></td>
-        </tr>
-        <tr class="row-paid">
-          <td>المبلغ المدفوع</td>
-          <td style="text-align:center">${fmt(o.paid)}</td>
-          <td style="font-size:11px;color:#15803d">تم الاستلام ✓</td>
-        </tr>
-        <tr class="row-remaining">
-          <td>المبلغ المتبقي</td>
-          <td style="text-align:center">${fmt(remaining)}</td>
-          <td style="font-size:11px;color:#c2410c">${remaining > 0 ? 'يُسدَّد عند التسليم' : 'مسدَّد بالكامل ✓'}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- ══ NOTES ══ -->
-    ${o.notes ? `
-    <div class="section-title">📝 ملاحظات</div>
-    <div class="notes-box">${o.notes}</div>
-    ` : ''}
-
-    <!-- ══ SIGNATURE AREA — FIRST PAGE ══ -->
-    <div class="signature-area">
-      <div class="sig-title">✍️ التوقيعات والإقرار</div>
-
-      <div style="background:#fef9ee;border:1px solid #f5d78e;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:#7a5a08;line-height:1.8">
-        أقرّ الطرف الثاني باستلام نسخة من هذا العقد والاطلاع على جميع بنوده والموافقة عليها. 
-        وتلتزم شركة رُقي للمطابخ والديكورات بتنفيذ الطلبية وفق المواصفات المذكورة أعلاه 
-        في التاريخ المحدد للتسليم.
-      </div>
-
-      <div class="sig-grid">
-        <div class="sig-box">
-          <div class="sig-box-label">العميل / الطرف الثاني</div>
-          <div style="font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:4px">${o.name || '—'}</div>
-          ${o.phone ? `<div style="font-size:11px;color:#888">${o.phone}</div>` : ''}
-          <div class="sig-line"></div>
-          <div class="sig-name-field">التوقيع</div>
-        </div>
-
-        <div class="sig-box">
-          <div class="sig-box-label">المندوب / منفذ الطلب</div>
-          <div style="flex:1"></div>
-          <div class="sig-line"></div>
-          <div class="sig-name-field">الاسم والتوقيع</div>
-        </div>
-
-        <div class="sig-box">
-          <div class="sig-box-label">مدير شركة رُقي</div>
-          <div style="flex:1"></div>
-          <div class="sig-line"></div>
-          <div class="sig-name-field">الاسم والتوقيع والختم</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ PAGE FOOTER ══ -->
-    <div class="page-footer">
-      <div class="brand">رُقي للمطابخ والديكورات</div>
-      <div>عقد رقم: #${String(o.orderNum||'').padStart(3,'0')} — تاريخ الطباعة: ${printDate}</div>
-      <div>جميع الحقوق محفوظة © ${new Date().getFullYear()}</div>
-    </div>
-
-  `;
-}
-
 render();
-window.onload = () => {
-  // Auto-print after 800ms for smooth experience
-  setTimeout(() => {
-    if (window.location.search.includes('autoprint=1')) window.print();
-  }, 800);
-};
 </script>
 </body>
 </html>
