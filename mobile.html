@@ -53,25 +53,18 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
 .sync-dot.on{animation:blink 2s infinite}
 .icon-btn{width:33px;height:33px;border-radius:9px;background:rgba(255,255,255,.08);border:none;font-size:17px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center}
 
-/* ══ CONTENT — fills remaining space, scrollable ══ */
-.content{
-  flex:1;
-  overflow:hidden;
-  position:relative;
-}
+/* ══ CONTENT ══ */
+.content{flex:1;overflow:hidden;position:relative;min-height:0}
 
-/* ══ PAGES — each fills content area and scrolls independently ══ */
+/* ══ PAGES ══ */
 .page{
-  position:absolute;
-  inset:0;
-  display:none;
-  flex-direction:column;
-  gap:11px;
-  padding:13px 13px calc(var(--nav-h) + env(safe-area-inset-bottom,0) + 10px);
-  overflow-y:auto;
-  overflow-x:hidden;
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  display:none;flex-direction:column;gap:11px;
+  padding:13px 13px calc(var(--nav-h) + env(safe-area-inset-bottom,0) + 20px);
+  overflow-y:scroll;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
+  overscroll-behavior-y:contain;
+  scroll-behavior:smooth;
 }
 .page.active{display:flex}
 
@@ -262,7 +255,21 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
 .si-r{text-align:left;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .si-a{font-size:13px;font-weight:700;color:var(--purple)}
 
-/* ══ EMPTY ══ */
+/* ══ ADD BUTTON ══ */
+.add-btn{
+  width:100%;padding:16px;border-radius:14px;border:none;
+  font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;
+  box-shadow:0 4px 16px rgba(220,38,38,.3);
+  -webkit-tap-highlight-color:transparent;
+  transition:.15s;
+}
+.add-btn:active{transform:scale(.97);opacity:.9}
+.add-btn-purple{
+  background:linear-gradient(135deg,#5b21b6,#7c3aed);
+  box-shadow:0 4px 16px rgba(124,58,237,.3);
+}
 .empty{text-align:center;padding:28px 16px}
 .empty-ic{font-size:36px;margin-bottom:8px}
 .empty-t{font-size:14px;font-weight:700;margin-bottom:4px}
@@ -441,27 +448,10 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
         </div>
       </div>
 
-      <div class="fs">
-        <div class="fs-hdr"><div class="fs-ic" style="background:#FEF2F2">➕</div><div class="fs-ti">إضافة مصروف تشغيلي</div></div>
-        <div class="ff">
-          <div class="fi"><label>اسم البند *</label><input id="e-name" type="text" placeholder="مثال: خشب MDF، طلاء..."></div>
-          <div class="fi">
-            <label>الفئة</label>
-            <select id="e-cat">
-              <option value="مواد خام">📦 مواد خام</option>
-              <option value="تشغيل">⚡ تشغيل</option>
-              <option value="نقل">🚚 نقل</option>
-              <option value="أخرى">📎 أخرى</option>
-            </select>
-          </div>
-          <div class="fr">
-            <div class="fi"><label>المبلغ (د.ل) *</label><input id="e-amt" type="number" inputmode="decimal" placeholder="0"></div>
-            <div class="fi"><label>التاريخ</label><input id="e-date" type="date"></div>
-          </div>
-          <div class="fi"><label>ملاحظة</label><input id="e-note" type="text" placeholder="اختياري"></div>
-          <button class="btn btn-g" onclick="saveExp()">✅ حفظ المصروف</button>
-        </div>
-      </div>
+      <!-- زر إضافة مصروف واضح وكبير -->
+      <button class="add-btn" onclick="document.getElementById('ov-add-exp').classList.add('open')">
+        <span style="font-size:20px">➕</span> إضافة مصروف تشغيلي جديد
+      </button>
 
       <div class="sh"><div class="sh-t">سجل المصروفات</div><div class="sh-s" id="e-cnt"></div></div>
       <div class="card" id="e-list"><div class="empty" style="padding:18px"><div style="font-size:24px;margin-bottom:4px">💸</div><div style="font-size:12px;color:var(--t2)">لا توجد مصروفات</div></div></div>
@@ -487,26 +477,10 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
 
       <div id="sal-cards"></div>
 
-      <div class="fs">
-        <div class="fs-hdr"><div class="fs-ic" style="background:#f3e8ff">👷</div><div class="fs-ti">تسجيل راتب موظف جديد</div></div>
-        <div class="ff">
-          <div class="fi"><label>اسم الموظف *</label><input id="s-name" type="text" placeholder="اسم الموظف"></div>
-          <div class="fi"><label>المبلغ (د.ل) *</label><input id="s-amt" type="number" inputmode="decimal" placeholder="0"></div>
-          <div class="fr">
-            <div class="fi"><label>الشهر</label>
-              <select id="s-mon">
-                <option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option>
-                <option value="4">أبريل</option><option value="5">مايو</option><option value="6">يونيو</option>
-                <option value="7">يوليو</option><option value="8">أغسطس</option><option value="9">سبتمبر</option>
-                <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>
-              </select>
-            </div>
-            <div class="fi"><label>السنة</label><input id="s-yr" type="number" inputmode="numeric" placeholder="2025"></div>
-          </div>
-          <div class="fi"><label>ملاحظة (اختياري)</label><input id="s-note" type="text" placeholder="مكافأة / خصم..."></div>
-          <button class="btn btn-p" onclick="saveSal()">✅ حفظ الراتب</button>
-        </div>
-      </div>
+      <!-- زر إضافة راتب واضح وكبير -->
+      <button class="add-btn add-btn-purple" onclick="document.getElementById('ov-add-sal').classList.add('open')">
+        <span style="font-size:20px">👷</span> تسجيل راتب موظف جديد
+      </button>
 
       <div class="sh"><div class="sh-t">سجل الرواتب</div></div>
       <div class="card" id="s-list"><div class="empty" style="padding:18px"><div style="font-size:24px;margin-bottom:4px">👷</div><div style="font-size:12px;color:var(--t2)">لا توجد رواتب مسجلة</div></div></div>
@@ -523,6 +497,57 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
     <button class="nb" id="nb-sal" onclick="goTo('sal')"><div class="ni">👷</div><div class="nl">رواتب</div></button>
   </nav>
 </div><!-- /app -->
+
+<!-- ADD EXPENSE SHEET -->
+<div class="ov" id="ov-add-exp" onclick="if(event.target===this)closeAddExp()">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-hdr">➕ إضافة مصروف تشغيلي <button class="sh-cls" onclick="closeAddExp()">✕</button></div>
+    <div class="sh-body">
+      <div class="fi"><label>اسم البند *</label><input id="e-name" type="text" placeholder="مثال: خشب MDF، طلاء..."></div>
+      <div class="fi">
+        <label>الفئة</label>
+        <select id="e-cat">
+          <option value="مواد خام">📦 مواد خام</option>
+          <option value="تشغيل">⚡ تشغيل</option>
+          <option value="نقل">🚚 نقل</option>
+          <option value="أخرى">📎 أخرى</option>
+        </select>
+      </div>
+      <div class="fr">
+        <div class="fi"><label>المبلغ (د.ل) *</label><input id="e-amt" type="number" inputmode="decimal" placeholder="0"></div>
+        <div class="fi"><label>التاريخ</label><input id="e-date" type="date"></div>
+      </div>
+      <div class="fi"><label>ملاحظة (اختياري)</label><input id="e-note" type="text" placeholder="اختياري"></div>
+      <button class="btn btn-g" onclick="saveExp()">✅ حفظ المصروف</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SALARY SHEET -->
+<div class="ov" id="ov-add-sal" onclick="if(event.target===this)closeAddSal()">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-hdr">👷 تسجيل راتب موظف <button class="sh-cls" onclick="closeAddSal()">✕</button></div>
+    <div class="sh-body">
+      <div class="fi"><label>اسم الموظف *</label><input id="s-name" type="text" placeholder="اسم الموظف"></div>
+      <div class="fi"><label>المبلغ (د.ل) *</label><input id="s-amt" type="number" inputmode="decimal" placeholder="0"></div>
+      <div class="fr">
+        <div class="fi"><label>الشهر</label>
+          <select id="s-mon">
+            <option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option>
+            <option value="4">أبريل</option><option value="5">مايو</option><option value="6">يونيو</option>
+            <option value="7">يوليو</option><option value="8">أغسطس</option><option value="9">سبتمبر</option>
+            <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+          </select>
+        </div>
+        <div class="fi"><label>السنة</label><input id="s-yr" type="number" inputmode="numeric" placeholder="2025"></div>
+      </div>
+      <div class="fi"><label>ملاحظة (اختياري)</label><input id="s-note" type="text" placeholder="مكافأة / خصم..."></div>
+      <button class="btn btn-p" onclick="saveSal()">✅ حفظ الراتب</button>
+    </div>
+  </div>
+</div>
 
 <!-- EDIT ORDER SHEET -->
 <div class="ov" id="ov-ord" onclick="if(event.target===this)closeOrdSheet()">
@@ -672,8 +697,16 @@ function goTo(id){
   if(nb)nb.classList.add('active');
   if(id==='home')renderHome();
   if(id==='orders')renderOrders('all');
-  if(id==='exp'){popEY();popEM();renderExp()}
-  if(id==='sal'){popSY();popSM();renderSal()}
+  if(id==='exp'){
+    popEY();popEM();renderExp();
+    const _ed2=document.getElementById('e-date');if(_ed2&&!_ed2.value)_ed2.value=today();
+  }
+  if(id==='sal'){
+    popSY();popSM();renderSal();
+    const _sn=new Date();
+    const _sm2=document.getElementById('s-mon');if(_sm2)_sm2.value=_sn.getMonth()+1;
+    const _sy2=document.getElementById('s-yr');if(_sy2&&!_sy2.value)_sy2.value=_sn.getFullYear();
+  }
   if(id==='new'){const el=document.getElementById('n-date');if(el)el.value=today()}
 }
 
@@ -895,6 +928,9 @@ function renderExp(){
       </div>
     </div>`).join('')
 }
+function closeAddExp(){document.getElementById('ov-add-exp').classList.remove('open')}
+function closeAddSal(){document.getElementById('ov-add-sal').classList.remove('open')}
+
 async function saveExp(){
   const name=document.getElementById('e-name').value.trim();
   const amount=parseFloat(document.getElementById('e-amt').value)||0;
@@ -907,6 +943,7 @@ async function saveExp(){
   await db.saveExpense(exp);expenses.push(exp);
   document.getElementById('e-name').value='';document.getElementById('e-amt').value='';document.getElementById('e-note').value='';
   document.getElementById('e-date').value=today();
+  closeAddExp();
   popEY();popEM();renderExp();renderHome();toast('✅ تم تسجيل المصروف')
 }
 async function delExp(id){
@@ -992,6 +1029,7 @@ async function saveSal(){
   const sal={id:db.newId(),name,amount,month,year,note:document.getElementById('s-note').value,dateAdded:new Date().toISOString()};
   await db.saveSalary(sal);salaries.push(sal);
   document.getElementById('s-name').value='';document.getElementById('s-amt').value='';document.getElementById('s-note').value='';
+  closeAddSal();
   popSY();popSM();renderSal();renderHome();toast('✅ تم تسجيل راتب '+name)
 }
 async function delSal(id){
