@@ -139,7 +139,7 @@ tbody tr:hover td{background:#faf8f4}
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:var(--rlg);padding:1.5rem;width:90%;max-width:520px;border-top:3px solid var(--gold);max-height:90vh;overflow-y:auto}
+.modal{background:var(--surface);border-radius:var(--rlg);padding:1.5rem;width:90%;max-width:560px;border-top:3px solid var(--gold);max-height:90vh;overflow-y:auto}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
 .mt{font-size:15px;font-weight:700}
 .mc{background:none;border:none;font-size:18px;cursor:pointer;color:var(--t2)}
@@ -178,6 +178,26 @@ tbody tr:hover td{background:#faf8f4}
 /* EXP EDIT BTN */
 .exp-edit-btn{color:var(--gold);border-color:var(--gold)}
 .exp-edit-btn:hover{background:#fff8e1}
+
+/* MODAL SECTION DIVIDER */
+.modal-sec{font-size:12px;font-weight:700;color:var(--t2);padding:8px 0 4px;border-bottom:1px solid var(--border);margin-bottom:8px;margin-top:4px}
+
+/* PAYMENT HISTORY IN MODAL */
+.pay-hist{background:var(--s2);border-radius:8px;padding:.6rem .8rem;margin-bottom:8px;border:1px solid var(--border)}
+.pay-hist-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid var(--border)}
+.pay-hist-row:last-child{border:none}
+
+/* SALARY DEDUCTIONS */
+.ded-box{background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;padding:.75rem;margin-bottom:8px}
+.ded-title{font-size:11px;font-weight:700;color:#6b21a8;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.ded-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid #e9d5ff}
+.ded-row:last-child{border:none}
+.ded-total-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;padding-top:6px;margin-top:4px;border-top:2px solid #d8b4fe}
+
+/* NET SALARY SUMMARY */
+.net-sal-box{background:linear-gradient(135deg,#3b1f6b,#5a2d91);color:#fff;border-radius:8px;padding:.75rem 1rem;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+.net-sal-box .lbl{font-size:12px;opacity:.85}
+.net-sal-box .val{font-size:18px;font-weight:800}
 </style>
 </head>
 <body>
@@ -372,15 +392,10 @@ tbody tr:hover td{background:#faf8f4}
 
 <!-- ===== EXPENSES (تشغيلية فقط) ===== -->
 <div id="pg-expenses" class="page">
-
-  <!-- فلتر الشهر -->
   <div class="month-bar">
     <label>📅 الفترة:</label>
-    <select id="exp-month-sel" onchange="renderExpenses()">
-      <option value="all">كل الأشهر</option>
-    </select>
-    <select id="exp-year-sel" onchange="populateExpMonths();renderExpenses()">
-    </select>
+    <select id="exp-month-sel" onchange="renderExpenses()"><option value="all">كل الأشهر</option></select>
+    <select id="exp-year-sel" onchange="populateExpMonths();renderExpenses()"></select>
     <div class="sep">|</div>
     <div class="month-summary">
       <div class="ms-item"><div class="ms-lbl">إجمالي الفترة</div><div class="ms-val" id="exp-period-total" style="color:#dc2626">0 د.ل</div></div>
@@ -411,10 +426,7 @@ tbody tr:hover td{background:#faf8f4}
       <div class="fg"><label>البند *</label><input id="e-name" type="text" placeholder="مثال: خشب MDF"></div>
       <div class="fg"><label>الفئة</label>
         <select id="e-cat">
-          <option>مواد خام</option>
-          <option>تشغيل</option>
-          <option>نقل</option>
-          <option>أخرى</option>
+          <option>مواد خام</option><option>تشغيل</option><option>نقل</option><option>أخرى</option>
         </select>
       </div>
       <div class="fg"><label>المبلغ (د.ل) *</label><input id="e-amount" type="number" placeholder="0"></div>
@@ -428,20 +440,17 @@ tbody tr:hover td{background:#faf8f4}
   </div>
 </div>
 
-<!-- ===== SALARIES (رواتب منفصلة) ===== -->
+<!-- ===== SALARIES ===== -->
 <div id="pg-salaries" class="page">
-
-  <!-- فلتر الشهر للرواتب -->
   <div class="month-bar">
     <label>📅 الفترة:</label>
-    <select id="sal-month-sel" onchange="renderSalaries()">
-      <option value="all">كل الأشهر</option>
-    </select>
-    <select id="sal-year-sel" onchange="populateSalMonths();renderSalaries()">
-    </select>
+    <select id="sal-month-sel" onchange="renderSalaries()"><option value="all">كل الأشهر</option></select>
+    <select id="sal-year-sel" onchange="populateSalMonths();renderSalaries()"></select>
     <div class="sep">|</div>
     <div class="month-summary">
       <div class="ms-item"><div class="ms-lbl">رواتب الفترة</div><div class="ms-val" id="sal-period-total" style="color:#7c3aed">0 د.ل</div></div>
+      <div class="ms-item"><div class="ms-lbl">صُرف فعلياً</div><div class="ms-val" id="sal-period-paid" style="color:#15803d">0 د.ل</div></div>
+      <div class="ms-item"><div class="ms-lbl">مستحق للصرف</div><div class="ms-val" id="sal-period-due" style="color:#dc2626">0 د.ل</div></div>
       <div class="ms-item"><div class="ms-lbl">عدد الموظفين</div><div class="ms-val" id="sal-period-count" style="color:#555">0</div></div>
     </div>
   </div>
@@ -460,7 +469,7 @@ tbody tr:hover td{background:#faf8f4}
       </div>
       <div style="padding:1rem">
         <div class="tw"><table>
-          <thead><tr><th>الموظف</th><th>المبلغ</th><th>الشهر</th><th>السنة</th><th>ملاحظة</th><th></th></tr></thead>
+          <thead><tr><th>الموظف</th><th>الراتب الأساسي</th><th>مصروفات مُخصومة</th><th>المستحق</th><th>الشهر</th><th>السنة</th><th>ملاحظة</th><th></th></tr></thead>
           <tbody id="sal-body"></tbody>
         </table></div>
         <div id="sal-empty" style="display:none;text-align:center;padding:1.5rem;color:var(--t3);font-size:13px">لا توجد رواتب مسجلة</div>
@@ -469,7 +478,7 @@ tbody tr:hover td{background:#faf8f4}
     <div class="card">
       <div class="sec">➕ تسجيل راتب موظف</div>
       <div class="fg"><label>اسم الموظف *</label><input id="s-name" type="text" placeholder="اسم الموظف"></div>
-      <div class="fg"><label>المبلغ (د.ل) *</label><input id="s-amount" type="number" placeholder="0"></div>
+      <div class="fg"><label>الراتب الأساسي (د.ل) *</label><input id="s-amount" type="number" placeholder="0" oninput="calcSalNet()"></div>
       <div class="form-grid">
         <div class="fg"><label>الشهر</label>
           <select id="s-month-inp">
@@ -483,10 +492,27 @@ tbody tr:hover td{background:#faf8f4}
         </div>
         <div class="fg"><label>السنة</label><input id="s-year-inp" type="number" placeholder="2025"></div>
       </div>
-      <div class="fg"><label>ملاحظة</label><input id="s-note" type="text" placeholder="مكافأة / خصم..."></div>
+
+      <!-- قسم المصروفات المخصومة -->
+      <div class="ded-box">
+        <div class="ded-title">💸 مصروفات مُخصومة من الراتب</div>
+        <div id="ded-list"></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <input id="ded-name" type="text" placeholder="اسم المصروف" style="flex:1;padding:7px 9px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit;direction:rtl">
+          <input id="ded-amount" type="number" placeholder="المبلغ" style="width:90px;padding:7px 9px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit" oninput="calcSalNet()">
+          <button class="btn btn-sm" style="background:#6b21a8;color:#fff;border-color:#6b21a8;flex-shrink:0" onclick="addDeduction()">➕</button>
+        </div>
+      </div>
+
+      <!-- صافي الراتب -->
+      <div class="net-sal-box">
+        <div class="lbl">الراتب المستحق (بعد الخصم)</div>
+        <div class="val" id="s-net-display">0 د.ل</div>
+      </div>
+
+      <div class="fg" style="margin-top:8px"><label>ملاحظة</label><input id="s-note" type="text" placeholder="مكافأة / خصم..."></div>
       <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="saveSalary()">✅ حفظ الراتب</button>
 
-      <!-- ملخص شهري -->
       <div style="margin-top:1rem;padding:.75rem;background:#f3e8ff;border-radius:8px;border:1px solid #d8b4fe">
         <div style="font-size:11px;color:#6b21a8;font-weight:600;margin-bottom:6px">📊 ملخص رواتب هذا الشهر</div>
         <div id="sal-month-summary" style="font-size:12px;color:#555">—</div>
@@ -497,15 +523,10 @@ tbody tr:hover td{background:#faf8f4}
 
 <!-- ===== REPORTS ===== -->
 <div id="pg-reports" class="page">
-
-  <!-- فلتر الشهر للتقارير -->
   <div class="month-bar">
     <label>📅 فلتر:</label>
-    <select id="rep-month-sel" onchange="renderReports()">
-      <option value="all">كل الأشهر</option>
-    </select>
-    <select id="rep-year-sel" onchange="populateRepMonths();renderReports()">
-    </select>
+    <select id="rep-month-sel" onchange="renderReports()"><option value="all">كل الأشهر</option></select>
+    <select id="rep-year-sel" onchange="populateRepMonths();renderReports()"></select>
   </div>
 
   <div class="stats">
@@ -522,7 +543,7 @@ tbody tr:hover td{background:#faf8f4}
         <tbody>
           <tr><td style="color:var(--t2)">إجمالي الإيرادات</td><td style="font-weight:700;text-align:left" id="r-rev">0 د.ل</td></tr>
           <tr><td style="color:var(--t2)">مصروفات تشغيلية</td><td style="font-weight:700;text-align:left;color:#dc2626" id="r-ops">0 د.ل</td></tr>
-          <tr><td style="color:var(--t2)">رواتب الموظفين</td><td style="font-weight:700;text-align:left;color:#7c3aed" id="r-sal">0 د.ل</td></tr>
+          <tr><td style="color:var(--t2)">رواتب الموظفين (مستحقة)</td><td style="font-weight:700;text-align:left;color:#7c3aed" id="r-sal">0 د.ل</td></tr>
           <tr style="background:#f9f7f0"><td style="font-weight:700">صافي الربح</td><td style="font-weight:800;text-align:left;font-size:16px" id="r-net2">0 د.ل</td></tr>
         </tbody>
       </table>
@@ -551,16 +572,74 @@ tbody tr:hover td{background:#faf8f4}
 </div><!-- /body -->
 </div><!-- /app -->
 
-<!-- EDIT ORDER MODAL -->
+<!-- ===== EDIT ORDER MODAL (محدّث) ===== -->
 <div class="overlay" id="edit-ov" onclick="if(event.target===this)closeEdit()">
   <div class="modal">
     <div class="mh"><span class="mt">✏️ تعديل الطلبية</span><button class="mc" onclick="closeEdit()">✕</button></div>
-    <div class="fg"><label>المبلغ المدفوع (د.ل)</label><input id="em-paid" type="number"></div>
-    <div class="fg"><label>الحالة</label><select id="em-status"><option value="paid">مدفوعة ✅</option><option value="partial">جزئية 🔵</option><option value="pending">معلقة ⏳</option><option value="cancel">ملغية ❌</option></select></div>
+
+    <!-- قيمة العقد -->
+    <div class="modal-sec">📝 تعديل قيمة العقد</div>
+    <div class="form-grid">
+      <div class="fg">
+        <label>قيمة العقد الجديدة (د.ل)</label>
+        <input id="em-total" type="number" placeholder="0" oninput="editCalcRemaining()">
+      </div>
+      <div class="fg">
+        <label>إجمالي المدفوع الحالي</label>
+        <input id="em-paid-display" type="number" readonly style="background:var(--s2);color:var(--t2)">
+      </div>
+    </div>
+
+    <!-- سجل الدفعات -->
+    <div class="modal-sec">💳 سجل الدفعات</div>
+    <div class="pay-hist" id="em-pay-hist"></div>
+
+    <!-- إضافة دفعة جديدة -->
+    <div class="modal-sec">➕ إضافة دفعة جديدة</div>
+    <div class="form-grid">
+      <div class="fg">
+        <label>مبلغ الدفعة (د.ل)</label>
+        <input id="em-new-pay" type="number" placeholder="0" oninput="editCalcRemaining()">
+      </div>
+      <div class="fg">
+        <label>طريقة الدفع</label>
+        <select id="em-pay-method">
+          <option>كاش</option><option>تحويل بنكي</option><option>دفعات</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- الملخص المالي -->
+    <div style="background:var(--s2);border-radius:8px;padding:.75rem;margin-bottom:10px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+        <span style="color:var(--t2)">قيمة العقد</span>
+        <strong id="em-summary-total" style="color:#B8860B">0 د.ل</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+        <span style="color:var(--t2)">إجمالي المدفوع</span>
+        <strong id="em-summary-paid" style="color:#15803d">0 د.ل</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;border-top:1px solid var(--border);padding-top:6px">
+        <span>المتبقي بعد الدفعة</span>
+        <strong id="em-summary-rem" style="color:#dc2626">0 د.ل</strong>
+      </div>
+    </div>
+
+    <!-- الحالة والملاحظة -->
+    <div class="modal-sec">⚙️ الحالة</div>
+    <div class="fg"><label>الحالة</label>
+      <select id="em-status">
+        <option value="paid">مدفوعة ✅</option>
+        <option value="partial">جزئية 🔵</option>
+        <option value="pending">معلقة ⏳</option>
+        <option value="cancel">ملغية ❌</option>
+      </select>
+    </div>
     <div class="fg"><label>ملاحظة</label><input id="em-note" type="text"></div>
+
     <div style="display:flex;gap:8px;margin-top:.5rem">
-      <button class="btn btn-gold" onclick="saveEdit()">✅ حفظ</button>
-      <button class="btn" style="color:#dc2626" onclick="delOrder()">🗑 حذف</button>
+      <button class="btn btn-gold" onclick="saveEdit()">✅ حفظ التعديلات</button>
+      <button class="btn" style="color:#dc2626" onclick="delOrder()">🗑 حذف الطلبية</button>
     </div>
   </div>
 </div>
@@ -585,12 +664,12 @@ tbody tr:hover td{background:#faf8f4}
   </div>
 </div>
 
-<!-- EDIT SALARY MODAL -->
+<!-- EDIT SALARY MODAL (محدّث) -->
 <div class="overlay" id="sal-edit-ov" onclick="if(event.target===this)closeSalEdit()">
   <div class="modal">
     <div class="mh"><span class="mt">✏️ تعديل الراتب</span><button class="mc" onclick="closeSalEdit()">✕</button></div>
     <div class="fg"><label>اسم الموظف *</label><input id="se-name" type="text"></div>
-    <div class="fg"><label>المبلغ (د.ل) *</label><input id="se-amount" type="number"></div>
+    <div class="fg"><label>الراتب الأساسي (د.ل) *</label><input id="se-amount" type="number" oninput="calcEditSalNet()"></div>
     <div class="form-grid">
       <div class="fg"><label>الشهر</label>
         <select id="se-month">
@@ -604,7 +683,24 @@ tbody tr:hover td{background:#faf8f4}
       </div>
       <div class="fg"><label>السنة</label><input id="se-year" type="number"></div>
     </div>
-    <div class="fg"><label>ملاحظة</label><input id="se-note" type="text"></div>
+
+    <!-- المصروفات المخصومة في التعديل -->
+    <div class="ded-box">
+      <div class="ded-title">💸 مصروفات مُخصومة من الراتب</div>
+      <div id="se-ded-list"></div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <input id="se-ded-name" type="text" placeholder="اسم المصروف" style="flex:1;padding:7px 9px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit;direction:rtl">
+        <input id="se-ded-amount" type="number" placeholder="المبلغ" style="width:90px;padding:7px 9px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit" oninput="calcEditSalNet()">
+        <button class="btn btn-sm" style="background:#6b21a8;color:#fff;border-color:#6b21a8;flex-shrink:0" onclick="addEditDeduction()">➕</button>
+      </div>
+    </div>
+
+    <div class="net-sal-box">
+      <div class="lbl">الراتب المستحق (بعد الخصم)</div>
+      <div class="val" id="se-net-display">0 د.ل</div>
+    </div>
+
+    <div class="fg" style="margin-top:8px"><label>ملاحظة</label><input id="se-note" type="text"></div>
     <div style="display:flex;gap:8px;margin-top:.5rem">
       <button class="btn btn-gold" onclick="saveSalEdit()">✅ حفظ</button>
       <button class="btn" style="color:#dc2626" onclick="delSalFromModal()">🗑 حذف</button>
@@ -620,7 +716,7 @@ tbody tr:hover td{background:#faf8f4}
 <script src="firebase-config.js"></script>
 
 <script>
-// ===== RuqiDB extension for salaries =====
+// ===== RuqiDB salary extensions =====
 RuqiDB.prototype.getSalaries = async function() {
   if (this.firebaseReady) {
     const snap = await this.db.ref('salaries').once('value');
@@ -654,11 +750,15 @@ RuqiDB.prototype.onSalariesChange = function(cb) {
 
 // ===== STATE =====
 const db = new RuqiDB();
-let orders = [], expenses = [], salaries = [], editId = null, expEditId = null, salEditId = null;
+let orders = [], expenses = [], salaries = [];
+let editId = null, expEditId = null, salEditId = null;
+// قائمة الخصومات المؤقتة في نموذج إضافة الراتب
+let tempDeductions = [];
+// قائمة الخصومات المؤقتة في نموذج تعديل الراتب
+let editTempDeductions = [];
 
 const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
-// Clock
 setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('ar', {hour:'2-digit',minute:'2-digit'}); }, 1000);
 document.getElementById('mobile-url').textContent = location.href.replace('index.html','mobile.html');
 
@@ -723,7 +823,6 @@ function populateMonthSel(selId, yearSelId, arr, dateField) {
   const sel = document.getElementById(selId);
   const cur = sel.value;
   const yr = document.getElementById(yearSelId).value;
-  // get months used that year
   const usedMonths = new Set();
   arr.forEach(item => {
     let iy, im;
@@ -734,7 +833,6 @@ function populateMonthSel(selId, yearSelId, arr, dateField) {
   sel.innerHTML = `<option value="all">كل الأشهر</option>` +
     MONTHS_AR.map((m,i)=>{
       const v = String(i+1);
-      const used = usedMonths.has(v) ? '' : '';
       return `<option value="${v}" ${v===cur?'selected':''}>${m}</option>`;
     }).join('');
   if (!sel.value) sel.value = 'all';
@@ -744,32 +842,17 @@ function populateExpYears()  { populateYearSel('exp-year-sel', expenses, 'date')
 function populateExpMonths() { populateMonthSel('exp-month-sel','exp-year-sel', expenses, 'date'); }
 function populateSalYears()  { populateYearSel('sal-year-sel', salaries, 'sal'); }
 function populateSalMonths() { populateMonthSel('sal-month-sel','sal-year-sel', salaries, 'sal'); }
-function populateRepYears()  {
-  const all = [...orders, ...expenses, ...salaries];
-  populateYearSel('rep-year-sel', orders, 'date');
-}
+function populateRepYears()  { populateYearSel('rep-year-sel', orders, 'date'); }
 function populateRepMonths() { populateMonthSel('rep-month-sel','rep-year-sel', orders, 'date'); }
-
-function filterByMonth(arr, dateField, yearSelId, monthSelId) {
-  const yr = document.getElementById(yearSelId).value;
-  const mo = document.getElementById(monthSelId).value;
-  return arr.filter(item => {
-    let iy, im;
-    if (dateField === 'sal') { iy = String(item.year||''); im = String(item.month||''); }
-    else { const d = item[dateField]||''; iy = d.slice(0,4); im = String(parseInt(d.slice(5,7))||0); }
-    const yearOk = iy === yr;
-    const monthOk = mo === 'all' || im === mo;
-    return yearOk && monthOk;
-  });
-}
 
 // ===== DASHBOARD =====
 function renderDash(){
   const rev=orders.reduce((s,o)=>s+o.total,0);
   const paid=orders.reduce((s,o)=>s+o.paid,0);
   const pend=rev-paid;
-  const opsExp=expenses.reduce((s,e)=>s+e.amount,0); // عدا الرواتب
-  const salExp=salaries.reduce((s,s2)=>s+s2.amount,0);
+  const opsExp=expenses.reduce((s,e)=>s+e.amount,0);
+  // الرواتب: استخدام الراتب المستحق (بعد الخصم) وليس الأساسي
+  const salExp=salaries.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
   const totalExp=opsExp+salExp;
   const net=rev-totalExp;
   const cp=rev>0?Math.round(paid/rev*100):0;
@@ -792,7 +875,6 @@ function renderDash(){
   document.getElementById('d-sal-foot').textContent=fmt(salExp);
   document.getElementById('d-net2').textContent=fmt(net);
   document.getElementById('d-net2').style.color=net>=0?'#15803d':'#dc2626';
-
   renderChart(); renderDonut(); renderActivity();
 }
 
@@ -828,7 +910,7 @@ function renderActivity(){
   if(!all.length){el.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--t3);font-size:13px">لا توجد عمليات</div>';return;}
   el.innerHTML=all.map(a=>{
     if(a._t==='o') return `<div class="ai"><div class="a-ic" style="background:#dcfce7">📋</div><div class="a-b"><div class="a-t">${a.name}</div><div class="a-m">${a.type}</div></div><div class="a-amt" style="color:#15803d">+${fmt(a.total)}</div></div>`;
-    if(a._t==='s') return `<div class="ai"><div class="a-ic" style="background:#f3e8ff">👷</div><div class="a-b"><div class="a-t">${a.name}</div><div class="a-m">راتب · ${MONTHS_AR[(a.month||1)-1]} ${a.year||''}</div></div><div class="a-amt" style="color:#7c3aed">-${fmt(a.amount)}</div></div>`;
+    if(a._t==='s') return `<div class="ai"><div class="a-ic" style="background:#f3e8ff">👷</div><div class="a-b"><div class="a-t">${a.name}</div><div class="a-m">راتب · ${MONTHS_AR[(a.month||1)-1]} ${a.year||''}</div></div><div class="a-amt" style="color:#7c3aed">-${fmt(a.netAmount!==undefined?a.netAmount:a.amount)}</div></div>`;
     return `<div class="ai"><div class="a-ic" style="background:#fee2e2">💸</div><div class="a-b"><div class="a-t">${a.name}</div><div class="a-m">${a.cat}</div></div><div class="a-amt" style="color:#dc2626">-${fmt(a.amount)}</div></div>`;
   }).join('');
 }
@@ -885,6 +967,8 @@ async function saveOrder(){
   const dep=parseFloat(document.getElementById('n-dep').value)||0;
   const status=dep>=total?'paid':dep>0?'partial':'pending';
   orderCounter++;localStorage.setItem('ruqi_counter',orderCounter);
+  // حفظ الدفعات كمصفوفة
+  const payments = dep > 0 ? [{amount: dep, method: document.getElementById('n-pay').value, date: today(), note: 'دفعة أولى'}] : [];
   const order={
     id:db.newId(),orderNum:orderCounter,
     name,phone:document.getElementById('n-phone').value,addr:document.getElementById('n-addr').value,
@@ -892,6 +976,7 @@ async function saveOrder(){
     frame:document.getElementById('n-frame').value,height:document.getElementById('n-height').value,
     acc:document.getElementById('n-acc').value,notes:document.getElementById('n-notes').value,
     total,paid:dep,remaining:Math.max(total-dep,0),status,
+    payments,
     pay:document.getElementById('n-pay').value,
     date:document.getElementById('n-date').value||today(),
     dateAdded:new Date().toISOString()
@@ -903,11 +988,99 @@ async function saveOrder(){
 
 function clearNew(){['n-name','n-phone','n-addr','n-facade','n-frame','n-height','n-acc','n-date','n-notes','n-total','n-dep','n-rem'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});pvUpdate();}
 
-// ===== EDIT ORDER =====
+// ===== EDIT ORDER (محدّث) =====
 function printOrder(id){const o=orders.find(o=>o.id===id);if(!o)return;localStorage.setItem('ruqi_print_order',JSON.stringify(o));window.open('print-order.html?id='+id,'_blank');}
-function openEdit(id){editId=id;const o=orders.find(o=>o.id===id);if(!o)return;document.getElementById('em-paid').value=o.paid;document.getElementById('em-status').value=o.status;document.getElementById('em-note').value=o.notes||'';document.getElementById('edit-ov').classList.add('open');}
+
+function openEdit(id){
+  editId=id;
+  const o=orders.find(o=>o.id===id);
+  if(!o)return;
+
+  // ملء الحقول
+  document.getElementById('em-total').value = o.total;
+  document.getElementById('em-paid-display').value = o.paid;
+  document.getElementById('em-status').value = o.status;
+  document.getElementById('em-note').value = o.notes||'';
+  document.getElementById('em-new-pay').value = '';
+  document.getElementById('em-pay-method').value = 'كاش';
+
+  // عرض سجل الدفعات
+  renderPayHistory(o);
+  editCalcRemaining();
+  document.getElementById('edit-ov').classList.add('open');
+}
+
+function renderPayHistory(o) {
+  const payments = o.payments || [];
+  const el = document.getElementById('em-pay-hist');
+  if (!payments.length) {
+    // إذا كان هناك مبلغ مدفوع لكن بدون سجل دفعات (بيانات قديمة)
+    if (o.paid > 0) {
+      el.innerHTML = `<div class="pay-hist-row"><span style="color:var(--t2)">دفعة سابقة</span><span style="color:#15803d;font-weight:600">${fmt(o.paid)}</span></div>`;
+    } else {
+      el.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:12px;padding:6px">لا توجد دفعات مسجلة بعد</div>';
+    }
+    return;
+  }
+  el.innerHTML = payments.map((p,i)=>`
+    <div class="pay-hist-row">
+      <span style="color:var(--t2)">دفعة ${i+1} · ${p.date||''} · ${p.method||'كاش'}</span>
+      <span style="color:#15803d;font-weight:600">${fmt(p.amount)}</span>
+    </div>`).join('');
+}
+
+function editCalcRemaining() {
+  const o = orders.find(o=>o.id===editId);
+  const currentTotal = parseFloat(document.getElementById('em-total').value) || (o?o.total:0);
+  const currentPaid = o ? o.paid : 0;
+  const newPay = parseFloat(document.getElementById('em-new-pay').value) || 0;
+  const totalPaid = currentPaid + newPay;
+  const remaining = Math.max(currentTotal - totalPaid, 0);
+
+  document.getElementById('em-summary-total').textContent = fmt(currentTotal);
+  document.getElementById('em-summary-paid').textContent = fmt(totalPaid);
+  document.getElementById('em-summary-rem').textContent = fmt(remaining);
+  document.getElementById('em-paid-display').value = totalPaid;
+
+  // تحديث الحالة تلقائياً
+  let autoStatus = 'pending';
+  if (totalPaid >= currentTotal) autoStatus = 'paid';
+  else if (totalPaid > 0) autoStatus = 'partial';
+  document.getElementById('em-status').value = autoStatus;
+}
+
 function closeEdit(){document.getElementById('edit-ov').classList.remove('open');editId=null;}
-async function saveEdit(){const o=orders.find(o=>o.id===editId);if(!o)return;o.paid=parseFloat(document.getElementById('em-paid').value)||o.paid;o.remaining=o.total-o.paid;o.status=document.getElementById('em-status').value;o.notes=document.getElementById('em-note').value;await db.saveOrder(o);closeEdit();renderOrders('all');renderDash();toast('✅ تم التحديث');}
+
+async function saveEdit(){
+  const o=orders.find(o=>o.id===editId);
+  if(!o)return;
+
+  const newTotal = parseFloat(document.getElementById('em-total').value) || o.total;
+  const newPay = parseFloat(document.getElementById('em-new-pay').value) || 0;
+  const payMethod = document.getElementById('em-pay-method').value;
+
+  // تحديث قيمة العقد
+  o.total = newTotal;
+
+  // إضافة الدفعة الجديدة إن وجدت
+  if (newPay > 0) {
+    if (!o.payments) o.payments = o.paid > 0 ? [{amount:o.paid, method:o.pay||'كاش', date:o.date||today(), note:'دفعة سابقة'}] : [];
+    o.payments.push({amount: newPay, method: payMethod, date: today(), note: ''});
+    o.paid = o.payments.reduce((s,p)=>s+p.amount, 0);
+  }
+
+  o.remaining = Math.max(o.total - o.paid, 0);
+  o.status = document.getElementById('em-status').value;
+  o.notes = document.getElementById('em-note').value;
+
+  await db.saveOrder(o);
+  closeEdit();
+  renderOrders('all');
+  renderDash();
+  toast('✅ تم تحديث الطلبية');
+}
+
+function closeEdit(){document.getElementById('edit-ov').classList.remove('open');editId=null;}
 async function confirmDel(id){if(!confirm('حذف هذه الطلبية؟'))return;await db.deleteOrder(id);orders=orders.filter(o=>o.id!==id);renderOrders('all');renderDash();toast('🗑 تم الحذف');}
 async function delOrder(){if(!confirm('حذف الطلبية نهائياً؟'))return;await db.deleteOrder(editId);orders=orders.filter(o=>o.id!==editId);closeEdit();renderOrders('all');renderDash();toast('🗑 تم الحذف');}
 
@@ -931,7 +1104,6 @@ function renderExpenses(){
   const nql=filtered.filter(e=>e.cat==='نقل').reduce((s,e)=>s+e.amount,0);
   const oth=filtered.filter(e=>!['مواد خام','تشغيل','نقل'].includes(e.cat)).reduce((s,e)=>s+e.amount,0);
 
-  // Stats all-time
   const allTot=expenses.reduce((s,e)=>s+e.amount,0);
   const allMat=expenses.filter(e=>e.cat==='مواد خام').reduce((s,e)=>s+e.amount,0);
   const allOps=expenses.filter(e=>['تشغيل','نقل'].includes(e.cat)).reduce((s,e)=>s+e.amount,0);
@@ -941,18 +1113,15 @@ function renderExpenses(){
   document.getElementById('e-ops').textContent=fmt(allOps);
   document.getElementById('e-other').textContent=fmt(allOth);
 
-  // Period summary
   const yr = document.getElementById('exp-year-sel')?.value;
   const mo = document.getElementById('exp-month-sel')?.value;
   const revFiltered = orders.filter(o => {
     const d=o.date||''; const iy=d.slice(0,4), im=String(parseInt(d.slice(5,7))||0);
     return iy===yr && (mo==='all'||im===mo);
   });
-  const salFiltered = salaries.filter(s => {
-    return String(s.year)===yr && (mo==='all'||String(s.month)===mo);
-  });
+  const salFiltered = salaries.filter(s => String(s.year)===yr && (mo==='all'||String(s.month)===mo));
   const periodRev = revFiltered.reduce((s,o)=>s+o.total,0);
-  const periodSal = salFiltered.reduce((s,s2)=>s+s2.amount,0);
+  const periodSal = salFiltered.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
   const periodNet = periodRev - tot - periodSal;
   document.getElementById('exp-period-total').textContent=fmt(tot);
   document.getElementById('exp-period-mat').textContent=fmt(mat);
@@ -991,7 +1160,6 @@ async function saveExp(){
 
 async function delExp(id){if(!confirm('حذف هذا المصروف؟'))return;await db.deleteExpense(id);expenses=expenses.filter(e=>e.id!==id);renderExpenses();renderDash();toast('🗑 تم الحذف');}
 
-// Edit expense
 function openExpEdit(id){
   expEditId=id;
   const e=expenses.find(e=>e.id===id);if(!e)return;
@@ -1015,7 +1183,92 @@ async function saveExpEdit(){
 }
 async function delExpFromModal(){if(!confirm('حذف هذا المصروف؟'))return;await db.deleteExpense(expEditId);expenses=expenses.filter(e=>e.id!==expEditId);closeExpEdit();renderExpenses();renderDash();toast('🗑 تم الحذف');}
 
-// ===== SALARIES =====
+// ===== SALARIES + DEDUCTIONS =====
+
+// حساب صافي الراتب في نموذج الإضافة
+function calcSalNet() {
+  const base = parseFloat(document.getElementById('s-amount').value) || 0;
+  const totalDed = tempDeductions.reduce((s,d)=>s+d.amount, 0);
+  const net = Math.max(base - totalDed, 0);
+  document.getElementById('s-net-display').textContent = fmt(net);
+}
+
+// إضافة خصم جديد في نموذج الإضافة
+function addDeduction() {
+  const name = document.getElementById('ded-name').value.trim();
+  const amount = parseFloat(document.getElementById('ded-amount').value) || 0;
+  if (!name || !amount) { toast('⚠️ أدخل اسم المصروف والمبلغ'); return; }
+  tempDeductions.push({id: Date.now(), name, amount});
+  document.getElementById('ded-name').value = '';
+  document.getElementById('ded-amount').value = '';
+  renderDedList();
+  calcSalNet();
+}
+
+// عرض قائمة الخصومات في نموذج الإضافة
+function renderDedList() {
+  const el = document.getElementById('ded-list');
+  if (!tempDeductions.length) { el.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد خصومات</div>'; return; }
+  el.innerHTML = tempDeductions.map(d=>`
+    <div class="ded-row">
+      <span>${d.name}</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <strong style="color:#7c3aed">${fmt(d.amount)}</strong>
+        <button onclick="removeDed(${d.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0">✕</button>
+      </div>
+    </div>`).join('');
+  if (tempDeductions.length) {
+    const total = tempDeductions.reduce((s,d)=>s+d.amount,0);
+    el.innerHTML += `<div class="ded-total-row"><span>إجمالي الخصومات</span><span style="color:#dc2626">-${fmt(total)}</span></div>`;
+  }
+}
+
+function removeDed(id) {
+  tempDeductions = tempDeductions.filter(d=>d.id!==id);
+  renderDedList();
+  calcSalNet();
+}
+
+// حساب صافي الراتب في نموذج التعديل
+function calcEditSalNet() {
+  const base = parseFloat(document.getElementById('se-amount').value) || 0;
+  const totalDed = editTempDeductions.reduce((s,d)=>s+d.amount, 0);
+  const net = Math.max(base - totalDed, 0);
+  document.getElementById('se-net-display').textContent = fmt(net);
+}
+
+function addEditDeduction() {
+  const name = document.getElementById('se-ded-name').value.trim();
+  const amount = parseFloat(document.getElementById('se-ded-amount').value) || 0;
+  if (!name || !amount) { toast('⚠️ أدخل اسم المصروف والمبلغ'); return; }
+  editTempDeductions.push({id: Date.now(), name, amount});
+  document.getElementById('se-ded-name').value = '';
+  document.getElementById('se-ded-amount').value = '';
+  renderEditDedList();
+  calcEditSalNet();
+}
+
+function renderEditDedList() {
+  const el = document.getElementById('se-ded-list');
+  if (!editTempDeductions.length) { el.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد خصومات</div>'; return; }
+  el.innerHTML = editTempDeductions.map(d=>`
+    <div class="ded-row">
+      <span>${d.name}</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <strong style="color:#7c3aed">${fmt(d.amount)}</strong>
+        <button onclick="removeEditDed(${d.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0">✕</button>
+      </div>
+    </div>`).join('');
+  const total = editTempDeductions.reduce((s,d)=>s+d.amount,0);
+  el.innerHTML += `<div class="ded-total-row"><span>إجمالي الخصومات</span><span style="color:#dc2626">-${fmt(total)}</span></div>`;
+}
+
+function removeEditDed(id) {
+  editTempDeductions = editTempDeductions.filter(d=>d.id!==id);
+  renderEditDedList();
+  calcEditSalNet();
+}
+
 function getFilteredSalaries() {
   const yr = document.getElementById('sal-year-sel')?.value;
   const mo = document.getElementById('sal-month-sel')?.value;
@@ -1025,28 +1278,42 @@ function getFilteredSalaries() {
 
 function renderSalaries(){
   const filtered = getFilteredSalaries();
-  const tot=salaries.reduce((s,s2)=>s+s2.amount,0);
+  const tot=salaries.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
   const now=new Date();
-  const thisMonth=salaries.filter(s=>s.month===now.getMonth()+1 && s.year===now.getFullYear()).reduce((s,s2)=>s+s2.amount,0);
-  // average per month
+  const thisMonth=salaries.filter(s=>s.month===now.getMonth()+1 && s.year===now.getFullYear()).reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
   const months=new Set(salaries.map(s=>`${s.year}-${s.month}`));
   const avg=months.size?Math.round(tot/months.size):0;
   document.getElementById('s-total').textContent=fmt(tot);
   document.getElementById('s-month').textContent=fmt(thisMonth);
   document.getElementById('s-avg').textContent=fmt(avg);
 
-  // Period summary
-  const periodTot=filtered.reduce((s,s2)=>s+s2.amount,0);
+  const periodTot=filtered.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
+  const periodBase=filtered.reduce((s,s2)=>s+s2.amount,0);
+  const periodDue=periodBase-periodTot;
   const employees=new Set(filtered.map(s=>s.name));
-  document.getElementById('sal-period-total').textContent=fmt(periodTot);
+  document.getElementById('sal-period-total').textContent=fmt(periodBase);
+  document.getElementById('sal-period-paid').textContent=fmt(periodTot);
+  document.getElementById('sal-period-due').textContent=fmt(periodDue);
   document.getElementById('sal-period-count').textContent=employees.size;
 
-  // Month summary box
+  // ملخص الشهر الحالي
   const now2=new Date();
   const curMonthSals=salaries.filter(s=>s.month===now2.getMonth()+1&&s.year===now2.getFullYear());
   if(curMonthSals.length){
-    const empTots={};curMonthSals.forEach(s=>{empTots[s.name]=(empTots[s.name]||0)+s.amount;});
-    document.getElementById('sal-month-summary').innerHTML=Object.entries(empTots).map(([n,a])=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #e9d5ff"><span>${n}</span><strong style="color:#6b21a8">${fmt(a)}</strong></div>`).join('')+`<div style="display:flex;justify-content:space-between;padding-top:6px;font-weight:700"><span>الإجمالي</span><span style="color:#6b21a8">${fmt(curMonthSals.reduce((s,s2)=>s+s2.amount,0))}</span></div>`;
+    const empTots={};
+    curMonthSals.forEach(s=>{
+      if(!empTots[s.name]) empTots[s.name]={base:0,net:0};
+      empTots[s.name].base+=s.amount;
+      empTots[s.name].net+=(s.netAmount!==undefined?s.netAmount:s.amount);
+    });
+    const totNet=curMonthSals.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
+    document.getElementById('sal-month-summary').innerHTML=
+      Object.entries(empTots).map(([n,d])=>`
+        <div style="padding:4px 0;border-bottom:1px solid #e9d5ff">
+          <div style="display:flex;justify-content:space-between"><span style="font-weight:600">${n}</span><strong style="color:#6b21a8">${fmt(d.net)}</strong></div>
+          ${d.base!==d.net?`<div style="font-size:11px;color:#9333ea">أساسي: ${fmt(d.base)} · خصم: ${fmt(d.base-d.net)}</div>`:''}
+        </div>`).join('')+
+      `<div style="display:flex;justify-content:space-between;padding-top:6px;font-weight:700"><span>الإجمالي المستحق</span><span style="color:#6b21a8">${fmt(totNet)}</span></div>`;
   } else {
     document.getElementById('sal-month-summary').textContent='لا توجد رواتب لهذا الشهر بعد';
   }
@@ -1054,36 +1321,51 @@ function renderSalaries(){
   const tb=document.getElementById('sal-body'),em=document.getElementById('sal-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  tb.innerHTML=[...filtered].sort((a,b)=>b.year-a.year||b.month-a.month).map(s=>`<tr>
-    <td style="font-weight:600">${s.name}</td>
-    <td style="color:#7c3aed;font-weight:700">${fmt(s.amount)}</td>
-    <td>${MONTHS_AR[(s.month||1)-1]}</td>
-    <td>${s.year||''}</td>
-    <td style="color:var(--t2);font-size:12px">${s.note||'—'}</td>
-    <td style="display:flex;gap:4px">
-      <button class="btn btn-sm" style="color:#7c3aed;border-color:#7c3aed" onclick="openSalEdit('${s.id}')">✏️</button>
-      <button class="btn btn-sm" style="color:#dc2626" onclick="delSal('${s.id}')">🗑</button>
-    </td>
-  </tr>`).join('');
+  tb.innerHTML=[...filtered].sort((a,b)=>b.year-a.year||b.month-a.month).map(s=>{
+    const net=s.netAmount!==undefined?s.netAmount:s.amount;
+    const dedTotal=s.deductions?s.deductions.reduce((x,d)=>x+d.amount,0):0;
+    return `<tr>
+      <td style="font-weight:600">${s.name}</td>
+      <td style="color:var(--t2)">${fmt(s.amount)}</td>
+      <td style="color:#dc2626;font-size:12px">${dedTotal>0?'-'+fmt(dedTotal):'—'}</td>
+      <td style="color:#7c3aed;font-weight:700">${fmt(net)}</td>
+      <td>${MONTHS_AR[(s.month||1)-1]}</td>
+      <td>${s.year||''}</td>
+      <td style="color:var(--t2);font-size:12px">${s.note||'—'}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-sm" style="color:#7c3aed;border-color:#7c3aed" onclick="openSalEdit('${s.id}')">✏️</button>
+        <button class="btn btn-sm" style="color:#dc2626" onclick="delSal('${s.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 async function saveSalary(){
   const name=document.getElementById('s-name').value.trim();
   const amount=parseFloat(document.getElementById('s-amount').value)||0;
   if(!name){toast('⚠️ أدخل اسم الموظف');return;}
-  if(!amount){toast('⚠️ أدخل المبلغ');return;}
+  if(!amount){toast('⚠️ أدخل الراتب الأساسي');return;}
   const month=parseInt(document.getElementById('s-month-inp').value);
   const year=parseInt(document.getElementById('s-year-inp').value)||new Date().getFullYear();
-  const sal={id:db.newId(),name,amount,month,year,note:document.getElementById('s-note').value,dateAdded:new Date().toISOString()};
+  const deductions = [...tempDeductions];
+  const dedTotal = deductions.reduce((s,d)=>s+d.amount,0);
+  const netAmount = Math.max(amount - dedTotal, 0);
+  const sal={
+    id:db.newId(),name,amount,deductions,dedTotal,netAmount,
+    month,year,note:document.getElementById('s-note').value,
+    dateAdded:new Date().toISOString()
+  };
   await db.saveSalary(sal);salaries.push(sal);
   ['s-name','s-amount','s-note'].forEach(id=>document.getElementById(id).value='');
+  tempDeductions=[];
+  renderDedList();
+  document.getElementById('s-net-display').textContent='0 د.ل';
   populateSalYears();populateSalMonths();renderSalaries();renderDash();renderReports();
   toast('✅ تم تسجيل راتب '+name);
 }
 
 async function delSal(id){if(!confirm('حذف هذا الراتب؟'))return;await db.deleteSalary(id);salaries=salaries.filter(s=>s.id!==id);renderSalaries();renderDash();renderReports();toast('🗑 تم الحذف');}
 
-// Edit salary
 function openSalEdit(id){
   salEditId=id;
   const s=salaries.find(s=>s.id===id);if(!s)return;
@@ -1092,9 +1374,14 @@ function openSalEdit(id){
   document.getElementById('se-month').value=s.month;
   document.getElementById('se-year').value=s.year;
   document.getElementById('se-note').value=s.note||'';
+  // تحميل الخصومات الموجودة
+  editTempDeductions = s.deductions ? [...s.deductions].map(d=>({...d, id:d.id||Date.now()+Math.random()})) : [];
+  renderEditDedList();
+  calcEditSalNet();
   document.getElementById('sal-edit-ov').classList.add('open');
 }
-function closeSalEdit(){document.getElementById('sal-edit-ov').classList.remove('open');salEditId=null;}
+function closeSalEdit(){document.getElementById('sal-edit-ov').classList.remove('open');salEditId=null;editTempDeductions=[];}
+
 async function saveSalEdit(){
   const s=salaries.find(s=>s.id===salEditId);if(!s)return;
   s.name=document.getElementById('se-name').value.trim()||s.name;
@@ -1102,6 +1389,9 @@ async function saveSalEdit(){
   s.month=parseInt(document.getElementById('se-month').value);
   s.year=parseInt(document.getElementById('se-year').value)||s.year;
   s.note=document.getElementById('se-note').value;
+  s.deductions=[...editTempDeductions];
+  s.dedTotal=s.deductions.reduce((x,d)=>x+d.amount,0);
+  s.netAmount=Math.max(s.amount-s.dedTotal,0);
   await db.saveSalary(s);
   closeSalEdit();populateSalYears();populateSalMonths();renderSalaries();renderDash();renderReports();toast('✅ تم تعديل الراتب');
 }
@@ -1124,7 +1414,8 @@ function renderReports(){
 
   const rev=fOrders.reduce((s,o)=>s+o.total,0);
   const exp=fExp.reduce((s,e)=>s+e.amount,0);
-  const sal=fSal.reduce((s,s2)=>s+s2.amount,0);
+  // استخدام الراتب المستحق في التقارير
+  const sal=fSal.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
   const paid=fOrders.reduce((s,o)=>s+o.paid,0);
   const net=rev-exp-sal;
 
@@ -1148,12 +1439,12 @@ function renderReports(){
 function dl(content,name,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+content],{type}));a.download=name;a.click();}
 function expCSV(){if(!orders.length){toast('لا توجد طلبيات');return;}dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','التاريخ'].join(','),...orders.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.date].join(','))].join('\n'),'ruqi-orders-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
 function expExpCSV(){if(!expenses.length){toast('لا توجد مصروفات');return;}dl([['البند','الفئة','المبلغ','التاريخ','ملاحظة'].join(','),...expenses.map(e=>[e.name,e.cat,e.amount,e.date,e.note].join(','))].join('\n'),'ruqi-expenses-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
-function expSalCSV(){if(!salaries.length){toast('لا توجد رواتب');return;}dl([['الموظف','المبلغ','الشهر','السنة','ملاحظة'].join(','),...salaries.map(s=>[s.name,s.amount,MONTHS_AR[(s.month||1)-1],s.year,s.note].join(','))].join('\n'),'ruqi-salaries-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
+function expSalCSV(){if(!salaries.length){toast('لا توجد رواتب');return;}dl([['الموظف','الراتب الأساسي','الخصومات','المستحق','الشهر','السنة','ملاحظة'].join(','),...salaries.map(s=>[s.name,s.amount,s.dedTotal||0,s.netAmount!==undefined?s.netAmount:s.amount,MONTHS_AR[(s.month||1)-1],s.year,s.note].join(','))].join('\n'),'ruqi-salaries-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
 function backupAll(){dl(JSON.stringify({orders,expenses,salaries,exportDate:new Date().toISOString()},null,2),'ruqi-backup-'+today()+'.json','application/json');toast('💾 تم حفظ النسخة الاحتياطية');}
 function printRep(){
   const rev=orders.reduce((s,o)=>s+o.total,0),
         exp=expenses.reduce((s,e)=>s+e.amount,0),
-        sal=salaries.reduce((s,s2)=>s+s2.amount,0),
+        sal=salaries.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0),
         net=rev-exp-sal;
   const w=window.open('','_blank');
   w.document.write(`<html dir="rtl"><body style="font-family:Arial;padding:2rem">
@@ -1163,7 +1454,7 @@ function printRep(){
       <tr><th>البند</th><th>المبلغ</th></tr>
       <tr><td>إجمالي الإيرادات</td><td>${fmt(rev)}</td></tr>
       <tr><td>مصروفات تشغيلية</td><td>${fmt(exp)}</td></tr>
-      <tr><td>رواتب الموظفين</td><td>${fmt(sal)}</td></tr>
+      <tr><td>رواتب الموظفين (مستحقة)</td><td>${fmt(sal)}</td></tr>
       <tr style="background:#f0f0f0"><td><strong>صافي الربح</strong></td><td><strong>${fmt(net)}</strong></td></tr>
     </table></body></html>`);
   w.print();
@@ -1175,6 +1466,8 @@ document.getElementById('e-date').value=today();
 const now=new Date();
 document.getElementById('s-month-inp').value=now.getMonth()+1;
 document.getElementById('s-year-inp').value=now.getFullYear();
+// تهيئة قائمة الخصومات الفارغة
+renderDedList();
 pvUpdate();
 load();
 </script>
