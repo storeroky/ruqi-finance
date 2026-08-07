@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -431,9 +432,24 @@ tbody tr:hover td{background:#faf8f4}
           <div class="fg"><label>الارتفاع</label><input id="c-height" type="text" placeholder="90 سم"></div>
           <div class="fg full"><label>الاكسسوارات</label><input id="c-acc" type="text" placeholder="مقبض، سكة، سيكلو..."></div>
           <div class="fg"><label>تاريخ التسليم المتوقع</label><input id="c-date" type="date"></div>
-          <div class="fg"><label>القيمة التقديرية (د.ل)</label><input id="c-value" type="number" placeholder="اختياري — لا تُحتسب"></div>
+          <div class="fg"><label>المندوب / أُضيف بواسطة</label><input id="c-agent" type="text" placeholder="اسم الموظف"></div>
           <div class="fg full"><label>ملاحظات</label><textarea id="c-notes" placeholder="تفاصيل إضافية..."></textarea></div>
         </div>
+
+        <div class="ded-box" style="background:#fff8e1;border-color:#f5d78e">
+          <div class="ded-title" style="color:#92400e">🧾 بنود المنتجات (اختياري — لإظهار جدول تفصيلي في الطباعة)</div>
+          <div id="citem-list"></div>
+          <div class="form-grid" style="margin-top:6px">
+            <div class="fg full"><label>اسم المنتج</label><input id="ci-name" type="text" placeholder="مثال: مطبخ MDF 730"></div>
+            <div class="fg"><label>الكمية</label><input id="ci-qty" type="number" placeholder="1" oninput="calcContractTotals()"></div>
+            <div class="fg"><label>سعر الوحدة (د.ل)</label><input id="ci-price" type="number" placeholder="0" oninput="calcContractTotals()"></div>
+            <div class="fg"><label>التخفيض (د.ل)</label><input id="ci-disc" type="number" placeholder="0" oninput="calcContractTotals()"></div>
+          </div>
+          <button class="btn btn-sm" style="background:#B8860B;color:#fff;border-color:#B8860B" onclick="addContractItem()">➕ إضافة البند</button>
+        </div>
+
+        <div class="fg"><label>القيمة التقديرية الإجمالية (د.ل) — تُحسب تلقائياً من البنود، أو أدخلها يدوياً إن لم تُضِف بنودًا</label><input id="c-value" type="number" placeholder="اختياري — لا تُحتسب في الحسابات المالية" oninput="markManualValue()"></div>
+
         <div style="display:flex;gap:8px;margin-top:.5rem">
           <button class="btn btn-gold" onclick="saveContract()">✅ حفظ وإصدار العقد المبدئي</button>
           <button class="btn" onclick="clearContractForm()">🗑 مسح</button>
@@ -845,6 +861,9 @@ let editId = null, expEditId = null, salEditId = null, contractEditId = null;
 let tempDeductions = [];
 // قائمة الخصومات المؤقتة في نموذج تعديل الراتب
 let editTempDeductions = [];
+// بنود منتجات العقد المبدئي (نموذج الإضافة/التعديل معًا لأنهما نفس الفورم)
+let tempContractItems = [];
+let contractValueManual = false;
 
 const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
@@ -1179,12 +1198,58 @@ async function delOrder(){if(!confirm('حذف الطلبية نهائياً؟'))
 // ===== PRELIMINARY CONTRACTS (منفصلة تماماً عن الطلبيات — لا تدخل أي حساب مالي) =====
 let contractCounter=parseInt(localStorage.getItem('ruqi_contract_counter')||'0');
 
+function addContractItem(){
+  const name=document.getElementById('ci-name').value.trim();
+  const qty=parseFloat(document.getElementById('ci-qty').value)||1;
+  const price=parseFloat(document.getElementById('ci-price').value)||0;
+  const disc=parseFloat(document.getElementById('ci-disc').value)||0;
+  if(!name){toast('⚠️ أدخل اسم المنتج');return;}
+  tempContractItems.push({id:Date.now(),name,qty,price,disc});
+  ['ci-name','ci-qty','ci-price','ci-disc'].forEach(id=>document.getElementById(id).value='');
+  renderContractItemsList();
+  calcContractTotals();
+}
+
+function removeContractItem(id){
+  tempContractItems=tempContractItems.filter(i=>i.id!==id);
+  renderContractItemsList();
+  calcContractTotals();
+}
+
+function renderContractItemsList(){
+  const el=document.getElementById('citem-list');
+  if(!el) return;
+  if(!tempContractItems.length){el.innerHTML='<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد بنود مضافة بعد</div>';return;}
+  el.innerHTML=tempContractItems.map(i=>{
+    const rowTotal=Math.max(i.qty*i.price-i.disc,0);
+    return `<div class="ded-row">
+      <span>${i.name} <span style="color:var(--t3)">(${i.qty} × ${fmt(i.price)}${i.disc?' − '+fmt(i.disc):''})</span></span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <strong style="color:#B8860B">${fmt(rowTotal)}</strong>
+        <button onclick="removeContractItem(${i.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function markManualValue(){ contractValueManual = true; }
+
+function calcContractTotals(){
+  if(!tempContractItems.length) return;
+  const total=tempContractItems.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
+  document.getElementById('c-value').value = total;
+  contractValueManual = false;
+}
+
 function clearContractForm(){
-  ['c-name','c-phone','c-addr','c-facade','c-frame','c-height','c-acc','c-date','c-notes','c-value'].forEach(id=>{
+  ['c-name','c-phone','c-addr','c-facade','c-frame','c-height','c-acc','c-date','c-notes','c-value','c-agent'].forEach(id=>{
     const e=document.getElementById(id); if(e) e.value='';
   });
   document.getElementById('c-type').value='مطبخ';
   contractEditId=null;
+  tempContractItems=[];
+  contractValueManual=false;
+  renderContractItemsList();
 }
 
 async function saveContract(){
@@ -1192,6 +1257,9 @@ async function saveContract(){
   if(!name){toast('⚠️ أدخل اسم العميل');return;}
   if(contractEditId){ await saveContractEditIfEditing(); return; }
   contractCounter++; localStorage.setItem('ruqi_contract_counter',contractCounter);
+  const items=[...tempContractItems];
+  const itemsTotal=items.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
+  const total = items.length ? itemsTotal : (parseFloat(document.getElementById('c-value').value)||0);
   const contract={
     id:db.newId(),
     contractNum:String(contractCounter).padStart(3,'0'),
@@ -1204,7 +1272,9 @@ async function saveContract(){
     height:document.getElementById('c-height').value,
     acc:document.getElementById('c-acc').value,
     notes:document.getElementById('c-notes').value,
-    total:parseFloat(document.getElementById('c-value').value)||0,
+    agent:document.getElementById('c-agent').value,
+    items,
+    total,
     date:document.getElementById('c-date').value||today(),
     dateAdded:new Date().toISOString(),
     isPreliminary:true
@@ -1253,8 +1323,11 @@ function openContractEdit(id){
   document.getElementById('c-height').value=c.height||'';
   document.getElementById('c-acc').value=c.acc||'';
   document.getElementById('c-date').value=c.date||'';
+  document.getElementById('c-agent').value=c.agent||'';
   document.getElementById('c-value').value=c.total||'';
   document.getElementById('c-notes').value=c.notes||'';
+  tempContractItems = c.items ? c.items.map(i=>({...i,id:i.id||Date.now()+Math.random()})) : [];
+  renderContractItemsList();
   toast('✏️ عدّل البيانات ثم اضغط "حفظ" — سيتم تحديث نفس العقد #'+c.contractNum);
 }
 
@@ -1271,7 +1344,10 @@ async function saveContractEditIfEditing(){
   c.height=document.getElementById('c-height').value;
   c.acc=document.getElementById('c-acc').value;
   c.date=document.getElementById('c-date').value||c.date;
-  c.total=parseFloat(document.getElementById('c-value').value)||0;
+  c.agent=document.getElementById('c-agent').value;
+  c.items=[...tempContractItems];
+  const itemsTotal=c.items.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
+  c.total = c.items.length ? itemsTotal : (parseFloat(document.getElementById('c-value').value)||0);
   c.notes=document.getElementById('c-notes').value;
   await db.saveContract(c);
   contractEditId=null;
@@ -1692,6 +1768,7 @@ document.getElementById('s-month-inp').value=now.getMonth()+1;
 document.getElementById('s-year-inp').value=now.getFullYear();
 // تهيئة قائمة الخصومات الفارغة
 renderDedList();
+renderContractItemsList();
 pvUpdate();
 load();
 </script>
