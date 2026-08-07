@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -293,6 +292,21 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
 .inst-ios-step{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
 .inst-ios-n{width:20px;height:20px;border-radius:50%;background:var(--amber);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .inst-btns{display:flex;flex-direction:column;gap:8px}
+
+/* MULTI-KITCHEN LIST */
+.kitchen-item{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.kitchen-item .ki-title{font-weight:700;color:var(--gold)}
+.kitchen-item .ki-sub{color:var(--t2);font-size:11px;margin-top:1px}
+
+/* ARCHIVE CARD */
+.arc-card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:2px}
+.arc-hdr{background:linear-gradient(135deg,#334155,#1e293b);padding:10px 13px;display:flex;justify-content:space-between;align-items:center}
+.arc-t{font-size:12px;color:rgba(255,255,255,.75);font-weight:600}
+.arc-v{font-size:16px;font-weight:800;color:#fff}
+.arc-body{padding:10px 13px;display:flex;flex-direction:column;gap:5px}
+.arc-row{display:flex;justify-content:space-between;font-size:12px}
+.arc-row span:first-child{color:var(--t2)}
+.arc-row span:last-child{font-weight:700}
 </style>
 </head>
 <body>
@@ -310,6 +324,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
     </div>
     <div class="hdr-acts">
       <div class="sync-dot off" id="sdot"></div>
+      <button class="icon-btn" onclick="openMoreSheet()">☰</button>
       <button class="icon-btn" onclick="forceSync()">↻</button>
     </div>
   </div>
@@ -386,6 +401,8 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
           </div>
           <div class="fi"><label>الاكسسوارات</label><input id="n-acc" type="text" placeholder="مقبض، سكة..."></div>
           <div class="fi"><label>ملاحظات</label><textarea id="n-notes" placeholder="تفاصيل إضافية..."></textarea></div>
+          <div id="kitchen-list"></div>
+          <button class="btn btn-o" onclick="addAnotherKitchen()">➕ إضافة مطبخ آخر لنفس العميل</button>
         </div>
       </div>
       <div class="fs">
@@ -417,7 +434,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
         <button class="chip" onclick="setECat('مواد خام',this)">📦 مواد خام</button>
         <button class="chip" onclick="setECat('تشغيل',this)">⚡ تشغيل</button>
         <button class="chip" onclick="setECat('نقل',this)">🚚 نقل</button>
-        <button class="chip" onclick="setECat('أخرى',this)">📎 أخرى</button>
+        <button class="chip" onclick="setECat('مصروفات العامل',this)">📎 مصروفات العامل</button>
       </div>
       <div class="exp-hero">
         <div class="eh-lbl">إجمالي المصروفات التشغيلية — الفترة المختارة</div>
@@ -425,7 +442,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
         <div class="eh-grid">
           <div class="eh-item"><div class="eh-il">📦 مواد خام</div><div class="eh-iv" style="color:#FBB040" id="e-mat">0 د.ل</div></div>
           <div class="eh-item"><div class="eh-il">⚡ تشغيل+نقل</div><div class="eh-iv" style="color:#60a5fa" id="e-ops">0 د.ل</div></div>
-          <div class="eh-item"><div class="eh-il">📎 أخرى</div><div class="eh-iv" style="color:#a78bfa" id="e-oth">0 د.ل</div></div>
+          <div class="eh-item"><div class="eh-il">📎 مصروفات العامل</div><div class="eh-iv" style="color:#a78bfa" id="e-oth">0 د.ل</div></div>
         </div>
       </div>
       <button class="add-btn" onclick="document.getElementById('ov-add-exp').classList.add('open')">
@@ -458,6 +475,82 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
       <div class="card" id="s-list"></div>
     </div>
 
+    <!-- PRELIMINARY CONTRACTS -->
+    <div id="pg-contracts" class="page">
+      <div class="exp-hero" style="background:linear-gradient(135deg,#3b1f6b,#6b21a8)">
+        <div class="eh-lbl">📄 عقود مبدئية — لا تُحتسب مالياً</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.7">توثيق اتفاق أولي مع العميل قبل تأكيد الطلبية. حوّل العقد لطلبية فعلية عند التأكيد.</div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-hdr"><div class="fs-ic" style="background:#EEF2FF">👤</div><div class="fs-ti">بيانات العميل</div></div>
+        <div class="ff">
+          <div class="fi"><label>الاسم *</label><input id="c-name" type="text" placeholder="اسم العميل"></div>
+          <div class="fr">
+            <div class="fi"><label>الهاتف</label><input id="c-phone" type="tel" placeholder="09XX..."></div>
+            <div class="fi"><label>العنوان</label><input id="c-addr" type="text" placeholder="الحي"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-hdr"><div class="fs-ic" style="background:#FFF7ED">🔧</div><div class="fs-ti">التفاصيل</div></div>
+        <div class="ff">
+          <div class="fi"><label>النوع *</label><select id="c-type"><option>مطبخ</option><option>غرفة نوم</option><option>ديكور وأثاث</option><option>دولاب ملابس</option><option>أخرى</option></select></div>
+          <div class="fr">
+            <div class="fi"><label>الواجهة</label><input id="c-facade" type="text" placeholder="MDF/لاكيه"></div>
+            <div class="fi"><label>الهيكل</label><input id="c-frame" type="text" placeholder="النوع"></div>
+          </div>
+          <div class="fr">
+            <div class="fi"><label>الارتفاع</label><input id="c-height" type="text" placeholder="90 سم"></div>
+            <div class="fi"><label>تاريخ التسليم المتوقع</label><input id="c-date" type="date"></div>
+          </div>
+          <div class="fi"><label>الاكسسوارات</label><input id="c-acc" type="text" placeholder="مقبض، سكة..."></div>
+          <div class="fi"><label>المندوب / أُضيف بواسطة</label><input id="c-agent" type="text" placeholder="اسم الموظف"></div>
+          <div class="fi"><label>ملاحظات</label><textarea id="c-notes" placeholder="تفاصيل إضافية..."></textarea></div>
+        </div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-hdr"><div class="fs-ic" style="background:#FFF8E1">🧾</div><div class="fs-ti">بنود المنتجات (اختياري)</div></div>
+        <div class="ff">
+          <div class="ded-box" style="background:#FFF8E1;border-color:#F5D9A8">
+            <div class="ded-title" style="color:#92400E">🧾 البنود المضافة</div>
+            <div id="citem-list"><div style="text-align:center;font-size:11px;color:var(--t3);padding:4px">لا توجد بنود مضافة بعد</div></div>
+          </div>
+          <div class="fi"><label>اسم المنتج</label><input id="ci-name" type="text" placeholder="مثال: مطبخ MDF 730"></div>
+          <div class="fr">
+            <div class="fi"><label>الكمية</label><input id="ci-qty" type="number" inputmode="decimal" placeholder="1"></div>
+            <div class="fi"><label>سعر الوحدة</label><input id="ci-price" type="number" inputmode="decimal" placeholder="0"></div>
+          </div>
+          <div class="fi"><label>التخفيض (د.ل)</label><input id="ci-disc" type="number" inputmode="decimal" placeholder="0"></div>
+          <button class="btn btn-o" onclick="addContractItem()">➕ إضافة البند</button>
+        </div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-hdr"><div class="fs-ic" style="background:#F0FDF4">💰</div><div class="fs-ti">القيمة التقديرية</div></div>
+        <div class="ff">
+          <div class="fi"><label>القيمة التقديرية الإجمالية (د.ل)</label><input id="c-value" type="number" inputmode="decimal" placeholder="تُحسب تلقائياً من البنود أو أدخلها يدوياً"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-p" onclick="saveContract()">✅ حفظ وإصدار العقد المبدئي</button>
+      <button class="btn btn-o" onclick="clearContractForm()">🗑 مسح الحقول</button>
+
+      <div class="sh"><div class="sh-t">سجل العقود المبدئية</div><div class="sh-s" id="c-cnt"></div></div>
+      <div id="contracts-list"></div>
+    </div>
+
+    <!-- ARCHIVE -->
+    <div id="pg-archive" class="page">
+      <div class="exp-hero" style="background:linear-gradient(135deg,#334155,#1e293b)">
+        <div class="eh-lbl">🗄️ الحسابات المُقفلة</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.7">هنا تُحفظ الدورات الحسابية بعد إقفالها. العقود المبدئية لا تتأثر بالإقفال.</div>
+      </div>
+      <div id="archive-list"></div>
+    </div>
+
   </div><!-- /content -->
 
   <!-- BOTTOM NAV -->
@@ -468,6 +561,19 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
     <button class="nb" id="nb-exp" onclick="goTo('exp')"><div class="ni">💸</div><div class="nl">مصروفات</div></button>
     <button class="nb" id="nb-sal" onclick="goTo('sal')"><div class="ni">👷</div><div class="nl">رواتب</div></button>
   </nav>
+</div>
+
+<!-- MORE MENU SHEET -->
+<div class="ov" id="ov-more" onclick="if(event.target===this)closeMoreSheet()">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-hdr">☰ المزيد <button class="sh-cls" onclick="closeMoreSheet()">✕</button></div>
+    <div class="sh-body">
+      <button class="btn btn-p" onclick="closeMoreSheet();goTo('contracts')">📄 عقود مبدئية</button>
+      <button class="btn btn-o" onclick="closeMoreSheet();goTo('archive')">🗄️ الأرشيف</button>
+      <button class="btn" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff" onclick="closeMoreSheet();closeAccount()">🔒 إقفال الحساب وأرشفته</button>
+    </div>
+  </div>
 </div>
 
 <!-- ADD EXPENSE SHEET -->
@@ -482,7 +588,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
           <option value="مواد خام">📦 مواد خام</option>
           <option value="تشغيل">⚡ تشغيل</option>
           <option value="نقل">🚚 نقل</option>
-          <option value="أخرى">📎 أخرى</option>
+          <option value="مصروفات العامل">📎 مصروفات العامل</option>
         </select>
       </div>
       <div class="fr">
@@ -591,7 +697,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
     <div class="sh-body">
       <div class="fi"><label>البند *</label><input id="ee-name" type="text"></div>
       <div class="fi"><label>الفئة</label>
-        <select id="ee-cat"><option value="مواد خام">📦 مواد خام</option><option value="تشغيل">⚡ تشغيل</option><option value="نقل">🚚 نقل</option><option value="أخرى">📎 أخرى</option></select>
+        <select id="ee-cat"><option value="مواد خام">📦 مواد خام</option><option value="تشغيل">⚡ تشغيل</option><option value="نقل">🚚 نقل</option><option value="مصروفات العامل">📎 مصروفات العامل</option></select>
       </div>
       <div class="fr">
         <div class="fi"><label>المبلغ *</label><input id="ee-amt" type="number" inputmode="decimal"></div>
@@ -639,6 +745,24 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
       <div class="fi"><label>ملاحظة</label><input id="se-note" type="text"></div>
       <button class="btn btn-p" onclick="saveSalEdit()">✅ حفظ التعديل</button>
       <button class="btn btn-r" onclick="delSalFromSheet()">🗑 حذف الراتب</button>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHIVE DETAIL SHEET -->
+<div class="ov" id="ov-archive-view" onclick="if(event.target===this)closeArchiveView()">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-hdr" id="av-title">🗄️ تفاصيل الحساب المُقفل <button class="sh-cls" onclick="closeArchiveView()">✕</button></div>
+    <div class="sh-body">
+      <div class="fin-sum" id="av-summary"></div>
+      <div class="sh-sec">📋 الطلبيات (<span id="av-ocnt">0</span>)</div>
+      <div class="card" id="av-orders"></div>
+      <div class="sh-sec">💸 المصروفات (<span id="av-ecnt">0</span>)</div>
+      <div class="card" id="av-exp"></div>
+      <div class="sh-sec">👷 الرواتب (<span id="av-scnt">0</span>)</div>
+      <div class="card" id="av-sal"></div>
+      <button class="btn btn-r" onclick="delArchive()">🗑 حذف هذا الأرشيف نهائياً</button>
     </div>
   </div>
 </div>
@@ -701,12 +825,75 @@ RuqiDB.prototype.onSalariesChange=function(cb){
   })
 };
 
+/* عقود مبدئية — منفصلة تماماً عن الطلبيات، لا تُحتسب مالياً */
+RuqiDB.prototype.getContracts=async function(){
+  if(this.firebaseReady){const s=await this.db.ref('contracts').once('value');return s.val()?Object.values(s.val()):[]}
+  return JSON.parse(this.local.getItem('ruqi_contracts')||'[]')
+};
+RuqiDB.prototype.saveContract=async function(c){
+  const all=await this.getContracts();const i=all.findIndex(x=>x.id===c.id);
+  if(i>=0)all[i]=c;else all.push(c);
+  this.local.setItem('ruqi_contracts',JSON.stringify(all));
+  if(this.firebaseReady)await this.db.ref('contracts/'+c.id).set(c);
+  return c
+};
+RuqiDB.prototype.deleteContract=async function(id){
+  let all=await this.getContracts();all=all.filter(x=>x.id!==id);
+  this.local.setItem('ruqi_contracts',JSON.stringify(all));
+  if(this.firebaseReady)await this.db.ref('contracts/'+id).remove()
+};
+RuqiDB.prototype.onContractsChange=function(cb){
+  if(this.firebaseReady)this.db.ref('contracts').on('value',snap=>{
+    const d=snap.val()?Object.values(snap.val()):[];
+    this.local.setItem('ruqi_contracts',JSON.stringify(d));cb(d)
+  })
+};
+
+/* الأرشيف — إقفال الحساب */
+RuqiDB.prototype.getArchives=async function(){
+  if(this.firebaseReady){const s=await this.db.ref('archives').once('value');return s.val()?Object.values(s.val()):[]}
+  return JSON.parse(this.local.getItem('ruqi_archives')||'[]')
+};
+RuqiDB.prototype.saveArchive=async function(a){
+  const all=await this.getArchives();all.push(a);
+  this.local.setItem('ruqi_archives',JSON.stringify(all));
+  if(this.firebaseReady)await this.db.ref('archives/'+a.id).set(a);
+  return a
+};
+RuqiDB.prototype.deleteArchive=async function(id){
+  let all=await this.getArchives();all=all.filter(x=>x.id!==id);
+  this.local.setItem('ruqi_archives',JSON.stringify(all));
+  if(this.firebaseReady)await this.db.ref('archives/'+id).remove()
+};
+RuqiDB.prototype.onArchivesChange=function(cb){
+  if(this.firebaseReady)this.db.ref('archives').on('value',snap=>{
+    const d=snap.val()?Object.values(snap.val()):[];
+    this.local.setItem('ruqi_archives',JSON.stringify(d));cb(d)
+  })
+};
+RuqiDB.prototype.clearAllOrders=async function(){
+  this.local.setItem('ruqi_orders','[]');
+  if(this.firebaseReady)await this.db.ref('orders').remove()
+};
+RuqiDB.prototype.clearAllExpenses=async function(){
+  this.local.setItem('ruqi_expenses','[]');
+  if(this.firebaseReady)await this.db.ref('expenses').remove()
+};
+RuqiDB.prototype.clearAllSalaries=async function(){
+  this.local.setItem('ruqi_salaries','[]');
+  if(this.firebaseReady)await this.db.ref('salaries').remove()
+};
+
 /* STATE */
 const db=new RuqiDB();
-let orders=[],expenses=[],salaries=[];
+let orders=[],expenses=[],salaries=[],contracts=[],archives=[];
 let editOrdId=null,editExpId=null,editSalId=null,eCatFilter='all';
 // خصومات مؤقتة لنموذج الإضافة والتعديل
 let addDedList=[],editDedList=[];
+// بنود منتجات العقد المبدئي + المطابخ المتعددة للطلبية
+let tempContractItems=[],contractEditId=null,contractCounter=parseInt(localStorage.getItem('ruqi_contract_counter')||'0');
+let tempKitchens=[];
+let viewingArchiveId=null;
 
 const MA=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 const fmt=n=>Math.round(n||0).toLocaleString('ar-LY');
@@ -744,22 +931,29 @@ function goTo(id){
     const _y=document.getElementById('s-yr');if(_y&&!_y.value)_y.value=_n.getFullYear();
   }
   if(id==='new'){const el=document.getElementById('n-date');if(el)el.value=today()}
+  if(id==='contracts'){renderContracts();const el=document.getElementById('c-date');if(el&&!el.value)el.value=today()}
+  if(id==='archive')renderArchives();
 }
 
 /* LOAD */
 async function loadAll(){
-  [orders,expenses,salaries]=await Promise.all([db.getOrders(),db.getExpenses(),db.getSalaries()]);
+  [orders,expenses,salaries,contracts,archives]=await Promise.all([db.getOrders(),db.getExpenses(),db.getSalaries(),db.getContracts(),db.getArchives()]);
   renderHome();renderOrders('all');
   popEY();popEM();renderExp();
   popSY();popSM();renderSal();
+  renderContracts();renderArchives();
 }
 db.onOrdersChange(d=>{orders=d;setSync('on');renderHome();renderOrders('all')});
 db.onExpensesChange(d=>{expenses=d;popEY();popEM();renderExp();renderHome()});
 db.onSalariesChange(d=>{salaries=d;popSY();popSM();renderSal();renderHome()});
+db.onContractsChange(d=>{contracts=d;renderContracts()});
+db.onArchivesChange(d=>{archives=d;renderArchives()});
 window.addEventListener('online',()=>{setSync('on');toast('✅ متصل');loadAll()});
 window.addEventListener('offline',()=>{setSync('off');toast('⚠️ أوف لاين')});
 setSync(navigator.onLine?'on':'off');
 function forceSync(){loadAll();toast('🔄 جاري التحديث...')}
+function openMoreSheet(){document.getElementById('ov-more').classList.add('open')}
+function closeMoreSheet(){document.getElementById('ov-more').classList.remove('open')}
 
 /* YEAR/MONTH HELPERS */
 function popYrSel(selId,arr,field){
@@ -846,7 +1040,7 @@ function renderOrders(filter){
     <div class="ocs ${o.status||'pending'}"></div>
     <div class="oc-b">
       <div class="oc-t"><div><div class="oc-n">${o.name}</div><div class="oc-num">#${String(o.orderNum||'').padStart(3,'0')} · ${o.date||''}</div></div><span class="pill ${pc[o.status]||'p-pending'}">${sl[o.status]||''}</span></div>
-      <div class="oc-ty">${o.type||''}${o.facade?' · '+o.facade:''}</div>
+      <div class="oc-ty">${o.type||''}${o.facade?' · '+o.facade:''}${o.kitchens&&o.kitchens.length>1?` <span class="badge bp">+${o.kitchens.length-1} مطبخ</span>`:''}</div>
       <div class="oc-m">
         <div class="oc-mi"><div class="oc-ml">العقد</div><div class="oc-mv">${fmt(o.total)}</div></div>
         <div class="oc-mi"><div class="oc-ml">المدفوع</div><div class="oc-mv" style="color:var(--green)">${fmt(o.paid)}</div></div>
@@ -868,6 +1062,35 @@ function calcRem(){
   const d=parseFloat(document.getElementById('n-dep').value)||0;
   document.getElementById('n-rem').value=Math.max(t-d,0)
 }
+
+/* MULTI-KITCHEN */
+function addAnotherKitchen(){
+  const type=document.getElementById('n-type').value;
+  const facade=document.getElementById('n-facade').value.trim();
+  const frame=document.getElementById('n-frame').value.trim();
+  const height=document.getElementById('n-height').value.trim();
+  const acc=document.getElementById('n-acc').value.trim();
+  if(!type&&!facade&&!frame&&!height&&!acc){toast('⚠️ أدخل تفاصيل المطبخ أولاً');return}
+  tempKitchens.push({id:Date.now(),type,facade,frame,height,acc});
+  ['n-facade','n-frame','n-height','n-acc'].forEach(id=>document.getElementById(id).value='');
+  renderKitchenList();
+  toast('✅ تمت إضافة المطبخ ('+tempKitchens.length+') — أدخل بيانات المطبخ التالي')
+}
+function removeKitchen(id){tempKitchens=tempKitchens.filter(k=>k.id!==id);renderKitchenList()}
+function renderKitchenList(){
+  const el=document.getElementById('kitchen-list');if(!el)return;
+  if(!tempKitchens.length){el.innerHTML='';return}
+  el.innerHTML=tempKitchens.map((k,i)=>`
+    <div class="kitchen-item">
+      <div>
+        <div class="ki-title">🔧 مطبخ ${i+1}: ${k.type||'—'}</div>
+        <div class="ki-sub">${[k.facade,k.frame,k.height,k.acc].filter(Boolean).join(' · ')||'بدون تفاصيل إضافية'}</div>
+      </div>
+      <button onclick="removeKitchen(${k.id})" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:15px">✕</button>
+    </div>`).join('')+
+    `<div style="font-size:10px;color:var(--t3);margin-bottom:4px">+ مطبخ إضافي واحد قيد الإدخال حالياً في الحقول أعلاه</div>`
+}
+
 async function saveOrder(){
   const name=document.getElementById('n-name').value.trim();
   const total=parseFloat(document.getElementById('n-total').value)||0;
@@ -876,12 +1099,26 @@ async function saveOrder(){
   const dep=parseFloat(document.getElementById('n-dep').value)||0;
   const num=db.nextOrderNum?db.nextOrderNum():Date.now();
   const payments=dep>0?[{amount:dep,method:document.getElementById('n-pay').value,date:today(),note:'دفعة أولى'}]:[];
+
+  // تجميع المطابخ: المطابخ المضافة مسبقاً + المطبخ الحالي في الحقول (إن وُجد)
+  const curType=document.getElementById('n-type').value;
+  const curFacade=document.getElementById('n-facade').value.trim();
+  const curFrame=document.getElementById('n-frame').value.trim();
+  const curHeight=document.getElementById('n-height').value.trim();
+  const curAcc=document.getElementById('n-acc').value.trim();
+  const kitchens=[...tempKitchens];
+  if(curType||curFacade||curFrame||curHeight||curAcc||!kitchens.length){
+    kitchens.push({id:Date.now(),type:curType,facade:curFacade,frame:curFrame,height:curHeight,acc:curAcc});
+  }
+
   const o={
     id:db.newId(),orderNum:num,name,
     phone:document.getElementById('n-phone').value,addr:document.getElementById('n-addr').value,
-    type:document.getElementById('n-type').value,facade:document.getElementById('n-facade').value,
-    frame:document.getElementById('n-frame').value,height:document.getElementById('n-height').value,
-    acc:document.getElementById('n-acc').value,notes:document.getElementById('n-notes').value,
+    // الحقول العلوية تعكس المطبخ الأول للتوافق مع الإحصائيات القديمة
+    type:kitchens[0].type,facade:kitchens[0].facade,
+    frame:kitchens[0].frame,height:kitchens[0].height,
+    acc:kitchens[0].acc,notes:document.getElementById('n-notes').value,
+    kitchens,
     total,paid:dep,remaining:Math.max(total-dep,0),
     status:dep>=total?'paid':dep>0?'partial':'pending',
     payments,pay:document.getElementById('n-pay').value,
@@ -890,14 +1127,15 @@ async function saveOrder(){
   };
   try{
     await db.saveOrder(o);orders.push(o);
-    toast('✅ تم حفظ الطلبية #'+String(num).padStart(3,'0'));
+    toast('✅ تم حفظ الطلبية #'+String(num).padStart(3,'0')+(kitchens.length>1?' بعدد '+kitchens.length+' مطابخ':''));
     if(confirm('هل تريد طباعة العقد الآن؟'))printOrder(o.id);
     clearForm();goTo('orders')
   }catch(e){toast('❌ خطأ في الحفظ')}
 }
 function clearForm(){
   ['n-name','n-phone','n-addr','n-facade','n-frame','n-height','n-acc','n-date','n-notes','n-total','n-dep','n-rem'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
-  const nd=document.getElementById('n-date');if(nd)nd.value=today()
+  const nd=document.getElementById('n-date');if(nd)nd.value=today();
+  tempKitchens=[];renderKitchenList();
 }
 function printOrder(id){
   const o=orders.find(o=>o.id===id);if(!o)return;
@@ -983,9 +1221,9 @@ async function delOrder(){
 }
 
 /* EXPENSES */
-const CIC={'مواد خام':'📦','تشغيل':'⚡','نقل':'🚚','أخرى':'📎'};
-const CBG={'مواد خام':'#FEF3E2','تشغيل':'#EEF2FF','نقل':'#ecfdf5','أخرى':'#F9F7F4'};
-const CCL={'مواد خام':'#b45309','تشغيل':'#1d4ed8','نقل':'#0f766e','أخرى':'#6b7280'};
+const CIC={'مواد خام':'📦','تشغيل':'⚡','نقل':'🚚','مصروفات العامل':'📎'};
+const CBG={'مواد خام':'#FEF3E2','تشغيل':'#EEF2FF','نقل':'#ecfdf5','مصروفات العامل':'#F9F7F4'};
+const CCL={'مواد خام':'#b45309','تشغيل':'#1d4ed8','نقل':'#0f766e','مصروفات العامل':'#6b7280'};
 
 function renderExp(){
   const f=getExpFiltered();
@@ -1243,6 +1481,262 @@ function renderSal(){
   }).join('')
 }
 
+/* ===== PRELIMINARY CONTRACTS (منفصلة تماماً عن الطلبيات — لا تدخل أي حساب مالي) ===== */
+function addContractItem(){
+  const name=document.getElementById('ci-name').value.trim();
+  const qty=parseFloat(document.getElementById('ci-qty').value)||1;
+  const price=parseFloat(document.getElementById('ci-price').value)||0;
+  const disc=parseFloat(document.getElementById('ci-disc').value)||0;
+  if(!name){toast('⚠️ أدخل اسم المنتج');return}
+  tempContractItems.push({id:Date.now(),name,qty,price,disc});
+  ['ci-name','ci-qty','ci-price','ci-disc'].forEach(id=>document.getElementById(id).value='');
+  renderContractItemsList();
+}
+function removeContractItem(id){tempContractItems=tempContractItems.filter(i=>i.id!==id);renderContractItemsList()}
+function renderContractItemsList(){
+  const el=document.getElementById('citem-list');if(!el)return;
+  if(!tempContractItems.length){el.innerHTML='<div style="text-align:center;font-size:11px;color:var(--t3);padding:4px">لا توجد بنود مضافة بعد</div>';return}
+  const total=tempContractItems.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
+  el.innerHTML=tempContractItems.map(i=>{
+    const rowTotal=Math.max(i.qty*i.price-i.disc,0);
+    return `<div class="ded-row">
+      <span>${i.name} <span style="color:var(--t3)">(${i.qty}×${fmt(i.price)}${i.disc?' −'+fmt(i.disc):''})</span></span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <strong style="color:var(--gold)">${fmtD(rowTotal)}</strong>
+        <button onclick="removeContractItem(${i.id})" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;padding:0">✕</button>
+      </div>
+    </div>`;
+  }).join('')+`<div class="ded-total"><span>إجمالي البنود</span><strong style="color:var(--gold)">${fmtD(total)}</strong></div>`;
+  document.getElementById('c-value').value=total;
+}
+
+function clearContractForm(){
+  ['c-name','c-phone','c-addr','c-facade','c-frame','c-height','c-acc','c-date','c-notes','c-value','c-agent'].forEach(id=>{
+    const e=document.getElementById(id);if(e)e.value=''
+  });
+  document.getElementById('c-type').value='مطبخ';
+  contractEditId=null;tempContractItems=[];renderContractItemsList();
+  const cd=document.getElementById('c-date');if(cd)cd.value=today();
+}
+
+async function saveContract(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name){toast('⚠️ أدخل اسم العميل');return}
+  if(contractEditId){await saveContractEditIfEditing();return}
+  contractCounter++;localStorage.setItem('ruqi_contract_counter',contractCounter);
+  const items=[...tempContractItems];
+  const itemsTotal=items.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
+  const total=items.length?itemsTotal:(parseFloat(document.getElementById('c-value').value)||0);
+  const contract={
+    id:db.newId(),contractNum:String(contractCounter).padStart(3,'0'),name,
+    phone:document.getElementById('c-phone').value,addr:document.getElementById('c-addr').value,
+    type:document.getElementById('c-type').value,facade:document.getElementById('c-facade').value,
+    frame:document.getElementById('c-frame').value,height:document.getElementById('c-height').value,
+    acc:document.getElementById('c-acc').value,notes:document.getElementById('c-notes').value,
+    agent:document.getElementById('c-agent').value,items,total,
+    date:document.getElementById('c-date').value||today(),
+    dateAdded:new Date().toISOString(),isPreliminary:true
+  };
+  await db.saveContract(contract);contracts.push(contract);
+  toast('✅ تم إصدار العقد المبدئي #'+contract.contractNum);
+  clearContractForm();renderContracts();
+}
+
+function renderContracts(){
+  const el=document.getElementById('contracts-list');const cntEl=document.getElementById('c-cnt');
+  if(!el)return;
+  const data=[...contracts].reverse();
+  if(cntEl)cntEl.textContent=data.length+' عقد';
+  if(!data.length){el.innerHTML='<div class="empty"><div class="empty-ic">📄</div><div class="empty-t">لا توجد عقود مبدئية</div><div class="empty-s">أضف عقداً من النموذج أعلاه</div></div>';return}
+  el.innerHTML=data.map(c=>`<div class="oc">
+    <div class="ocs" style="background:var(--purple)"></div>
+    <div class="oc-b">
+      <div class="oc-t"><div><div class="oc-n">${c.name}</div><div class="oc-num">#${c.contractNum||''} · ${c.date||''}</div></div><span class="pill" style="background:var(--purple-bg);color:var(--purple)">مبدئي</span></div>
+      <div class="oc-ty">${c.type||''}${c.facade?' · '+c.facade:''}</div>
+      <div class="oc-m">
+        <div class="oc-mi"><div class="oc-ml">القيمة التقديرية</div><div class="oc-mv">${c.total?fmt(c.total):'—'}</div></div>
+      </div>
+    </div>
+    <div class="oc-act">
+      <button class="ob ob-e" onclick="openContractEdit('${c.id}')">✏️ تعديل</button>
+      <button class="ob ob-p" onclick="printContract('${c.id}')">🖨️ طباعة</button>
+      <button class="ob" style="background:var(--green-bg);color:var(--green);border:1px solid #A8DFB8" onclick="convertContractToOrder('${c.id}')">🔄 تحويل</button>
+    </div>
+    <div class="oc-act" style="border-top:none;padding-top:0">
+      <button class="ob" style="background:var(--red-bg);color:var(--red)" onclick="delContract('${c.id}')">🗑 حذف العقد</button>
+    </div>
+  </div>`).join('')
+}
+
+function printContract(id){
+  const c=contracts.find(x=>x.id===id);if(!c)return;
+  localStorage.setItem('ruqi_print_order',JSON.stringify(c));
+  window.open('print-order.html?contract='+id,'_blank')
+}
+
+function openContractEdit(id){
+  contractEditId=id;
+  const c=contracts.find(x=>x.id===id);if(!c)return;
+  document.getElementById('c-name').value=c.name;
+  document.getElementById('c-phone').value=c.phone||'';
+  document.getElementById('c-addr').value=c.addr||'';
+  document.getElementById('c-type').value=c.type||'مطبخ';
+  document.getElementById('c-facade').value=c.facade||'';
+  document.getElementById('c-frame').value=c.frame||'';
+  document.getElementById('c-height').value=c.height||'';
+  document.getElementById('c-acc').value=c.acc||'';
+  document.getElementById('c-date').value=c.date||'';
+  document.getElementById('c-agent').value=c.agent||'';
+  document.getElementById('c-value').value=c.total||'';
+  document.getElementById('c-notes').value=c.notes||'';
+  tempContractItems=c.items?c.items.map(i=>({...i,id:i.id||Date.now()+Math.random()})):[];
+  renderContractItemsList();
+  toast('✏️ عدّل البيانات ثم اضغط "حفظ" — سيتم تحديث نفس العقد #'+c.contractNum);
+  goTo('contracts');
+  document.getElementById('pg-contracts').scrollTop=0;
+}
+
+async function saveContractEditIfEditing(){
+  if(!contractEditId)return false;
+  const c=contracts.find(x=>x.id===contractEditId);if(!c)return false;
+  c.name=document.getElementById('c-name').value.trim()||c.name;
+  c.phone=document.getElementById('c-phone').value;
+  c.addr=document.getElementById('c-addr').value;
+  c.type=document.getElementById('c-type').value;
+  c.facade=document.getElementById('c-facade').value;
+  c.frame=document.getElementById('c-frame').value;
+  c.height=document.getElementById('c-height').value;
+  c.acc=document.getElementById('c-acc').value;
+  c.date=document.getElementById('c-date').value||c.date;
+  c.agent=document.getElementById('c-agent').value;
+  c.items=[...tempContractItems];
+  const itemsTotal=c.items.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
+  c.total=c.items.length?itemsTotal:(parseFloat(document.getElementById('c-value').value)||0);
+  c.notes=document.getElementById('c-notes').value;
+  await db.saveContract(c);
+  contractEditId=null;
+  toast('✅ تم تحديث العقد المبدئي #'+c.contractNum);
+  clearContractForm();renderContracts();
+  return true;
+}
+
+async function delContract(id){
+  if(!confirm('حذف هذا العقد المبدئي؟'))return;
+  await db.deleteContract(id);contracts=contracts.filter(c=>c.id!==id);
+  if(contractEditId===id){contractEditId=null;clearContractForm()}
+  renderContracts();toast('🗑 تم حذف العقد المبدئي')
+}
+
+function convertContractToOrder(id){
+  const c=contracts.find(x=>x.id===id);if(!c)return;
+  goTo('new');
+  document.getElementById('n-name').value=c.name;
+  document.getElementById('n-phone').value=c.phone||'';
+  document.getElementById('n-addr').value=c.addr||'';
+  document.getElementById('n-type').value=c.type||'مطبخ';
+  document.getElementById('n-facade').value=c.facade||'';
+  document.getElementById('n-frame').value=c.frame||'';
+  document.getElementById('n-height').value=c.height||'';
+  document.getElementById('n-acc').value=c.acc||'';
+  document.getElementById('n-date').value=c.date||'';
+  document.getElementById('n-notes').value=(c.notes?c.notes+' — ':'')+'مُحوَّل من العقد المبدئي #'+c.contractNum;
+  if(c.total)document.getElementById('n-total').value=c.total;
+  calcRem();
+  toast('📋 تم نقل بيانات العميل — أدخل قيمة العقد النهائية والدفعة الأولى ثم احفظ')
+}
+
+/* ===== CLOSE ACCOUNT / ARCHIVE ===== */
+async function closeAccount(){
+  if(!orders.length&&!expenses.length&&!salaries.length){toast('⚠️ لا توجد بيانات حالية لإقفالها');return}
+  const rev=orders.reduce((s,o)=>s+(o.total||0),0);
+  const opsExp=expenses.reduce((s,e)=>s+(e.amount||0),0);
+  const salExp=salaries.reduce((s,v)=>s+(v.netAmount!==undefined?v.netAmount:v.amount||0),0);
+  const paid=orders.reduce((s,o)=>s+(o.paid||0),0);
+  const net=rev-opsExp-salExp;
+
+  const warn=`سيتم أرشفة ${orders.length} طلبية و${expenses.length} مصروف و${salaries.length} راتب في سجل دائم بالأرشيف، ثم تصفير لوحة التحكم للبدء من جديد.\n\nصافي الربح الحالي: ${fmtD(net)}\n\nملاحظة: العقود المبدئية لن تتأثر.\n\nهل تريد المتابعة؟`;
+  if(!confirm(warn))return;
+  if(!confirm('تأكيد نهائي: هل أنت متأكد من إقفال الحساب الحالي؟ لا يمكن التراجع (لكن يمكن مراجعة البيانات لاحقاً من الأرشيف).'))return;
+
+  const dates=[...orders.map(o=>o.date),...expenses.map(e=>e.date)].filter(Boolean).sort();
+  const archive={
+    id:db.newId(),closedAt:new Date().toISOString(),
+    fromDate:dates[0]||null,toDate:dates[dates.length-1]||today(),
+    orders:[...orders],expenses:[...expenses],salaries:[...salaries],
+    totals:{revenue:rev,paid,opsExp,salExp,net,ordersCount:orders.length,expCount:expenses.length,salCount:salaries.length}
+  };
+  await db.saveArchive(archive);archives.push(archive);
+  await db.clearAllOrders();await db.clearAllExpenses();await db.clearAllSalaries();
+  orders=[];expenses=[];salaries=[];
+
+  renderHome();renderOrders('all');
+  popEY();popEM();renderExp();
+  popSY();popSM();renderSal();
+  renderArchives();
+  toast('🔒 تم إقفال الحساب وأرشفته — لوحة التحكم جاهزة لدورة جديدة');
+}
+
+function renderArchives(){
+  const el=document.getElementById('archive-list');if(!el)return;
+  const data=[...archives].reverse();
+  if(!data.length){el.innerHTML='<div class="empty"><div class="empty-ic">🗄️</div><div class="empty-t">لا توجد حسابات مُقفلة</div><div class="empty-s">استخدم زر إقفال الحساب من قائمة المزيد</div></div>';return}
+  el.innerHTML=data.map(a=>{
+    const t=a.totals||{};
+    const closedDate=a.closedAt?new Date(a.closedAt).toLocaleDateString('ar-LY'):'—';
+    return `<div class="arc-card" onclick="openArchiveView('${a.id}')" style="cursor:pointer">
+      <div class="arc-hdr"><div class="arc-t">🗄️ أُقفل بتاريخ ${closedDate}</div><div class="arc-v">${fmtD(t.net)}</div></div>
+      <div class="arc-body">
+        <div class="arc-row"><span>الفترة</span><span>${a.fromDate||'—'} → ${a.toDate||'—'}</span></div>
+        <div class="arc-row"><span>عدد الطلبيات</span><span>${t.ordersCount||0}</span></div>
+        <div class="arc-row"><span>الإيرادات</span><span style="color:var(--green)">${fmtD(t.revenue)}</span></div>
+        <div class="arc-row"><span>المصروفات</span><span style="color:var(--red)">${fmtD(t.opsExp)}</span></div>
+        <div class="arc-row"><span>الرواتب</span><span style="color:var(--purple)">${fmtD(t.salExp)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openArchiveView(id){
+  viewingArchiveId=id;
+  const a=archives.find(x=>x.id===id);if(!a)return;
+  const t=a.totals||{};
+  const closedDate=a.closedAt?new Date(a.closedAt).toLocaleString('ar-LY'):'—';
+  document.querySelector('#av-title').innerHTML=`🗄️ حساب مُقفل — ${closedDate} <button class="sh-cls" onclick="closeArchiveView()">✕</button>`;
+  document.getElementById('av-summary').innerHTML=`
+    <div class="fin-sum-row"><span>الفترة</span><strong>${a.fromDate||'—'} → ${a.toDate||'—'}</strong></div>
+    <div class="fin-sum-row"><span>الإيرادات</span><strong style="color:var(--green)">${fmtD(t.revenue)}</strong></div>
+    <div class="fin-sum-row"><span>مصروفات تشغيلية</span><strong style="color:var(--red)">${fmtD(t.opsExp)}</strong></div>
+    <div class="fin-sum-row"><span>رواتب</span><strong style="color:var(--purple)">${fmtD(t.salExp)}</strong></div>
+    <div class="fin-sum-total"><span>صافي الربح</span><strong>${fmtD(t.net)}</strong></div>
+  `;
+  document.getElementById('av-ocnt').textContent=(a.orders||[]).length;
+  document.getElementById('av-ecnt').textContent=(a.expenses||[]).length;
+  document.getElementById('av-scnt').textContent=(a.salaries||[]).length;
+
+  document.getElementById('av-orders').innerHTML=(a.orders||[]).map(o=>`
+    <div class="ar"><div class="ar-ic" style="background:#E8F7EE">📋</div><div class="ar-b"><div class="ar-n">${o.name}</div><div class="ar-s">${o.type||''} · #${String(o.orderNum||'').padStart(3,'0')}</div></div><div class="ar-r"><div class="ar-a">${fmt(o.total)}</div><div class="ar-d">${o.date||''}</div></div></div>`
+  ).join('')||'<div class="empty" style="padding:14px"><div style="font-size:12px;color:var(--t2)">لا توجد طلبيات</div></div>';
+
+  document.getElementById('av-exp').innerHTML=(a.expenses||[]).map(e=>`
+    <div class="ar"><div class="ar-ic" style="background:#FDECEA">💸</div><div class="ar-b"><div class="ar-n">${e.name}</div><div class="ar-s">${e.cat||''}</div></div><div class="ar-r"><div class="ar-a" style="color:var(--red)">${fmt(e.amount)}</div><div class="ar-d">${e.date||''}</div></div></div>`
+  ).join('')||'<div class="empty" style="padding:14px"><div style="font-size:12px;color:var(--t2)">لا توجد مصروفات</div></div>';
+
+  document.getElementById('av-sal').innerHTML=(a.salaries||[]).map(s=>`
+    <div class="ar"><div class="ar-ic" style="background:#f3e8ff">👷</div><div class="ar-b"><div class="ar-n">${s.name}</div><div class="ar-s">${MA[(s.month||1)-1]} ${s.year||''}</div></div><div class="ar-r"><div class="ar-a" style="color:var(--purple)">${fmt(s.netAmount!==undefined?s.netAmount:s.amount)}</div></div></div>`
+  ).join('')||'<div class="empty" style="padding:14px"><div style="font-size:12px;color:var(--t2)">لا توجد رواتب</div></div>';
+
+  document.getElementById('ov-archive-view').classList.add('open');
+}
+function closeArchiveView(){document.getElementById('ov-archive-view').classList.remove('open');viewingArchiveId=null}
+async function delArchive(){
+  if(!viewingArchiveId)return;
+  if(!confirm('حذف هذا الأرشيف نهائياً؟ لا يمكن التراجع.'))return;
+  await db.deleteArchive(viewingArchiveId);
+  archives=archives.filter(a=>a.id!==viewingArchiveId);
+  closeArchiveView();renderArchives();toast('🗑 تم حذف الأرشيف')
+}
+
+
 /* INSTALL PWA */
 let deferredPrompt=null;
 const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -1269,6 +1763,9 @@ const _nd=document.getElementById('n-date');if(_nd)_nd.value=today();
 const _ed=document.getElementById('e-date');if(_ed)_ed.value=today();
 const _sm=document.getElementById('s-mon');if(_sm)_sm.value=_now.getMonth()+1;
 const _sy=document.getElementById('s-yr');if(_sy)_sy.value=_now.getFullYear();
+const _cd=document.getElementById('c-date');if(_cd)_cd.value=today();
+renderContractItemsList();
+renderKitchenList();
 loadAll();
 </script>
 </body>
