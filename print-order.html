@@ -81,6 +81,37 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1a1a1a;direction:rtl;
 
 /* WATERMARK */
 .watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:80px;font-weight:900;color:rgba(220,38,38,.06);pointer-events:none;z-index:0;font-family:Georgia,serif}
+
+/* ===== INVOICE-STYLE PRELIMINARY CONTRACT ===== */
+.inv-topbar{display:flex;justify-content:space-between;font-size:11px;color:#555;padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid #e0d8c0}
+.inv-head{display:flex;justify-content:center;align-items:center;gap:10px;padding-bottom:10px;border-bottom:3px solid #B8860B;margin-bottom:14px}
+.inv-head .brand-name{font-size:26px}
+.inv-title{text-align:center;font-size:19px;font-weight:800;color:#1a1a1a;margin-bottom:16px}
+.inv-title span{color:#B8860B}
+
+.meta-tbl{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px}
+.meta-tbl td{border:1px solid #ddd6c4;padding:7px 10px}
+.meta-tbl .ml{background:#faf8f0;font-weight:700;color:#666;width:150px;text-align:center}
+.meta-tbl .mv{font-weight:600;color:#1a1a1a}
+
+.items-tbl{width:100%;border-collapse:collapse;margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid #e0d8c0}
+.items-tbl th{background:#16182a;color:#fff;padding:8px 10px;text-align:center;font-size:11px;font-weight:600}
+.items-tbl td{padding:7px 10px;text-align:center;border-bottom:1px solid #f0ebe0;font-size:12px}
+.items-tbl tr:nth-child(even) td{background:#faf8f0}
+.items-tbl td:nth-child(2){text-align:right;font-weight:600}
+
+.totals-tbl{width:60%;margin-right:auto;border-collapse:collapse;margin-bottom:16px;font-size:12px}
+.totals-tbl td{border:1px solid #ddd6c4;padding:7px 12px}
+.totals-tbl .tl{background:#faf8f0;font-weight:700;color:#666;width:130px;text-align:center}
+.totals-tbl .tv{font-weight:700;text-align:center}
+.totals-tbl tr.grand .tv,.totals-tbl tr.grand .tl{background:#B8860B;color:#fff;font-size:14px}
+.totals-tbl tr.paid .tv{color:#15803d}
+.totals-tbl tr.rem .tv{color:#c2410c}
+
+.notes-list{font-size:10.5px;color:#666;line-height:2;margin-bottom:16px}
+.notes-list div{padding-right:2px}
+
+.inv-footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:2px solid #B8860B;font-size:10px;color:#888}
 </style>
 </head>
 <body>
@@ -95,6 +126,8 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1a1a1a;direction:rtl;
 
 <script>
 const MA=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const SHOP_PHONE='0923124913 - 0928888823';
+const SHOP_ADDR='سوق الجمعة';
 const fmt=n=>Math.round(n||0).toLocaleString('ar-LY')+' د.ل';
 function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'})}catch{return d}}
 const siMap={paid:{label:'مدفوعة بالكامل ✅',cls:'s-paid'},partial:{label:'دفعة جزئية 🔵',cls:'s-partial'},pending:{label:'لم يُدفع بعد ⏳',cls:'s-pending'},cancel:{label:'ملغية ❌',cls:'s-cancel'}};
@@ -112,7 +145,7 @@ function buildCopy(o, copyType) {
     <div>
       <div class="brand-name">رُقي</div>
       <div class="brand-sub">للمطابخ والديكورات</div>
-      <div class="brand-contact">📞 هاتف المحل<br>📍 عنوان المحل</div>
+      <div class="brand-contact">📞 ${SHOP_PHONE}<br>📍 ${SHOP_ADDR}</div>
     </div>
     <div class="contract-meta">
       ${o.isPreliminary?`<div class="prelim-pill">📄 عقد مبدئي — غير ملزم مالياً</div>`:''}
@@ -204,16 +237,94 @@ function buildCopy(o, copyType) {
   </div>`;
 }
 
+function buildPreliminaryInvoice(o){
+  const printDate = new Date().toLocaleDateString('ar-LY',{year:'numeric',month:'long',day:'numeric'});
+  const items = (o.items && o.items.length) ? o.items : [{
+    name: [o.type,o.facade].filter(Boolean).join(' - ') || 'تفاصيل الطلبية',
+    qty: 1, price: o.total||0, disc: 0
+  }];
+  const rows = items.map((it,i)=>{
+    const rowTotal = Math.max((it.qty||0)*(it.price||0)-(it.disc||0),0);
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${it.name||'—'}</td>
+      <td>${(it.qty||0).toLocaleString('ar-LY')}</td>
+      <td>${fmt(it.price)}</td>
+      <td>${fmt(it.disc||0)}</td>
+      <td>${fmt(rowTotal)}</td>
+    </tr>`;
+  }).join('');
+
+  const subtotal = items.reduce((s,it)=>s+(it.qty||0)*(it.price||0),0);
+  const totalDisc = items.reduce((s,it)=>s+(it.disc||0),0);
+  const grandTotal = Math.max(subtotal-totalDisc,0);
+  const paid = o.paid||0;
+  const remaining = Math.max(grandTotal-paid,0);
+
+  return `
+  <div class="inv-topbar">
+    <span>📍 العنوان: ${SHOP_ADDR}</span>
+    <span>📞 الهاتف: ${SHOP_PHONE}</span>
+  </div>
+
+  <div class="inv-head">
+    <div class="brand-name">رُقي</div>
+  </div>
+  <div style="text-align:center;font-size:10px;color:#888;margin-top:-10px;margin-bottom:14px">للمطابخ والديكورات</div>
+
+  <div class="inv-title">📄 عقد <span>مبدئي</span> — غير مُحتسب مالياً</div>
+
+  <table class="meta-tbl">
+    <tr><td class="mv">${SHOP_ADDR}</td><td class="ml">الفرع</td></tr>
+    <tr><td class="mv">PRE-${o.contractNum||''}</td><td class="ml">رقم العقد</td></tr>
+    <tr><td class="mv">${printDate}</td><td class="ml">تاريخ العقد</td></tr>
+    <tr><td class="mv">${o.name||'—'}</td><td class="ml">اسم الزبون</td></tr>
+    <tr><td class="mv">${o.phone||'—'}</td><td class="ml">هاتف الزبون</td></tr>
+    ${o.date?`<tr><td class="mv">${fmtDate(o.date)}</td><td class="ml">تاريخ التسليم المتوقع</td></tr>`:''}
+    <tr><td class="mv">${o.notes||'عقد مبدئي لتوثيق الاتفاق الأولي بنفس التفاصيل'}</td><td class="ml">ملاحظات</td></tr>
+  </table>
+
+  <table class="items-tbl">
+    <thead><tr><th>رقم</th><th>اسم المنتج</th><th>الكمية</th><th>سعر الوحدة</th><th>التخفيض</th><th>الاجمالي</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <table class="totals-tbl">
+    <tr><td class="tv">${fmt(totalDisc)}</td><td class="tl">التخفيض</td></tr>
+    <tr class="grand"><td class="tv">${fmt(grandTotal)}</td><td class="tl">الاجمالي</td></tr>
+    <tr class="paid"><td class="tv">${fmt(paid)}</td><td class="tl">المدفوع</td></tr>
+    <tr class="rem"><td class="tv">${fmt(remaining)}</td><td class="tl">المتبقي</td></tr>
+  </table>
+
+  <div class="notes-list">
+    <div>1. هذا عقد مبدئي لتوثيق الاتفاق الأولي على المواصفات والأسعار، ولا يُعتبر التزاماً مالياً نهائياً ولا يُحتسب ضمن الحسابات.</div>
+    <div>2. تُحدَّد قيمة العقد النهائية والدفعة الأولى عند تحويله إلى طلبية فعلية مؤكدة.</div>
+    <div>3. الأسعار الواردة أعلاه تقديرية وقابلة للتعديل حتى تأكيد الطلبية رسمياً.</div>
+    <div>4. على الزبون مراجعة جميع التفاصيل والتأكد من مطابقتها قبل تحويل العقد إلى طلبية نهائية.</div>
+  </div>
+
+  <div class="inv-footer">
+    <div><strong style="color:#B8860B">رُقي للمطابخ والديكورات</strong></div>
+    <div>عقد مبدئي #${o.contractNum||''}</div>
+    <div>${o.agent?`أُضيف بواسطة: ${o.agent}`:''} — طُبع: ${printDate}</div>
+  </div>`;
+}
+
 function render(){
   const raw=localStorage.getItem('ruqi_print_order');
   if(!raw){document.getElementById('contract').innerHTML='<div style="text-align:center;padding:3rem;color:#999">لم يُعثر على بيانات<br><a href="javascript:history.back()">← رجوع</a></div>';return}
   const o=JSON.parse(raw);
+  if(o.isPreliminary){
+    document.getElementById('contract').innerHTML = buildPreliminaryInvoice(o);
+    document.title = `عقد رُقي مبدئي #${o.contractNum||''}`;
+    return;
+  }
   if(o.status==='cancel')document.getElementById('watermark').style.display='block';
   document.getElementById('contract').innerHTML=
     buildCopy(o,'client') +
     `<div class="copy-break"></div>` +
     buildCopy(o,'factory');
-  document.title=o.isPreliminary?`عقد رُقي مبدئي #${o.contractNum||''}`:`عقد رُقي #${String(o.orderNum||'').padStart(3,'0')}`;
+  document.title=`عقد رُقي #${String(o.orderNum||'').padStart(3,'0')}`;
 }
 render();
 </script>
