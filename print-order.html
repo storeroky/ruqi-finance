@@ -164,6 +164,18 @@ function buildCopy(o, copyType) {
     <div class="full"><div class="ik">العنوان</div><div class="iv">${o.addr||'—'}</div></div>
   </div>
 
+  ${(o.kitchens && o.kitchens.length>1) ? `
+  <div class="sec-t">🔧 تفاصيل الطلبية — ${o.kitchens.length} مطابخ</div>
+  ${o.kitchens.map((k,i)=>`
+  <div style="font-size:11px;font-weight:700;color:#B8860B;margin:${i===0?'0':'8px'} 0 5px">مطبخ ${i+1}</div>
+  <div class="info-grid" style="margin-bottom:${i===o.kitchens.length-1?'16px':'8px'}">
+    <div><div class="ik">نوع المنتج</div><div class="iv">${k.type||'—'}</div></div>
+    <div><div class="ik">نوع الواجهة</div><div class="iv">${k.facade||'—'}</div></div>
+    <div><div class="ik">نوع الهيكل</div><div class="iv">${k.frame||'—'}</div></div>
+    <div><div class="ik">ارتفاع الدواليب</div><div class="iv">${k.height||'—'}</div></div>
+    ${k.acc?`<div class="full"><div class="ik">الاكسسوارات</div><div class="iv">${k.acc}</div></div>`:''}
+  </div>`).join('')}
+  ` : `
   <div class="sec-t">🔧 تفاصيل الطلبية</div>
   <div class="info-grid">
     <div><div class="ik">نوع المنتج</div><div class="iv">${o.type||'—'}</div></div>
@@ -172,6 +184,7 @@ function buildCopy(o, copyType) {
     <div><div class="ik">ارتفاع الدواليب</div><div class="iv">${o.height||'—'}</div></div>
     ${o.acc?`<div class="full"><div class="ik">الاكسسوارات</div><div class="iv">${o.acc}</div></div>`:''}
   </div>
+  `}
 
   <div class="sec-t">💰 ${o.isPreliminary?'القيمة التقديرية':'التفاصيل المالية'}</div>
   ${o.isPreliminary ? `
