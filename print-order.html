@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -32,6 +31,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1a1a1a;direction:rtl;
 .meta-key{color:#888}
 .meta-val{font-weight:700;color:#1a1a1a}
 .contract-num{font-size:18px;font-weight:800;color:#B8860B;text-align:center;margin-bottom:7px}
+.prelim-pill{display:block;text-align:center;font-size:10px;font-weight:800;color:#fff;background:#6b21a8;border-radius:6px;padding:3px 0;margin-bottom:7px;letter-spacing:.05em}
 
 /* SECTION TITLE */
 .sec-t{font-size:11px;font-weight:700;color:#B8860B;letter-spacing:.07em;margin-bottom:9px;display:flex;align-items:center;gap:6px}
@@ -53,6 +53,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1a1a1a;direction:rtl;
 .row-total td{background:#B8860B!important;color:#fff;font-weight:700;font-size:13px}
 .row-paid td{background:#dcfce7!important;color:#15803d;font-weight:700}
 .row-rem td{background:#fff8f0!important;color:#c2410c;font-weight:700}
+.row-est td{background:#f3e8ff!important;color:#6b21a8;font-weight:700}
 
 /* STATUS */
 .status-badge{display:inline-block;padding:4px 12px;border-radius:18px;font-size:11px;font-weight:700}
@@ -114,11 +115,12 @@ function buildCopy(o, copyType) {
       <div class="brand-contact">📞 هاتف المحل<br>📍 عنوان المحل</div>
     </div>
     <div class="contract-meta">
-      <div class="contract-num">#${String(o.orderNum||'').padStart(3,'0')}</div>
+      ${o.isPreliminary?`<div class="prelim-pill">📄 عقد مبدئي — غير ملزم مالياً</div>`:''}
+      <div class="contract-num">#${o.isPreliminary?(o.contractNum||''):String(o.orderNum||'').padStart(3,'0')}</div>
       <div class="meta-row"><span class="meta-key">تاريخ الإصدار</span><span class="meta-val">${printDate}</span></div>
       <div class="meta-row"><span class="meta-key">تاريخ التسليم</span><span class="meta-val">${fmtDate(o.date)}</span></div>
-      <div class="meta-row"><span class="meta-key">طريقة الدفع</span><span class="meta-val">${o.pay||'—'}</span></div>
-      <div style="text-align:center;margin-top:7px"><span class="status-badge ${si.cls}">${si.label}</span></div>
+      ${o.isPreliminary?'':`<div class="meta-row"><span class="meta-key">طريقة الدفع</span><span class="meta-val">${o.pay||'—'}</span></div>`}
+      <div style="text-align:center;margin-top:7px">${o.isPreliminary?'<span class="status-badge s-partial">قيد التأكيد ⏳</span>':`<span class="status-badge ${si.cls}">${si.label}</span>`}</div>
     </div>
   </div>
 
@@ -138,7 +140,15 @@ function buildCopy(o, copyType) {
     ${o.acc?`<div class="full"><div class="ik">الاكسسوارات</div><div class="iv">${o.acc}</div></div>`:''}
   </div>
 
-  <div class="sec-t">💰 التفاصيل المالية</div>
+  <div class="sec-t">💰 ${o.isPreliminary?'القيمة التقديرية':'التفاصيل المالية'}</div>
+  ${o.isPreliminary ? `
+  <table class="fin-table">
+    <thead><tr><th style="width:50%">البند</th><th style="width:25%;text-align:center">المبلغ</th><th>ملاحظة</th></tr></thead>
+    <tbody>
+      <tr class="row-est"><td><strong>القيمة التقديرية للطلبية</strong></td><td style="text-align:center;font-size:14px"><strong>${o.total?fmt(o.total):'غير محددة بعد'}</strong></td><td style="font-size:10px;color:#6b21a8">تقديرية — غير نهائية</td></tr>
+    </tbody>
+  </table>
+  ` : `
   <table class="fin-table">
     <thead><tr><th style="width:50%">البند</th><th style="width:25%;text-align:center">المبلغ</th><th>ملاحظة</th></tr></thead>
     <tbody>
@@ -147,6 +157,7 @@ function buildCopy(o, copyType) {
       <tr class="row-rem"><td>المبلغ المتبقي</td><td style="text-align:center">${fmt(remaining)}</td><td style="font-size:10px;color:#c2410c">${remaining>0?'يُسدَّد عند التسليم':'مسدَّد بالكامل ✓'}</td></tr>
     </tbody>
   </table>
+  `}
 
   ${o.notes ? `
   <div class="sec-t">📝 ملاحظات</div>
@@ -157,9 +168,13 @@ function buildCopy(o, copyType) {
   <div class="sig-area">
     <div class="sig-t">✍️ ${isClient?'التوقيعات والإقرار':'توقيعات المصنع'}</div>
     <div class="sig-clause">
-      ${isClient
-        ? 'أقرّ الطرف الثاني باستلام نسخة من هذا العقد والاطلاع على جميع بنوده والموافقة عليها. وتلتزم شركة رُقي بتنفيذ الطلبية وفق المواصفات المذكورة في تاريخ التسليم المحدد.'
-        : 'تُسلَّم هذه النسخة للمصنع للبدء في التصنيع وفق المواصفات المذكورة أعلاه، مع الالتزام بتاريخ التسليم المحدد.'
+      ${o.isPreliminary
+        ? (isClient
+            ? 'هذا عقد مبدئي لتوثيق الاتفاق الأولي على المواصفات المذكورة أعلاه، ولا يُعتبر التزاماً مالياً نهائياً ولا يُحتسب ضمن الحسابات. يتم تحويله إلى طلبية فعلية وتحديد قيمتها النهائية والدفعة الأولى عند التأكيد.'
+            : 'نسخة مبدئية للتوثيق الداخلي فقط، لا تُعتمد للتصنيع إلا بعد تحويلها إلى طلبية فعلية مؤكدة.')
+        : (isClient
+            ? 'أقرّ الطرف الثاني باستلام نسخة من هذا العقد والاطلاع على جميع بنوده والموافقة عليها. وتلتزم شركة رُقي بتنفيذ الطلبية وفق المواصفات المذكورة في تاريخ التسليم المحدد.'
+            : 'تُسلَّم هذه النسخة للمصنع للبدء في التصنيع وفق المواصفات المذكورة أعلاه، مع الالتزام بتاريخ التسليم المحدد.')
       }
     </div>
     <div class="sig-grid">
@@ -184,7 +199,7 @@ function buildCopy(o, copyType) {
 
   <div class="page-footer">
     <div class="pf-brand">رُقي للمطابخ والديكورات</div>
-    <div>عقد #${String(o.orderNum||'').padStart(3,'0')} — ${isClient?'نسخة العميل':'نسخة المصنع'}</div>
+    <div>${o.isPreliminary?'عقد مبدئي #'+(o.contractNum||''):'عقد #'+String(o.orderNum||'').padStart(3,'0')} — ${isClient?'نسخة العميل':'نسخة المصنع'}</div>
     <div>طُبع: ${printDate}</div>
   </div>`;
 }
@@ -198,7 +213,7 @@ function render(){
     buildCopy(o,'client') +
     `<div class="copy-break"></div>` +
     buildCopy(o,'factory');
-  document.title=`عقد رُقي #${String(o.orderNum||'').padStart(3,'0')}`;
+  document.title=o.isPreliminary?`عقد رُقي مبدئي #${o.contractNum||''}`:`عقد رُقي #${String(o.orderNum||'').padStart(3,'0')}`;
 }
 render();
 </script>
