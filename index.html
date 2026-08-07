@@ -499,7 +499,7 @@ tbody tr:hover td{background:#faf8f4}
     <div class="stat" style="--acc:#dc2626"><div class="st-ic">📉</div><div class="st-lbl">إجمالي التشغيلية</div><div class="st-val" id="e-total">0 د.ل</div></div>
     <div class="stat" style="--acc:#b45309"><div class="st-ic">📦</div><div class="st-lbl">مواد خام</div><div class="st-val" id="e-mat">0 د.ل</div></div>
     <div class="stat" style="--acc:#0891b2"><div class="st-ic">⚡</div><div class="st-lbl">تشغيل ونقل</div><div class="st-val" id="e-ops">0 د.ل</div></div>
-    <div class="stat" style="--acc:#6b7280"><div class="st-ic">📎</div><div class="st-lbl">أخرى</div><div class="st-val" id="e-other">0 د.ل</div></div>
+    <div class="stat" style="--acc:#6b7280"><div class="st-ic">📎</div><div class="st-lbl">مصروفات العامل</div><div class="st-val" id="e-other">0 د.ل</div></div>
   </div>
 
   <div class="two-col" style="align-items:start">
@@ -516,7 +516,7 @@ tbody tr:hover td{background:#faf8f4}
       <div class="fg"><label>البند *</label><input id="e-name" type="text" placeholder="مثال: خشب MDF"></div>
       <div class="fg"><label>الفئة</label>
         <select id="e-cat">
-          <option>مواد خام</option><option>تشغيل</option><option>نقل</option><option>أخرى</option>
+          <option>مواد خام</option><option>تشغيل</option><option>نقل</option><option>مصروفات العامل</option>
         </select>
       </div>
       <div class="fg"><label>المبلغ (د.ل) *</label><input id="e-amount" type="number" placeholder="0"></div>
@@ -761,7 +761,7 @@ tbody tr:hover td{background:#faf8f4}
     <div class="fg"><label>البند *</label><input id="ee-name" type="text"></div>
     <div class="fg"><label>الفئة</label>
       <select id="ee-cat">
-        <option>مواد خام</option><option>تشغيل</option><option>نقل</option><option>أخرى</option>
+        <option>مواد خام</option><option>تشغيل</option><option>نقل</option><option>مصروفات العامل</option>
       </select>
     </div>
     <div class="fg"><label>المبلغ (د.ل) *</label><input id="ee-amount" type="number"></div>
@@ -1727,7 +1727,7 @@ function renderExpenses(){
   document.getElementById('exp-period-net').textContent=fmt(periodNet);
   document.getElementById('exp-period-net').style.color=periodNet>=0?'#15803d':'#dc2626';
 
-  const catCls={'مواد خام':'sb-partial','تشغيل':'sb-ops','نقل':'sb-pending','أخرى':'sb-cancel'};
+  const catCls={'مواد خام':'sb-partial','تشغيل':'sb-ops','نقل':'sb-pending','مصروفات العامل':'sb-cancel'};
   const tb=document.getElementById('exp-body'),em=document.getElementById('exp-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
