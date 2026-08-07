@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -77,6 +76,7 @@ tbody tr:hover td{background:#faf8f4}
 .sb-cancel{background:#fee2e2;color:#991b1b}
 .sb-salary{background:#f3e8ff;color:#6b21a8}
 .sb-ops{background:#fff7ed;color:#c2410c}
+.sb-prelim{background:#ede9fe;color:#5b21b6}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--b2);background:var(--surface);color:var(--text);transition:.15s;font-family:inherit;font-weight:500}
@@ -198,6 +198,12 @@ tbody tr:hover td{background:#faf8f4}
 .net-sal-box{background:linear-gradient(135deg,#3b1f6b,#5a2d91);color:#fff;border-radius:8px;padding:.75rem 1rem;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
 .net-sal-box .lbl{font-size:12px;opacity:.85}
 .net-sal-box .val{font-size:18px;font-weight:800}
+
+/* PRELIMINARY CONTRACTS */
+.prelim-header{background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;border-radius:var(--rlg) var(--rlg) 0 0;padding:.8rem 1.25rem;display:flex;align-items:center;gap:8px}
+.prelim-header h3{font-size:14px;font-weight:700;color:#fff}
+.prelim-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden;margin-bottom:12px}
+.prelim-note{margin-top:.75rem;padding:.6rem;background:#f5f3ff;border-radius:8px;font-size:11px;color:#5b21b6;border:1px solid #ddd6fe}
 </style>
 </head>
 <body>
@@ -216,6 +222,7 @@ tbody tr:hover td{background:#faf8f4}
     <button class="tab active" onclick="goTo('dash',this)">🏠 الرئيسية</button>
     <button class="tab" onclick="goTo('orders',this)">📋 الطلبيات</button>
     <button class="tab" onclick="goTo('new',this)">➕ طلبية جديدة</button>
+    <button class="tab" onclick="goTo('contracts',this)">📄 عقود مبدئية</button>
     <button class="tab" onclick="goTo('expenses',this)">💸 المصروفات</button>
     <button class="tab" onclick="goTo('salaries',this)">👷 الرواتب</button>
     <button class="tab" onclick="goTo('reports',this)">📊 التقارير</button>
@@ -384,6 +391,55 @@ tbody tr:hover td{background:#faf8f4}
             <div class="inv-ti"><span style="font-size:10px;color:var(--t3)">الدفعة</span><strong id="pv-dep" style="color:#15803d">0 د.ل</strong></div>
             <div class="inv-ti"><span style="font-size:10px;color:var(--t3)">المتبقي</span><strong id="pv-rem" style="color:#dc2626">0 د.ل</strong></div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRELIMINARY CONTRACTS (لا تُحتسب في الحسابات المالية) ===== -->
+<div id="pg-contracts" class="page">
+  <div class="prelim-note" style="margin-bottom:12px">
+    💡 العقود المبدئية توثّق اتفاق العميل الأولي على المواصفات، ولا تُضاف قيمتها لأي حساب أو تقرير مالي. حوّلها إلى "طلبية فعلية" عند تأكيد العميل وتحديد الدفعة الأولى.
+  </div>
+  <div class="two-col" style="align-items:start">
+    <div class="prelim-card">
+      <div class="prelim-header">
+        <span style="font-size:18px">📄</span>
+        <h3>سجل العقود المبدئية</h3>
+      </div>
+      <div style="padding:1rem">
+        <div class="tw"><table>
+          <thead><tr><th>#</th><th>العميل</th><th>النوع</th><th>القيمة التقديرية</th><th>التاريخ</th><th></th></tr></thead>
+          <tbody id="contracts-body"></tbody>
+        </table></div>
+        <div id="contracts-empty" style="display:none;text-align:center;padding:1.5rem;color:var(--t3);font-size:13px">لا توجد عقود مبدئية بعد</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="sec">📄 إصدار عقد مبدئي جديد</div>
+        <div class="form-grid">
+          <div class="fg full"><label>اسم العميل *</label><input id="c-name" type="text" placeholder="اسم العميل"></div>
+          <div class="fg"><label>الهاتف</label><input id="c-phone" type="text" placeholder="09XX..."></div>
+          <div class="fg"><label>العنوان</label><input id="c-addr" type="text" placeholder="الحي"></div>
+        </div>
+        <div class="form-grid">
+          <div class="fg"><label>النوع *</label><select id="c-type"><option>مطبخ</option><option>غرفة نوم</option><option>ديكور وأثاث</option><option>دولاب ملابس</option><option>أخرى</option></select></div>
+          <div class="fg"><label>الواجهة</label><input id="c-facade" type="text" placeholder="MDF/لاكيه"></div>
+          <div class="fg"><label>الهيكل</label><input id="c-frame" type="text" placeholder="النوع"></div>
+          <div class="fg"><label>الارتفاع</label><input id="c-height" type="text" placeholder="90 سم"></div>
+          <div class="fg full"><label>الاكسسوارات</label><input id="c-acc" type="text" placeholder="مقبض، سكة، سيكلو..."></div>
+          <div class="fg"><label>تاريخ التسليم المتوقع</label><input id="c-date" type="date"></div>
+          <div class="fg"><label>القيمة التقديرية (د.ل)</label><input id="c-value" type="number" placeholder="اختياري — لا تُحتسب"></div>
+          <div class="fg full"><label>ملاحظات</label><textarea id="c-notes" placeholder="تفاصيل إضافية..."></textarea></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:.5rem">
+          <button class="btn btn-gold" onclick="saveContract()">✅ حفظ وإصدار العقد المبدئي</button>
+          <button class="btn" onclick="clearContractForm()">🗑 مسح</button>
+        </div>
+        <div class="prelim-note">
+          🔖 هذا العقد لتوثيق الاتفاق الأولي فقط — قيمته التقديرية لا تدخل ضمن الإيرادات أو التقارير المالية. عند تأكيد العميل استخدم زر "🔄 تحويل لطلبية" لإنشاء طلبية فعلية بنفس البيانات.
         </div>
       </div>
     </div>
@@ -748,10 +804,43 @@ RuqiDB.prototype.onSalariesChange = function(cb) {
   }
 };
 
+// ===== RuqiDB preliminary-contract extensions =====
+// عقود مبدئية: كيان منفصل تماماً عن الطلبيات (orders)، لا تُحتسب قيمتها في أي حساب مالي
+RuqiDB.prototype.getContracts = async function() {
+  if (this.firebaseReady) {
+    const snap = await this.db.ref('contracts').once('value');
+    return snap.val() ? Object.values(snap.val()) : [];
+  }
+  return JSON.parse(this.local.getItem('ruqi_contracts') || '[]');
+};
+RuqiDB.prototype.saveContract = async function(c) {
+  const list = await this.getContracts();
+  const idx = list.findIndex(x => x.id === c.id);
+  if (idx >= 0) list[idx] = c; else list.push(c);
+  this.local.setItem('ruqi_contracts', JSON.stringify(list));
+  if (this.firebaseReady) await this.db.ref(`contracts/${c.id}`).set(c);
+  return c;
+};
+RuqiDB.prototype.deleteContract = async function(id) {
+  let list = await this.getContracts();
+  list = list.filter(x => x.id !== id);
+  this.local.setItem('ruqi_contracts', JSON.stringify(list));
+  if (this.firebaseReady) await this.db.ref(`contracts/${id}`).remove();
+};
+RuqiDB.prototype.onContractsChange = function(cb) {
+  if (this.firebaseReady) {
+    this.db.ref('contracts').on('value', snap => {
+      const data = snap.val() ? Object.values(snap.val()) : [];
+      this.local.setItem('ruqi_contracts', JSON.stringify(data));
+      cb(data);
+    });
+  }
+};
+
 // ===== STATE =====
 const db = new RuqiDB();
-let orders = [], expenses = [], salaries = [];
-let editId = null, expEditId = null, salEditId = null;
+let orders = [], expenses = [], salaries = [], contracts = [];
+let editId = null, expEditId = null, salEditId = null, contractEditId = null;
 // قائمة الخصومات المؤقتة في نموذج إضافة الراتب
 let tempDeductions = [];
 // قائمة الخصومات المؤقتة في نموذج تعديل الراتب
@@ -772,6 +861,7 @@ function goTo(id, btn) {
   if (id === 'reports')  { populateRepYears(); populateRepMonths(); renderReports(); }
   if (id === 'expenses') { populateExpYears(); populateExpMonths(); renderExpenses(); }
   if (id === 'salaries') { populateSalYears(); populateSalMonths(); renderSalaries(); }
+  if (id === 'contracts') renderContracts();
   if (id === 'dash')     renderDash();
 }
 
@@ -784,17 +874,19 @@ function setSync(s){const d=document.getElementById('sync-dot'),l=document.getEl
 
 // ===== LOAD =====
 async function load() {
-  [orders, expenses, salaries] = await Promise.all([db.getOrders(), db.getExpenses(), db.getSalaries()]);
+  [orders, expenses, salaries, contracts] = await Promise.all([db.getOrders(), db.getExpenses(), db.getSalaries(), db.getContracts()]);
   renderDash();
   renderOrders('all');
   populateExpYears(); populateExpMonths(); renderExpenses();
   populateSalYears(); populateSalMonths(); renderSalaries();
   populateRepYears(); populateRepMonths(); renderReports();
+  renderContracts();
 }
 
 db.onOrdersChange(d=>{orders=d;setSync('on');renderDash();renderOrders('all');renderReports();});
 db.onExpensesChange(d=>{expenses=d;renderExpenses();renderDash();renderReports();});
 db.onSalariesChange(d=>{salaries=d;renderSalaries();renderDash();renderReports();});
+db.onContractsChange(d=>{contracts=d;renderContracts();});
 window.addEventListener('online',()=>{setSync('on');load();});
 window.addEventListener('offline',()=>setSync('off'));
 setSync(navigator.onLine?'on':'off');
@@ -1083,6 +1175,138 @@ async function saveEdit(){
 function closeEdit(){document.getElementById('edit-ov').classList.remove('open');editId=null;}
 async function confirmDel(id){if(!confirm('حذف هذه الطلبية؟'))return;await db.deleteOrder(id);orders=orders.filter(o=>o.id!==id);renderOrders('all');renderDash();toast('🗑 تم الحذف');}
 async function delOrder(){if(!confirm('حذف الطلبية نهائياً؟'))return;await db.deleteOrder(editId);orders=orders.filter(o=>o.id!==editId);closeEdit();renderOrders('all');renderDash();toast('🗑 تم الحذف');}
+
+// ===== PRELIMINARY CONTRACTS (منفصلة تماماً عن الطلبيات — لا تدخل أي حساب مالي) =====
+let contractCounter=parseInt(localStorage.getItem('ruqi_contract_counter')||'0');
+
+function clearContractForm(){
+  ['c-name','c-phone','c-addr','c-facade','c-frame','c-height','c-acc','c-date','c-notes','c-value'].forEach(id=>{
+    const e=document.getElementById(id); if(e) e.value='';
+  });
+  document.getElementById('c-type').value='مطبخ';
+  contractEditId=null;
+}
+
+async function saveContract(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name){toast('⚠️ أدخل اسم العميل');return;}
+  if(contractEditId){ await saveContractEditIfEditing(); return; }
+  contractCounter++; localStorage.setItem('ruqi_contract_counter',contractCounter);
+  const contract={
+    id:db.newId(),
+    contractNum:String(contractCounter).padStart(3,'0'),
+    name,
+    phone:document.getElementById('c-phone').value,
+    addr:document.getElementById('c-addr').value,
+    type:document.getElementById('c-type').value,
+    facade:document.getElementById('c-facade').value,
+    frame:document.getElementById('c-frame').value,
+    height:document.getElementById('c-height').value,
+    acc:document.getElementById('c-acc').value,
+    notes:document.getElementById('c-notes').value,
+    total:parseFloat(document.getElementById('c-value').value)||0,
+    date:document.getElementById('c-date').value||today(),
+    dateAdded:new Date().toISOString(),
+    isPreliminary:true
+  };
+  await db.saveContract(contract); contracts.push(contract);
+  toast('✅ تم إصدار العقد المبدئي #'+contract.contractNum);
+  clearContractForm();
+  renderContracts();
+}
+
+function renderContracts(){
+  const tb=document.getElementById('contracts-body'), em=document.getElementById('contracts-empty');
+  if(!tb) return;
+  const data=[...contracts].reverse();
+  if(!data.length){tb.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  tb.innerHTML=data.map(c=>`<tr>
+    <td style="color:var(--t3)">#${c.contractNum||''}</td>
+    <td style="font-weight:600">${c.name}</td>
+    <td>${c.type}</td>
+    <td>${c.total?fmt(c.total):'<span style="color:var(--t3)">—</span>'}</td>
+    <td style="color:var(--t3);font-size:12px">${c.date||''}</td>
+    <td style="display:flex;gap:4px">
+      <button class="btn btn-sm" onclick="openContractEdit('${c.id}')">✏️</button>
+      <button class="btn btn-sm" style="color:#6b21a8;border-color:#6b21a8" onclick="printContract('${c.id}')">🖨️ عقد مبدئي</button>
+      <button class="btn btn-sm" style="color:#B8860B;border-color:#B8860B" onclick="convertContractToOrder('${c.id}')">🔄 تحويل لطلبية</button>
+      <button class="btn btn-sm" style="color:#dc2626" onclick="delContract('${c.id}')">🗑</button>
+    </td></tr>`).join('');
+}
+
+function printContract(id){
+  const c=contracts.find(x=>x.id===id); if(!c)return;
+  localStorage.setItem('ruqi_print_order',JSON.stringify(c));
+  window.open('print-order.html?contract='+id,'_blank');
+}
+
+function openContractEdit(id){
+  contractEditId=id;
+  const c=contracts.find(x=>x.id===id); if(!c)return;
+  document.getElementById('c-name').value=c.name;
+  document.getElementById('c-phone').value=c.phone||'';
+  document.getElementById('c-addr').value=c.addr||'';
+  document.getElementById('c-type').value=c.type||'مطبخ';
+  document.getElementById('c-facade').value=c.facade||'';
+  document.getElementById('c-frame').value=c.frame||'';
+  document.getElementById('c-height').value=c.height||'';
+  document.getElementById('c-acc').value=c.acc||'';
+  document.getElementById('c-date').value=c.date||'';
+  document.getElementById('c-value').value=c.total||'';
+  document.getElementById('c-notes').value=c.notes||'';
+  toast('✏️ عدّل البيانات ثم اضغط "حفظ" — سيتم تحديث نفس العقد #'+c.contractNum);
+}
+
+async function saveContractEditIfEditing(){
+  // إن كان هناك عقد قيد التعديل، حدّثه بدل إنشاء عقد جديد
+  if(!contractEditId) return false;
+  const c=contracts.find(x=>x.id===contractEditId); if(!c) return false;
+  c.name=document.getElementById('c-name').value.trim()||c.name;
+  c.phone=document.getElementById('c-phone').value;
+  c.addr=document.getElementById('c-addr').value;
+  c.type=document.getElementById('c-type').value;
+  c.facade=document.getElementById('c-facade').value;
+  c.frame=document.getElementById('c-frame').value;
+  c.height=document.getElementById('c-height').value;
+  c.acc=document.getElementById('c-acc').value;
+  c.date=document.getElementById('c-date').value||c.date;
+  c.total=parseFloat(document.getElementById('c-value').value)||0;
+  c.notes=document.getElementById('c-notes').value;
+  await db.saveContract(c);
+  contractEditId=null;
+  toast('✅ تم تحديث العقد المبدئي #'+c.contractNum);
+  clearContractForm();
+  renderContracts();
+  return true;
+}
+
+async function delContract(id){
+  if(!confirm('حذف هذا العقد المبدئي؟'))return;
+  await db.deleteContract(id);
+  contracts=contracts.filter(c=>c.id!==id);
+  if(contractEditId===id){contractEditId=null;clearContractForm();}
+  renderContracts();
+  toast('🗑 تم حذف العقد المبدئي');
+}
+
+function convertContractToOrder(id){
+  const c=contracts.find(x=>x.id===id); if(!c)return;
+  goTo('new',document.querySelectorAll('.tab')[2]);
+  document.getElementById('n-name').value=c.name;
+  document.getElementById('n-phone').value=c.phone||'';
+  document.getElementById('n-addr').value=c.addr||'';
+  document.getElementById('n-type').value=c.type||'مطبخ';
+  document.getElementById('n-facade').value=c.facade||'';
+  document.getElementById('n-frame').value=c.frame||'';
+  document.getElementById('n-height').value=c.height||'';
+  document.getElementById('n-acc').value=c.acc||'';
+  document.getElementById('n-date').value=c.date||'';
+  document.getElementById('n-notes').value=(c.notes?c.notes+' — ':'')+'مُحوَّل من العقد المبدئي #'+c.contractNum;
+  if(c.total) document.getElementById('n-total').value=c.total;
+  nCalc(); pvUpdate();
+  toast('📋 تم نقل بيانات العميل — أدخل قيمة العقد النهائية والدفعة الأولى ثم احفظ');
+}
 
 // ===== EXPENSES =====
 function getFilteredExpenses() {
