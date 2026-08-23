@@ -524,7 +524,8 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
             <div class="fi"><label>سعر الوحدة</label><input id="ci-price" type="number" inputmode="decimal" placeholder="0"></div>
           </div>
           <div class="fi"><label>التخفيض (د.ل)</label><input id="ci-disc" type="number" inputmode="decimal" placeholder="0"></div>
-          <button class="btn btn-o" onclick="addContractItem()">➕ إضافة البند</button>
+          <button class="btn btn-o" id="ci-add-btn" onclick="addContractItem()">➕ إضافة البند</button>
+          <button class="btn btn-r" id="ci-cancel-edit-btn" style="display:none" onclick="cancelEditContractItem()">✕ إلغاء التعديل</button>
         </div>
       </div>
 
@@ -892,6 +893,8 @@ let editOrdId=null,editExpId=null,editSalId=null,eCatFilter='all';
 let addDedList=[],editDedList=[];
 // بنود منتجات العقد المبدئي + المطابخ المتعددة للطلبية
 let tempContractItems=[],contractEditId=null,contractCounter=parseInt(localStorage.getItem('ruqi_contract_counter')||'0');
+// فهرس البند الجاري تعديله حالياً داخل tempContractItems (null = إضافة بند جديد)
+let editingItemIndex=null;
 let tempKitchens=[];
 let viewingArchiveId=null;
 
@@ -1488,11 +1491,47 @@ function addContractItem(){
   const price=parseFloat(document.getElementById('ci-price').value)||0;
   const disc=parseFloat(document.getElementById('ci-disc').value)||0;
   if(!name){toast('⚠️ أدخل اسم المنتج');return}
-  tempContractItems.push({id:Date.now(),name,qty,price,disc});
+  if(editingItemIndex!==null && tempContractItems[editingItemIndex]){
+    // تحديث بند موجود بدل إضافة بند جديد
+    const existingId=tempContractItems[editingItemIndex].id;
+    tempContractItems[editingItemIndex]={id:existingId,name,qty,price,disc};
+    editingItemIndex=null;
+    const b=document.getElementById('ci-add-btn'); if(b) b.textContent='➕ إضافة البند';
+    const c=document.getElementById('ci-cancel-edit-btn'); if(c) c.style.display='none';
+    toast('✅ تم تحديث البند');
+  } else {
+    tempContractItems.push({id:Date.now(),name,qty,price,disc});
+  }
   ['ci-name','ci-qty','ci-price','ci-disc'].forEach(id=>document.getElementById(id).value='');
   renderContractItemsList();
 }
-function removeContractItem(id){tempContractItems=tempContractItems.filter(i=>i.id!==id);renderContractItemsList()}
+
+function editContractItem(id){
+  const idx=tempContractItems.findIndex(i=>i.id===id);
+  if(idx<0)return;
+  const item=tempContractItems[idx];
+  document.getElementById('ci-name').value=item.name;
+  document.getElementById('ci-qty').value=item.qty;
+  document.getElementById('ci-price').value=item.price;
+  document.getElementById('ci-disc').value=item.disc;
+  editingItemIndex=idx;
+  const b=document.getElementById('ci-add-btn'); if(b) b.textContent='✅ حفظ تعديل البند';
+  const c=document.getElementById('ci-cancel-edit-btn'); if(c) c.style.display='flex';
+  document.getElementById('ci-name').focus();
+}
+
+function cancelEditContractItem(){
+  editingItemIndex=null;
+  ['ci-name','ci-qty','ci-price','ci-disc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+  const b=document.getElementById('ci-add-btn'); if(b) b.textContent='➕ إضافة البند';
+  const c=document.getElementById('ci-cancel-edit-btn'); if(c) c.style.display='none';
+}
+
+function removeContractItem(id){
+  tempContractItems=tempContractItems.filter(i=>i.id!==id);
+  if(editingItemIndex!==null) cancelEditContractItem();
+  renderContractItemsList();
+}
 function renderContractItemsList(){
   const el=document.getElementById('citem-list');if(!el)return;
   if(!tempContractItems.length){el.innerHTML='<div style="text-align:center;font-size:11px;color:var(--t3);padding:4px">لا توجد بنود مضافة بعد</div>';return}
@@ -1503,7 +1542,8 @@ function renderContractItemsList(){
       <span>${i.name} <span style="color:var(--t3)">(${i.qty}×${fmt(i.price)}${i.disc?' −'+fmt(i.disc):''})</span></span>
       <div style="display:flex;align-items:center;gap:6px">
         <strong style="color:var(--gold)">${fmtD(rowTotal)}</strong>
-        <button onclick="removeContractItem(${i.id})" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;padding:0">✕</button>
+        <button onclick="editContractItem(${i.id})" style="background:none;border:none;cursor:pointer;color:var(--gold);font-size:14px;padding:0" title="تعديل البند">✏️</button>
+        <button onclick="removeContractItem(${i.id})" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;padding:0" title="حذف البند">✕</button>
       </div>
     </div>`;
   }).join('')+`<div class="ded-total"><span>إجمالي البنود</span><strong style="color:var(--gold)">${fmtD(total)}</strong></div>`;
@@ -1515,7 +1555,7 @@ function clearContractForm(){
     const e=document.getElementById(id);if(e)e.value=''
   });
   document.getElementById('c-type').value='مطبخ';
-  contractEditId=null;tempContractItems=[];renderContractItemsList();
+  contractEditId=null;tempContractItems=[];cancelEditContractItem();renderContractItemsList();
   const cd=document.getElementById('c-date');if(cd)cd.value=today();
 }
 
@@ -1590,8 +1630,9 @@ function openContractEdit(id){
   document.getElementById('c-value').value=c.total||'';
   document.getElementById('c-notes').value=c.notes||'';
   tempContractItems=c.items?c.items.map(i=>({...i,id:i.id||Date.now()+Math.random()})):[];
+  cancelEditContractItem();
   renderContractItemsList();
-  toast('✏️ عدّل البيانات ثم اضغط "حفظ" — سيتم تحديث نفس العقد #'+c.contractNum);
+  toast('✏️ عدّل البيانات أو بنود المنتجات ثم اضغط "حفظ" — سيتم تحديث نفس العقد #'+c.contractNum);
   goTo('contracts');
   document.getElementById('pg-contracts').scrollTop=0;
 }
