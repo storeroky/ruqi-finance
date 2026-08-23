@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -152,8 +153,8 @@ function buildCopy(o, copyType) {
       <div class="contract-num">#${o.isPreliminary?(o.contractNum||''):String(o.orderNum||'').padStart(3,'0')}</div>
       <div class="meta-row"><span class="meta-key">تاريخ الإصدار</span><span class="meta-val">${printDate}</span></div>
       <div class="meta-row"><span class="meta-key">تاريخ التسليم</span><span class="meta-val">${fmtDate(o.date)}</span></div>
-      ${o.isPreliminary?'':`<div class="meta-row"><span class="meta-key">طريقة الدفع</span><span class="meta-val">${o.pay||'—'}</span></div>`}
-      <div style="text-align:center;margin-top:7px">${o.isPreliminary?'<span class="status-badge s-partial">قيد التأكيد ⏳</span>':`<span class="status-badge ${si.cls}">${si.label}</span>`}</div>
+      ${(o.isPreliminary||!isClient)?'':`<div class="meta-row"><span class="meta-key">طريقة الدفع</span><span class="meta-val">${o.pay||'—'}</span></div>`}
+      <div style="text-align:center;margin-top:7px">${o.isPreliminary?'<span class="status-badge s-partial">قيد التأكيد ⏳</span>':(isClient?`<span class="status-badge ${si.cls}">${si.label}</span>`:'')}</div>
     </div>
   </div>
 
@@ -186,6 +187,7 @@ function buildCopy(o, copyType) {
   </div>
   `}
 
+  ${isClient ? `
   <div class="sec-t">💰 ${o.isPreliminary?'القيمة التقديرية':'التفاصيل المالية'}</div>
   ${o.isPreliminary ? `
   <table class="fin-table">
@@ -204,6 +206,7 @@ function buildCopy(o, copyType) {
     </tbody>
   </table>
   `}
+  ` : ''}
 
   ${o.notes ? `
   <div class="sec-t">📝 ملاحظات</div>
