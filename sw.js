@@ -1,68 +1,96 @@
-const CACHE = 'ruqi-v3';
+const CACHE = 'ruqi-v4';
+
+// ملفات التطبيق (نفس الأصل). كل ملف يُخزَّن على حدة حتى لا يفشل التثبيت لو غاب أحدها.
 const ASSETS = [
   './',
   './mobile.html',
   './index.html',
+  './print-order.html',
   './firebase-config.js',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
+];
+
+// مكتبات Firebase (طرف ثالث) — تُخزَّن ليعمل التطبيق بدون إنترنت
+const SDK = [
+  'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
+  'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js'
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE)
-      .then(c => c.addAll(ASSETS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE).then(async c => {
+      await Promise.allSettled(ASSETS.map(u => c.add(u)));
+      // no-cors => استجابة opaque، ويقبلها cache.put
+      await Promise.allSettled(SDK.map(u =>
+        fetch(u, { mode: 'no-cors' }).then(r => c.put(u, r))
+      ));
+    }).then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
-  // Firebase — always network, never cache
-  if (
-    e.request.url.includes('firebaseio.com') ||
-    e.request.url.includes('googleapis.com') ||
-    e.request.url.includes('firebase') ||
-    e.request.url.includes('gstatic.com')
-  ) {
-    return;
-  }
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
-  // HTML pages — Network First: جلب من الشبكة دائماً، الـ cache فقط عند الفشل
-  if (e.request.destination === 'document' ||
-      e.request.url.endsWith('.html') ||
-      e.request.url.endsWith('/')) {
+  // بيانات Firebase المباشرة — دائماً من الشبكة (بحسب اسم النطاق وليس اسم الملف)
+  if (url.hostname.endsWith('firebaseio.com') || url.hostname.endsWith('googleapis.com')) return;
+
+  // مكتبات Firebase على gstatic — الكاش أولاً
+  if (url.hostname === 'www.gstatic.com') {
     e.respondWith(
-      fetch(e.request)
-        .then(res => {
-          if (res && res.status === 200) {
-            const clone = res.clone();
-            caches.open(CACHE).then(c => c.put(e.request, clone));
-          }
-          return res;
-        })
-        .catch(() => caches.match(e.request))
+      caches.match(req).then(cached => cached || fetch(req).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(req, clone));
+        return res;
+      }))
     );
     return;
   }
 
-  // JS / CSS / Images — Cache First مع تحديث في الخلفية
+  // أي نطاق آخر — لا نتدخل
+  if (url.origin !== location.origin) return;
+
+  // صفحات HTML — الشبكة أولاً، والكاش عند الفشل
+  if (req.mode === 'navigate' || req.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+    e.respondWith(
+      fetch(req)
+        .then(res => {
+          if (res && res.status === 200) {
+            const clone = res.clone();
+            caches.open(CACHE).then(c => c.put(req, clone));
+          }
+          return res;
+        })
+        .catch(() =>
+          caches.match(req, { ignoreSearch: true })
+            .then(r => r || caches.match('./mobile.html'))
+        )
+    );
+    return;
+  }
+
+  // JS / CSS / صور — الكاش أولاً مع تحديث في الخلفية
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      const fetchPromise = fetch(e.request).then(res => {
+    caches.match(req, { ignoreSearch: true }).then(cached => {
+      const fetchPromise = fetch(req).then(res => {
         if (res && res.status === 200 && res.type === 'basic') {
           const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
+          caches.open(CACHE).then(c => c.put(req, clone));
         }
         return res;
       }).catch(() => cached);
-
       return cached || fetchPromise;
     })
   );
