@@ -219,6 +219,14 @@ tbody tr:hover td{background:#faf8f4}
 .kitchen-item{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:.5rem .75rem;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
 .kitchen-item .ki-title{font-weight:700;color:#B8860B}
 .kitchen-item .ki-sub{color:var(--t2);font-size:11px}
+
+/* PROFIT (جديد) */
+.cost-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.75rem;margin-bottom:8px}
+.cost-box .ded-row{border-bottom-color:#bbf7d0}
+.profit-box{background:linear-gradient(135deg,#14532d,#15803d);color:#fff;border-radius:8px;padding:.75rem 1rem;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+.profit-box .lbl{font-size:12px;opacity:.9}
+.profit-box .val{font-size:18px;font-weight:800}
+.closed-badge{background:#dcfce7;color:#15803d;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:700;margin-right:4px}
 </style>
 </head>
 <body>
@@ -278,8 +286,8 @@ tbody tr:hover td{background:#faf8f4}
   <div class="stats">
     <div class="stat" style="--acc:#7c3aed"><div class="st-ic">👷</div><div class="st-lbl">إجمالي الرواتب</div><div class="st-val" id="d-sal">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">كل الأشهر</span></div></div>
     <div class="stat" style="--acc:#0891b2"><div class="st-ic">💎</div><div class="st-lbl">صافي الربح</div><div class="st-val" id="d-net">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">بعد كل المصروفات</span></div></div>
-    <div class="stat" style="--acc:#16a34a" style="grid-column:span 2"></div>
-    <div class="stat" style="--acc:#16a34a" style="grid-column:span 2"></div>
+    <div class="stat" style="--acc:#15803d"><div class="st-ic">📅</div><div class="st-lbl">ربح الشهر الحالي (طلبيات مقفلة)</div><div class="st-val" id="d-pm">0 د.ل</div><div class="st-foot" id="d-pm-s"></div></div>
+    <div class="stat" style="--acc:#15803d"><div class="st-ic">🏆</div><div class="st-lbl">ربح السنة الحالية (طلبيات مقفلة)</div><div class="st-val" id="d-py">0 د.ل</div><div class="st-foot" id="d-py-s"></div></div>
   </div>
 
   <div class="two-col">
@@ -342,7 +350,7 @@ tbody tr:hover td{background:#faf8f4}
   </div>
   <div class="card">
     <div class="tw"><table>
-      <thead><tr><th>#</th><th>العميل</th><th>النوع</th><th>العقد</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th><th>التاريخ</th><th></th></tr></thead>
+      <thead><tr><th>#</th><th>العميل</th><th>النوع</th><th>العقد</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th><th>صافي الربح</th><th>التاريخ</th><th></th></tr></thead>
       <tbody id="orders-body"></tbody>
     </table></div>
     <div id="orders-empty" style="display:none;text-align:center;padding:2rem;color:var(--t3);font-size:13px">لا توجد طلبيات</div>
@@ -529,6 +537,9 @@ tbody tr:hover td{background:#faf8f4}
       <div style="margin-top:.75rem;padding:.6rem;background:#fff8e1;border-radius:8px;font-size:11px;color:#7a5a08;border:1px solid #f5d78e">
         💡 لتسجيل رواتب الموظفين انتقل إلى تبويب <strong>👷 الرواتب</strong>
       </div>
+      <div style="margin-top:.5rem;padding:.6rem;background:#f0fdf4;border-radius:8px;font-size:11px;color:#14532d;border:1px solid #bbf7d0">
+        ⚠️ تكاليف كل طلبية (مواد، أجور، نقل، تركيب) تُسجَّل داخل الطلبية نفسها من زر ✏️ في تبويب الطلبيات لحساب ربحها. هنا سجّل فقط المصروفات العامة (إيجار، كهرباء...) لتفادي احتساب التكلفة مرتين.
+      </div>
     </div>
   </div>
 </div>
@@ -649,6 +660,16 @@ tbody tr:hover td{background:#faf8f4}
       </table></div>
     </div>
   </div>
+
+  <div class="card">
+    <div class="sec">💎 صافي ربح الطلبيات المقفلة — حسب الشهر (للإدارة فقط)</div>
+    <div class="tw"><table>
+      <thead><tr><th>الشهر</th><th>عدد الطلبيات</th><th>الإيرادات</th><th>التكاليف</th><th>صافي الربح</th><th>الهامش</th></tr></thead>
+      <tbody id="profit-month-body"></tbody>
+      <tfoot id="profit-year-foot"></tfoot>
+    </table></div>
+  </div>
+
   <div class="card">
     <div class="sec">📂 تصدير وطباعة</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -736,6 +757,28 @@ tbody tr:hover td{background:#faf8f4}
         <span>المتبقي بعد الدفعة</span>
         <strong id="em-summary-rem" style="color:#dc2626">0 د.ل</strong>
       </div>
+    </div>
+
+    <!-- التكاليف وصافي الربح (للإدارة فقط) -->
+    <div class="modal-sec">💎 التكاليف وصافي الربح (للإدارة فقط — لا يظهر للزبون)</div>
+    <div class="cost-box">
+      <div id="em-cost-list"></div>
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+        <input id="em-cost-name" type="text" placeholder="اسم التكلفة" style="flex:1;min-width:110px;padding:7px 9px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit;direction:rtl">
+        <select id="em-cost-cat" style="padding:7px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit">
+          <option>مواد خام</option><option>أجور عمال</option><option>نقل</option><option>تركيب</option><option>أخرى</option>
+        </select>
+        <input id="em-cost-amount" type="number" placeholder="المبلغ" style="width:90px;padding:7px 9px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit">
+        <button class="btn btn-sm" style="background:#15803d;color:#fff;border-color:#15803d" onclick="addOrderCost()">➕</button>
+      </div>
+    </div>
+    <div class="profit-box">
+      <div><div class="lbl">صافي ربح الطلبية</div><div style="font-size:11px;opacity:.8" id="em-profit-sub"></div></div>
+      <div class="val" id="em-profit">0 د.ل</div>
+    </div>
+    <div style="display:flex;gap:8px;margin:8px 0">
+      <button class="btn btn-sm" id="em-close-btn" style="background:#15803d;color:#fff;border-color:#15803d" onclick="closeOrderProfit()">🔒 إقفال الطلبية وحساب الربح</button>
+      <button class="btn btn-sm" id="em-reopen-btn" style="display:none" onclick="reopenOrder()">🔓 إعادة فتح</button>
     </div>
 
     <!-- الحالة والملاحظة -->
@@ -832,7 +875,7 @@ tbody tr:hover td{background:#faf8f4}
 
     <div class="modal-sec">📋 الطلبيات (<span id="av-orders-count">0</span>)</div>
     <div class="tw"><table class="archive-mini-tbl">
-      <thead><tr><th>#</th><th>العميل</th><th>النوع</th><th>العقد</th><th>المدفوع</th><th>التاريخ</th></tr></thead>
+      <thead><tr><th>#</th><th>العميل</th><th>النوع</th><th>العقد</th><th>المدفوع</th><th>صافي الربح</th><th>التاريخ</th></tr></thead>
       <tbody id="av-orders-body"></tbody>
     </table></div>
 
@@ -989,6 +1032,8 @@ let editingItemIndex = null;
 // المطابخ المتعددة لنفس الطلبية (نموذج طلبية جديدة)
 let tempKitchens = [];
 let viewingArchiveId = null;
+// تكاليف الطلبية الجاري تعديلها (لحساب صافي ربح الطلبية)
+let editCosts = [];
 
 const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
@@ -1016,6 +1061,10 @@ function fmtN(n){return Math.round(n||0).toLocaleString('ar-LY')}
 function today(){return new Date().toISOString().slice(0,10)}
 function toast(msg,d=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
 function setSync(s){const d=document.getElementById('sync-dot'),l=document.getElementById('sync-lbl');d.className='sync-dot '+(s==='on'?'on':'off');l.textContent=s==='on'?'متصل — مزامنة فورية':'أوف لاين — محلي'}
+// تهريب النصوص لمنع XSS عند الإدراج في innerHTML
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+// تهريب خلايا CSV
+function csv(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
 
 // ===== LOAD =====
 async function load() {
@@ -1061,14 +1110,6 @@ function populateYearSel(selId, arr, dateField) {
 function populateMonthSel(selId, yearSelId, arr, dateField) {
   const sel = document.getElementById(selId);
   const cur = sel.value;
-  const yr = document.getElementById(yearSelId).value;
-  const usedMonths = new Set();
-  arr.forEach(item => {
-    let iy, im;
-    if (dateField === 'sal') { iy = String(item.year||''); im = String(item.month||''); }
-    else { const d = item[dateField]||''; iy = d.slice(0,4); im = String(parseInt(d.slice(5,7))||0); }
-    if (iy === yr) usedMonths.add(im);
-  });
   sel.innerHTML = `<option value="all">كل الأشهر</option>` +
     MONTHS_AR.map((m,i)=>{
       const v = String(i+1);
@@ -1083,6 +1124,9 @@ function populateSalYears()  { populateYearSel('sal-year-sel', salaries, 'sal');
 function populateSalMonths() { populateMonthSel('sal-month-sel','sal-year-sel', salaries, 'sal'); }
 function populateRepYears()  { populateYearSel('rep-year-sel', orders, 'date'); }
 function populateRepMonths() { populateMonthSel('rep-month-sel','rep-year-sel', orders, 'date'); }
+
+// ===== PROFIT HELPERS =====
+function orderCostTotal(arr){ return (arr||[]).reduce((s,c)=>s+(c.amount||0),0); }
 
 // ===== DASHBOARD =====
 function renderDash(){
@@ -1114,6 +1158,21 @@ function renderDash(){
   document.getElementById('d-sal-foot').textContent=fmt(salExp);
   document.getElementById('d-net2').textContent=fmt(net);
   document.getElementById('d-net2').style.color=net>=0?'#15803d':'#dc2626';
+
+  // ربح الشهر والسنة الحالية من الطلبيات المقفلة
+  const nowD=new Date(), cy=String(nowD.getFullYear()), cm=nowD.getMonth();
+  const closedOrders=orders.filter(o=>o.closed&&o.closedAt);
+  const yearClosed=closedOrders.filter(o=>o.closedAt.slice(0,4)===cy);
+  const monthClosed=yearClosed.filter(o=>new Date(o.closedAt).getMonth()===cm);
+  const pm=monthClosed.reduce((s,o)=>s+(o.profit||0),0);
+  const py=yearClosed.reduce((s,o)=>s+(o.profit||0),0);
+  document.getElementById('d-pm').textContent=fmt(pm);
+  document.getElementById('d-pm').style.color=pm>=0?'#15803d':'#dc2626';
+  document.getElementById('d-pm-s').textContent=monthClosed.length+' طلبية مقفلة';
+  document.getElementById('d-py').textContent=fmt(py);
+  document.getElementById('d-py').style.color=py>=0?'#15803d':'#dc2626';
+  document.getElementById('d-py-s').textContent=yearClosed.length+' طلبية مقفلة';
+
   renderChart(); renderDonut(); renderActivity();
 }
 
@@ -1136,7 +1195,7 @@ function renderDonut(){
   if(!keys.length){ctx.beginPath();ctx.arc(44,44,32,0,Math.PI*2);ctx.strokeStyle='#e0dbd2';ctx.lineWidth=14;ctx.stroke();document.getElementById('donut-leg').innerHTML='<div style="font-size:12px;color:var(--t3)">لا توجد طلبيات</div>';return;}
   let off=-Math.PI/2;
   keys.forEach((k,i)=>{const a=(types[k]/total)*Math.PI*2;ctx.beginPath();ctx.arc(44,44,30,off,off+a);ctx.strokeStyle=colors[i%colors.length];ctx.lineWidth=14;ctx.stroke();off+=a;});
-  document.getElementById('donut-leg').innerHTML=keys.map((k,i)=>`<div class="leg-row"><div class="leg-d" style="background:${colors[i%colors.length]}"></div><span style="color:var(--t2)">${k}</span><strong style="margin-right:auto">${Math.round(types[k]/total*100)}%</strong></div>`).join('');
+  document.getElementById('donut-leg').innerHTML=keys.map((k,i)=>`<div class="leg-row"><div class="leg-d" style="background:${colors[i%colors.length]}"></div><span style="color:var(--t2)">${esc(k)}</span><strong style="margin-right:auto">${Math.round(types[k]/total*100)}%</strong></div>`).join('');
 }
 
 function renderActivity(){
@@ -1148,9 +1207,9 @@ function renderActivity(){
   const el=document.getElementById('d-activity');
   if(!all.length){el.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--t3);font-size:13px">لا توجد عمليات</div>';return;}
   el.innerHTML=all.map(a=>{
-    if(a._t==='o') return `<div class="ai"><div class="a-ic" style="background:#dcfce7">📋</div><div class="a-b"><div class="a-t">${a.name}</div><div class="a-m">${a.type}</div></div><div class="a-amt" style="color:#15803d">+${fmt(a.total)}</div></div>`;
-    if(a._t==='s') return `<div class="ai"><div class="a-ic" style="background:#f3e8ff">👷</div><div class="a-b"><div class="a-t">${a.name}</div><div class="a-m">راتب · ${MONTHS_AR[(a.month||1)-1]} ${a.year||''}</div></div><div class="a-amt" style="color:#7c3aed">-${fmt(a.netAmount!==undefined?a.netAmount:a.amount)}</div></div>`;
-    return `<div class="ai"><div class="a-ic" style="background:#fee2e2">💸</div><div class="a-b"><div class="a-t">${a.name}</div><div class="a-m">${a.cat}</div></div><div class="a-amt" style="color:#dc2626">-${fmt(a.amount)}</div></div>`;
+    if(a._t==='o') return `<div class="ai"><div class="a-ic" style="background:#dcfce7">📋</div><div class="a-b"><div class="a-t">${esc(a.name)}</div><div class="a-m">${esc(a.type)}</div></div><div class="a-amt" style="color:#15803d">+${fmt(a.total)}</div></div>`;
+    if(a._t==='s') return `<div class="ai"><div class="a-ic" style="background:#f3e8ff">👷</div><div class="a-b"><div class="a-t">${esc(a.name)}</div><div class="a-m">راتب · ${MONTHS_AR[(a.month||1)-1]} ${a.year||''}</div></div><div class="a-amt" style="color:#7c3aed">-${fmt(a.netAmount!==undefined?a.netAmount:a.amount)}</div></div>`;
+    return `<div class="ai"><div class="a-ic" style="background:#fee2e2">💸</div><div class="a-b"><div class="a-t">${esc(a.name)}</div><div class="a-m">${esc(a.cat)}</div></div><div class="a-amt" style="color:#dc2626">-${fmt(a.amount)}</div></div>`;
   }).join('');
 }
 
@@ -1165,12 +1224,13 @@ function renderOrders(f){
   em.style.display='none';
   tb.innerHTML=data.map(o=>`<tr>
     <td style="color:var(--t3)">#${String(o.orderNum||'').padStart(3,'0')}</td>
-    <td style="font-weight:600">${o.name}</td><td>${o.type}${o.kitchens&&o.kitchens.length>1?` <span class="sb sb-prelim" style="padding:1px 7px">+${o.kitchens.length-1}</span>`:''}</td>
+    <td style="font-weight:600">${esc(o.name)}</td><td>${esc(o.type)}${o.kitchens&&o.kitchens.length>1?` <span class="sb sb-prelim" style="padding:1px 7px">+${o.kitchens.length-1}</span>`:''}</td>
     <td>${fmt(o.total)}</td>
     <td style="color:#15803d">${fmt(o.paid)}</td>
     <td style="color:${o.total-o.paid>0?'#dc2626':'var(--t3)'}">${fmt(o.total-o.paid)}</td>
     <td><span class="sb ${sm[o.status]||''}">${sl[o.status]||''}</span></td>
-    <td style="color:var(--t3);font-size:12px">${o.date||''}</td>
+    <td style="font-weight:700;color:${o.closed?((o.profit||0)>=0?'#15803d':'#dc2626'):'var(--t3)'}">${o.closed?fmt(o.profit):'—'}</td>
+    <td style="color:var(--t3);font-size:12px">${esc(o.date||'')}</td>
     <td style="display:flex;gap:4px">
       <button class="btn btn-sm" onclick="openEdit('${o.id}')">✏️</button>
       <button class="btn btn-sm" style="color:#B8860B;border-color:#B8860B" onclick="printOrder('${o.id}')">🖨️</button>
@@ -1212,8 +1272,8 @@ function renderKitchenList(){
   el.innerHTML=tempKitchens.map((k,i)=>`
     <div class="kitchen-item">
       <div>
-        <div class="ki-title">🔧 مطبخ ${i+1}: ${k.type||'—'}</div>
-        <div class="ki-sub">${[k.facade,k.frame,k.height,k.acc].filter(Boolean).join(' · ')||'بدون تفاصيل إضافية'}</div>
+        <div class="ki-title">🔧 مطبخ ${i+1}: ${esc(k.type)||'—'}</div>
+        <div class="ki-sub">${esc([k.facade,k.frame,k.height,k.acc].filter(Boolean).join(' · '))||'بدون تفاصيل إضافية'}</div>
       </div>
       <button onclick="removeKitchen(${k.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:14px">✕</button>
     </div>`).join('') + `<div style="font-size:11px;color:var(--t3);margin-bottom:6px">+ مطبخ إضافي واحد قيد الإدخال حالياً في الحقول أعلاه (اسم المنتج/الواجهة/الهيكل)</div>`;
@@ -1269,7 +1329,9 @@ async function saveOrder(){
     payments,
     pay:document.getElementById('n-pay').value,
     date:document.getElementById('n-date').value||today(),
-    dateAdded:new Date().toISOString()
+    dateAdded:new Date().toISOString(),
+    // حقول الربح (للإدارة فقط)
+    costs:[],profit:0,closed:false
   };
   await db.saveOrder(order);orders.push(order);
   toast('✅ تم حفظ الطلبية #'+String(orderCounter).padStart(3,'0')+(kitchens.length>1?' بعدد '+kitchens.length+' مطابخ':''));
@@ -1284,7 +1346,13 @@ function clearNew(){
 }
 
 // ===== EDIT ORDER (محدّث) =====
-function printOrder(id){const o=orders.find(o=>o.id===id);if(!o)return;localStorage.setItem('ruqi_print_order',JSON.stringify(o));window.open('print-order.html?id='+id,'_blank');}
+// الطباعة: نحذف حقول الربح والتكاليف حتى لا تظهر للزبون
+function printOrder(id){
+  const o=orders.find(o=>o.id===id); if(!o)return;
+  const {costs,profit,closed,closedAt,...safe}=o;
+  localStorage.setItem('ruqi_print_order',JSON.stringify(safe));
+  window.open('print-order.html?id='+id,'_blank');
+}
 
 function openEdit(id){
   editId=id;
@@ -1298,6 +1366,9 @@ function openEdit(id){
   document.getElementById('em-note').value = o.notes||'';
   document.getElementById('em-new-pay').value = '';
   document.getElementById('em-pay-method').value = 'كاش';
+
+  // تحميل التكاليف
+  editCosts = (o.costs||[]).map(c=>({...c}));
 
   // عرض سجل الدفعات
   renderPayHistory(o);
@@ -1319,7 +1390,7 @@ function renderPayHistory(o) {
   }
   el.innerHTML = payments.map((p,i)=>`
     <div class="pay-hist-row">
-      <span style="color:var(--t2)">دفعة ${i+1} · ${p.date||''} · ${p.method||'كاش'}</span>
+      <span style="color:var(--t2)">دفعة ${i+1} · ${esc(p.date||'')} · ${esc(p.method||'كاش')}</span>
       <span style="color:#15803d;font-weight:600">${fmt(p.amount)}</span>
     </div>`).join('');
 }
@@ -1342,11 +1413,67 @@ function editCalcRemaining() {
   if (totalPaid >= currentTotal) autoStatus = 'paid';
   else if (totalPaid > 0) autoStatus = 'partial';
   document.getElementById('em-status').value = autoStatus;
+
+  renderOrderCosts();
 }
 
-function closeEdit(){document.getElementById('edit-ov').classList.remove('open');editId=null;}
+// ----- تكاليف الطلبية وصافي الربح -----
+function addOrderCost(){
+  const name=document.getElementById('em-cost-name').value.trim();
+  const amount=parseFloat(document.getElementById('em-cost-amount').value)||0;
+  const cat=document.getElementById('em-cost-cat').value;
+  if(!name||!amount){toast('⚠️ أدخل اسم التكلفة والمبلغ');return;}
+  editCosts.push({id:Date.now(),name,cat,amount});
+  document.getElementById('em-cost-name').value='';
+  document.getElementById('em-cost-amount').value='';
+  renderOrderCosts();
+}
+function removeOrderCost(id){
+  editCosts=editCosts.filter(c=>c.id!==id);
+  renderOrderCosts();
+}
+function renderOrderCosts(){
+  const o=orders.find(o=>o.id===editId); if(!o) return;
+  const el=document.getElementById('em-cost-list');
+  el.innerHTML = editCosts.length
+    ? editCosts.map(c=>`<div class="ded-row"><span>${esc(c.name)} <span style="color:var(--t3)">(${esc(c.cat)})</span></span>
+        <div style="display:flex;align-items:center;gap:6px"><strong style="color:#dc2626">${fmt(c.amount)}</strong>
+        <button onclick="removeOrderCost(${c.id})" style="background:none;border:none;cursor:pointer;color:#dc2626">✕</button></div></div>`).join('')
+    : '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد تكاليف مسجلة</div>';
+  const total=parseFloat(document.getElementById('em-total').value)||o.total;
+  const costTotal=orderCostTotal(editCosts);
+  const profit=total-costTotal;
+  document.getElementById('em-profit').textContent=fmt(profit);
+  document.getElementById('em-profit-sub').textContent='العقد '+fmt(total)+' − التكاليف '+fmt(costTotal);
+  document.getElementById('em-close-btn').style.display=o.closed?'none':'inline-flex';
+  document.getElementById('em-reopen-btn').style.display=o.closed?'inline-flex':'none';
+}
 
-async function saveEdit(){
+async function closeOrderProfit(){
+  const o=orders.find(o=>o.id===editId); if(!o) return;
+  if(!editCosts.length && !confirm('لم تُدخل أي تكاليف، سيكون الربح = قيمة العقد كاملة. متابعة؟')) return;
+  const total=parseFloat(document.getElementById('em-total').value)||o.total;
+  const newPay=parseFloat(document.getElementById('em-new-pay').value)||0;
+  if(total-(o.paid+newPay)>0 && !confirm('ما زال هناك مبلغ متبقٍ على الزبون. هل تريد إقفال الطلبية رغم ذلك؟')) return;
+  await saveEdit(true);            // يحفظ العقد والدفعات أولاً
+  o.costs=[...editCosts];
+  o.profit=o.total-orderCostTotal(o.costs);
+  o.closed=true;
+  o.closedAt=new Date().toISOString();
+  await db.saveOrder(o);
+  closeEdit(); renderOrders('all'); renderDash(); renderReports();
+  toast('🔒 تم إقفال الطلبية — صافي الربح '+fmt(o.profit));
+}
+
+async function reopenOrder(){
+  const o=orders.find(o=>o.id===editId); if(!o) return;
+  o.closed=false; delete o.closedAt;
+  await db.saveOrder(o);
+  renderOrderCosts(); renderOrders('all'); renderDash(); renderReports();
+  toast('🔓 أُعيد فتح الطلبية');
+}
+
+async function saveEdit(silent){
   const o=orders.find(o=>o.id===editId);
   if(!o)return;
 
@@ -1362,22 +1489,29 @@ async function saveEdit(){
     if (!o.payments) o.payments = o.paid > 0 ? [{amount:o.paid, method:o.pay||'كاش', date:o.date||today(), note:'دفعة سابقة'}] : [];
     o.payments.push({amount: newPay, method: payMethod, date: today(), note: ''});
     o.paid = o.payments.reduce((s,p)=>s+p.amount, 0);
+    document.getElementById('em-new-pay').value = '';
   }
 
   o.remaining = Math.max(o.total - o.paid, 0);
   o.status = document.getElementById('em-status').value;
   o.notes = document.getElementById('em-note').value;
 
+  // التكاليف والربح
+  o.costs=[...editCosts];
+  if(o.closed) o.profit=o.total-orderCostTotal(o.costs);
+
   await db.saveOrder(o);
+  if(silent===true) return;   // عند الإقفال لا نغلق النافذة مرتين
   closeEdit();
   renderOrders('all');
   renderDash();
+  renderReports();
   toast('✅ تم تحديث الطلبية');
 }
 
-function closeEdit(){document.getElementById('edit-ov').classList.remove('open');editId=null;}
-async function confirmDel(id){if(!confirm('حذف هذه الطلبية؟'))return;await db.deleteOrder(id);orders=orders.filter(o=>o.id!==id);renderOrders('all');renderDash();toast('🗑 تم الحذف');}
-async function delOrder(){if(!confirm('حذف الطلبية نهائياً؟'))return;await db.deleteOrder(editId);orders=orders.filter(o=>o.id!==editId);closeEdit();renderOrders('all');renderDash();toast('🗑 تم الحذف');}
+function closeEdit(){document.getElementById('edit-ov').classList.remove('open');editId=null;editCosts=[];}
+async function confirmDel(id){if(!confirm('حذف هذه الطلبية؟'))return;await db.deleteOrder(id);orders=orders.filter(o=>o.id!==id);renderOrders('all');renderDash();renderReports();toast('🗑 تم الحذف');}
+async function delOrder(){if(!confirm('حذف الطلبية نهائياً؟'))return;await db.deleteOrder(editId);orders=orders.filter(o=>o.id!==editId);closeEdit();renderOrders('all');renderDash();renderReports();toast('🗑 تم الحذف');}
 
 // ===== PRELIMINARY CONTRACTS (منفصلة تماماً عن الطلبيات — لا تدخل أي حساب مالي) =====
 let contractCounter=parseInt(localStorage.getItem('ruqi_contract_counter')||'0');
@@ -1439,7 +1573,7 @@ function renderContractItemsList(){
   el.innerHTML=tempContractItems.map(i=>{
     const rowTotal=Math.max(i.qty*i.price-i.disc,0);
     return `<div class="ded-row">
-      <span>${i.name} <span style="color:var(--t3)">(${i.qty} × ${fmt(i.price)}${i.disc?' − '+fmt(i.disc):''})</span></span>
+      <span>${esc(i.name)} <span style="color:var(--t3)">(${i.qty} × ${fmt(i.price)}${i.disc?' − '+fmt(i.disc):''})</span></span>
       <div style="display:flex;align-items:center;gap:6px">
         <strong style="color:#B8860B">${fmt(rowTotal)}</strong>
         <button onclick="editContractItem(${i.id})" style="background:none;border:none;cursor:pointer;color:#B8860B;font-size:13px;padding:0" title="تعديل البند">✏️</button>
@@ -1510,11 +1644,11 @@ function renderContracts(){
   if(!data.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
   tb.innerHTML=data.map(c=>`<tr>
-    <td style="color:var(--t3)">#${c.contractNum||''}</td>
-    <td style="font-weight:600">${c.name}</td>
-    <td>${c.type}</td>
+    <td style="color:var(--t3)">#${esc(c.contractNum||'')}</td>
+    <td style="font-weight:600">${esc(c.name)}</td>
+    <td>${esc(c.type)}</td>
     <td>${c.total?fmt(c.total):'<span style="color:var(--t3)">—</span>'}</td>
-    <td style="color:var(--t3);font-size:12px">${c.date||''}</td>
+    <td style="color:var(--t3);font-size:12px">${esc(c.date||'')}</td>
     <td style="display:flex;gap:4px">
       <button class="btn btn-sm" onclick="openContractEdit('${c.id}')">✏️</button>
       <button class="btn btn-sm" style="color:#6b21a8;border-color:#6b21a8" onclick="printContract('${c.id}')">🖨️ عقد مبدئي</button>
@@ -1656,7 +1790,7 @@ function renderArchives(){
     const closedDate=a.closedAt?new Date(a.closedAt).toLocaleDateString('ar-LY'):'—';
     return `<tr>
       <td style="font-weight:600">${closedDate}</td>
-      <td style="color:var(--t3);font-size:12px">${a.fromDate||'—'} → ${a.toDate||'—'}</td>
+      <td style="color:var(--t3);font-size:12px">${esc(a.fromDate||'—')} → ${esc(a.toDate||'—')}</td>
       <td>${t.ordersCount||0}</td>
       <td style="color:#15803d">${fmt(t.revenue)}</td>
       <td style="color:#dc2626">${fmt(t.opsExp)}</td>
@@ -1674,7 +1808,7 @@ function openArchiveView(id){
   const closedDate=a.closedAt?new Date(a.closedAt).toLocaleString('ar-LY'):'—';
   document.getElementById('av-title').textContent='🗄️ حساب مُقفل بتاريخ '+closedDate;
   document.getElementById('av-summary').innerHTML=`
-    <div><div style="color:var(--t3);font-size:10px">الفترة</div><div style="font-weight:600">${a.fromDate||'—'} → ${a.toDate||'—'}</div></div>
+    <div><div style="color:var(--t3);font-size:10px">الفترة</div><div style="font-weight:600">${esc(a.fromDate||'—')} → ${esc(a.toDate||'—')}</div></div>
     <div><div style="color:var(--t3);font-size:10px">الإيرادات</div><div style="font-weight:700;color:#15803d">${fmt(t.revenue)}</div></div>
     <div><div style="color:var(--t3);font-size:10px">مصروفات تشغيلية</div><div style="font-weight:700;color:#dc2626">${fmt(t.opsExp)}</div></div>
     <div><div style="color:var(--t3);font-size:10px">رواتب</div><div style="font-weight:700;color:#7c3aed">${fmt(t.salExp)}</div></div>
@@ -1685,16 +1819,18 @@ function openArchiveView(id){
   document.getElementById('av-sal-count').textContent=(a.salaries||[]).length;
 
   document.getElementById('av-orders-body').innerHTML=(a.orders||[]).map(o=>`<tr>
-    <td>#${String(o.orderNum||'').padStart(3,'0')}</td><td>${o.name}</td><td>${o.type}</td>
-    <td>${fmt(o.total)}</td><td style="color:#15803d">${fmt(o.paid)}</td><td>${o.date||''}</td>
-  </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد طلبيات</td></tr>';
+    <td>#${String(o.orderNum||'').padStart(3,'0')}</td><td>${esc(o.name)}</td><td>${esc(o.type)}</td>
+    <td>${fmt(o.total)}</td><td style="color:#15803d">${fmt(o.paid)}</td>
+    <td style="font-weight:700;color:${o.closed?((o.profit||0)>=0?'#15803d':'#dc2626'):'var(--t3)'}">${o.closed?fmt(o.profit):'—'}</td>
+    <td>${esc(o.date||'')}</td>
+  </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--t3)">لا توجد طلبيات</td></tr>';
 
   document.getElementById('av-exp-body').innerHTML=(a.expenses||[]).map(e=>`<tr>
-    <td>${e.name}</td><td>${e.cat}</td><td style="color:#dc2626">${fmt(e.amount)}</td><td>${e.date||''}</td>
+    <td>${esc(e.name)}</td><td>${esc(e.cat)}</td><td style="color:#dc2626">${fmt(e.amount)}</td><td>${esc(e.date||'')}</td>
   </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--t3)">لا توجد مصروفات</td></tr>';
 
   document.getElementById('av-sal-body').innerHTML=(a.salaries||[]).map(s=>`<tr>
-    <td>${s.name}</td><td style="color:#7c3aed">${fmt(s.netAmount!==undefined?s.netAmount:s.amount)}</td><td>${MONTHS_AR[(s.month||1)-1]}</td><td>${s.year||''}</td>
+    <td>${esc(s.name)}</td><td style="color:#7c3aed">${fmt(s.netAmount!==undefined?s.netAmount:s.amount)}</td><td>${MONTHS_AR[(s.month||1)-1]}</td><td>${s.year||''}</td>
   </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--t3)">لا توجد رواتب</td></tr>';
 
   document.getElementById('archive-view-ov').classList.add('open');
@@ -1706,8 +1842,8 @@ function exportArchiveCSV(){
   const a=archives.find(x=>x.id===viewingArchiveId); if(!a)return;
   const orders_=a.orders||[];
   if(!orders_.length){toast('لا توجد طلبيات في هذا الأرشيف');return;}
-  dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','التاريخ'].join(','),
-      ...orders_.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.date].join(','))].join('\n'),
+  dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','صافي الربح','التاريخ'].join(','),
+      ...orders_.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.closed?o.profit:'',o.date].map(csv).join(','))].join('\n'),
      'ruqi-archive-orders-'+(a.closedAt||today()).slice(0,10)+'.csv','text/csv');
   toast('✅ تم التصدير');
 }
@@ -1772,11 +1908,11 @@ function renderExpenses(){
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
   tb.innerHTML=[...filtered].sort((a,b)=>new Date(b.dateAdded||b.date)-new Date(a.dateAdded||a.date)).map(e=>`<tr>
-    <td style="font-weight:500">${e.name}</td>
-    <td><span class="sb ${catCls[e.cat]||'sb-pending'}">${e.cat}</span></td>
+    <td style="font-weight:500">${esc(e.name)}</td>
+    <td><span class="sb ${catCls[e.cat]||'sb-pending'}">${esc(e.cat)}</span></td>
     <td style="color:#dc2626;font-weight:600">${fmt(e.amount)}</td>
-    <td style="color:var(--t3);font-size:12px">${e.date||''}</td>
-    <td style="color:var(--t2);font-size:12px">${e.note||'—'}</td>
+    <td style="color:var(--t3);font-size:12px">${esc(e.date||'')}</td>
+    <td style="color:var(--t2);font-size:12px">${esc(e.note||'—')}</td>
     <td style="display:flex;gap:4px">
       <button class="btn btn-sm exp-edit-btn" onclick="openExpEdit('${e.id}')">✏️</button>
       <button class="btn btn-sm" style="color:#dc2626" onclick="delExp('${e.id}')">🗑</button>
@@ -1849,7 +1985,7 @@ function renderDedList() {
   if (!tempDeductions.length) { el.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد خصومات</div>'; return; }
   el.innerHTML = tempDeductions.map(d=>`
     <div class="ded-row">
-      <span>${d.name}</span>
+      <span>${esc(d.name)}</span>
       <div style="display:flex;align-items:center;gap:6px">
         <strong style="color:#7c3aed">${fmt(d.amount)}</strong>
         <button onclick="removeDed(${d.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0">✕</button>
@@ -1891,7 +2027,7 @@ function renderEditDedList() {
   if (!editTempDeductions.length) { el.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد خصومات</div>'; return; }
   el.innerHTML = editTempDeductions.map(d=>`
     <div class="ded-row">
-      <span>${d.name}</span>
+      <span>${esc(d.name)}</span>
       <div style="display:flex;align-items:center;gap:6px">
         <strong style="color:#7c3aed">${fmt(d.amount)}</strong>
         <button onclick="removeEditDed(${d.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0">✕</button>
@@ -1948,7 +2084,7 @@ function renderSalaries(){
     document.getElementById('sal-month-summary').innerHTML=
       Object.entries(empTots).map(([n,d])=>`
         <div style="padding:4px 0;border-bottom:1px solid #e9d5ff">
-          <div style="display:flex;justify-content:space-between"><span style="font-weight:600">${n}</span><strong style="color:#6b21a8">${fmt(d.net)}</strong></div>
+          <div style="display:flex;justify-content:space-between"><span style="font-weight:600">${esc(n)}</span><strong style="color:#6b21a8">${fmt(d.net)}</strong></div>
           ${d.base!==d.net?`<div style="font-size:11px;color:#9333ea">أساسي: ${fmt(d.base)} · خصم: ${fmt(d.base-d.net)}</div>`:''}
         </div>`).join('')+
       `<div style="display:flex;justify-content:space-between;padding-top:6px;font-weight:700"><span>الإجمالي المستحق</span><span style="color:#6b21a8">${fmt(totNet)}</span></div>`;
@@ -1963,13 +2099,13 @@ function renderSalaries(){
     const net=s.netAmount!==undefined?s.netAmount:s.amount;
     const dedTotal=s.deductions?s.deductions.reduce((x,d)=>x+d.amount,0):0;
     return `<tr>
-      <td style="font-weight:600">${s.name}</td>
+      <td style="font-weight:600">${esc(s.name)}</td>
       <td style="color:var(--t2)">${fmt(s.amount)}</td>
       <td style="color:#dc2626;font-size:12px">${dedTotal>0?'-'+fmt(dedTotal):'—'}</td>
       <td style="color:#7c3aed;font-weight:700">${fmt(net)}</td>
       <td>${MONTHS_AR[(s.month||1)-1]}</td>
       <td>${s.year||''}</td>
-      <td style="color:var(--t2);font-size:12px">${s.note||'—'}</td>
+      <td style="color:var(--t2);font-size:12px">${esc(s.note||'—')}</td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-sm" style="color:#7c3aed;border-color:#7c3aed" onclick="openSalEdit('${s.id}')">✏️</button>
         <button class="btn btn-sm" style="color:#dc2626" onclick="delSal('${s.id}')">🗑</button>
@@ -2070,15 +2206,39 @@ function renderReports(){
 
   const clients={};fOrders.forEach(o=>{if(!clients[o.name])clients[o.name]={c:0,t:0};clients[o.name].c++;clients[o.name].t+=o.total;});
   const sorted=Object.entries(clients).sort((a,b)=>b[1].t-a[1].t).slice(0,5);
-  document.getElementById('top-body').innerHTML=sorted.map(([n,d],i)=>`<tr><td style="color:var(--gold);font-weight:700">${i+1}</td><td style="font-weight:600">${n}</td><td style="text-align:center">${d.c}</td><td style="font-weight:700;color:#15803d">${fmt(d.t)}</td></tr>`).join('');
+  document.getElementById('top-body').innerHTML=sorted.map(([n,d],i)=>`<tr><td style="color:var(--gold);font-weight:700">${i+1}</td><td style="font-weight:600">${esc(n)}</td><td style="text-align:center">${d.c}</td><td style="font-weight:700;color:#15803d">${fmt(d.t)}</td></tr>`).join('');
+
+  renderProfitByMonth();
+}
+
+// صافي ربح الطلبيات المقفلة حسب الشهر (حسب تاريخ الإقفال) للسنة المختارة
+function renderProfitByMonth(){
+  const body=document.getElementById('profit-month-body'), foot=document.getElementById('profit-year-foot');
+  if(!body||!foot) return;
+  const yr=document.getElementById('rep-year-sel')?.value || String(new Date().getFullYear());
+  const rows=Array.from({length:12},()=>({c:0,rev:0,cost:0,profit:0}));
+  orders.filter(o=>o.closed && (o.closedAt||'').slice(0,4)===yr).forEach(o=>{
+    const r=rows[new Date(o.closedAt).getMonth()];
+    r.c++; r.rev+=o.total; r.cost+=orderCostTotal(o.costs); r.profit+=o.profit||0;
+  });
+  const pc=r=>r.rev?Math.round(r.profit/r.rev*100)+'%':'—';
+  body.innerHTML=rows.map((r,i)=>r.c?`<tr>
+    <td style="font-weight:600">${MONTHS_AR[i]}</td><td>${r.c}</td><td>${fmt(r.rev)}</td>
+    <td style="color:#dc2626">${fmt(r.cost)}</td>
+    <td style="font-weight:700;color:${r.profit>=0?'#15803d':'#dc2626'}">${fmt(r.profit)}</td><td>${pc(r)}</td></tr>`:'').join('')
+    || '<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد طلبيات مقفلة في هذه السنة</td></tr>';
+  const t=rows.reduce((a,r)=>({c:a.c+r.c,rev:a.rev+r.rev,cost:a.cost+r.cost,profit:a.profit+r.profit}),{c:0,rev:0,cost:0,profit:0});
+  foot.innerHTML=`<tr style="background:#f9f7f0;font-weight:800">
+    <td>إجمالي سنة ${esc(yr)}</td><td>${t.c}</td><td>${fmt(t.rev)}</td><td>${fmt(t.cost)}</td>
+    <td style="color:${t.profit>=0?'#15803d':'#dc2626'}">${fmt(t.profit)}</td><td>${pc(t)}</td></tr>`;
 }
 
 // ===== EXPORT =====
 function dl(content,name,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+content],{type}));a.download=name;a.click();}
-function expCSV(){if(!orders.length){toast('لا توجد طلبيات');return;}dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','التاريخ'].join(','),...orders.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.date].join(','))].join('\n'),'ruqi-orders-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
-function expExpCSV(){if(!expenses.length){toast('لا توجد مصروفات');return;}dl([['البند','الفئة','المبلغ','التاريخ','ملاحظة'].join(','),...expenses.map(e=>[e.name,e.cat,e.amount,e.date,e.note].join(','))].join('\n'),'ruqi-expenses-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
-function expSalCSV(){if(!salaries.length){toast('لا توجد رواتب');return;}dl([['الموظف','الراتب الأساسي','الخصومات','المستحق','الشهر','السنة','ملاحظة'].join(','),...salaries.map(s=>[s.name,s.amount,s.dedTotal||0,s.netAmount!==undefined?s.netAmount:s.amount,MONTHS_AR[(s.month||1)-1],s.year,s.note].join(','))].join('\n'),'ruqi-salaries-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
-function backupAll(){dl(JSON.stringify({orders,expenses,salaries,exportDate:new Date().toISOString()},null,2),'ruqi-backup-'+today()+'.json','application/json');toast('💾 تم حفظ النسخة الاحتياطية');}
+function expCSV(){if(!orders.length){toast('لا توجد طلبيات');return;}dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','صافي الربح','التاريخ'].join(','),...orders.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.closed?o.profit:'',o.date].map(csv).join(','))].join('\n'),'ruqi-orders-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
+function expExpCSV(){if(!expenses.length){toast('لا توجد مصروفات');return;}dl([['البند','الفئة','المبلغ','التاريخ','ملاحظة'].join(','),...expenses.map(e=>[e.name,e.cat,e.amount,e.date,e.note].map(csv).join(','))].join('\n'),'ruqi-expenses-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
+function expSalCSV(){if(!salaries.length){toast('لا توجد رواتب');return;}dl([['الموظف','الراتب الأساسي','الخصومات','المستحق','الشهر','السنة','ملاحظة'].join(','),...salaries.map(s=>[s.name,s.amount,s.dedTotal||0,s.netAmount!==undefined?s.netAmount:s.amount,MONTHS_AR[(s.month||1)-1],s.year,s.note].map(csv).join(','))].join('\n'),'ruqi-salaries-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
+function backupAll(){dl(JSON.stringify({orders,expenses,salaries,contracts,archives,exportDate:new Date().toISOString()},null,2),'ruqi-backup-'+today()+'.json','application/json');toast('💾 تم حفظ النسخة الاحتياطية');}
 function printRep(){
   const rev=orders.reduce((s,o)=>s+o.total,0),
         exp=expenses.reduce((s,e)=>s+e.amount,0),
