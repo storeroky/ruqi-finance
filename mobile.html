@@ -903,6 +903,23 @@ let viewingArchiveId=null;
 const MA=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 const fmt=n=>Math.round(n||0).toLocaleString('ar-LY');
 const fmtD=n=>fmt(n)+' د.ل';
+
+/* ===== محرك الأرباح (نفس معادلة لوحة اللابتوب) =====
+   صافي الربح = ربح الطلبيات المقفلة − المصروفات العامة − الرواتب المستحقة */
+function orderCostTotal(arr){return (arr||[]).reduce((s,c)=>s+(c.amount||0),0)}
+function orderLinkedExp(o){return expenses.filter(e=>e.orderId&&e.orderId===o.id)}
+function orderCostAll(o){return orderCostTotal(o.costs)+orderLinkedExp(o).reduce((s,e)=>s+(e.amount||0),0)}
+function orderProfit(o){return (o.total||0)-orderCostAll(o)}
+function isLinkedExp(e){return !!e.orderId&&orders.some(o=>o.id===e.orderId)}
+function salNet(v){return v.netAmount!==undefined?v.netAmount:(v.amount||0)}
+function computeNet(){
+  const closed=orders.filter(o=>o.closed);
+  const rev=closed.reduce((s,o)=>s+(o.total||0),0);
+  const ordCost=closed.reduce((s,o)=>s+orderCostAll(o),0);
+  const gen=expenses.filter(e=>!isLinkedExp(e)).reduce((s,e)=>s+(e.amount||0),0);
+  const sal=salaries.reduce((s,v)=>s+salNet(v),0);
+  return {closedCount:closed.length,rev,ordCost,orderProfit:rev-ordCost,gen,sal,net:rev-ordCost-gen-sal};
+}
 const today=()=>new Date().toISOString().slice(0,10);
 
 /* TOAST */
@@ -1002,10 +1019,10 @@ function setECat(cat,btn){
 function renderHome(){
   const rev=orders.reduce((s,o)=>s+(o.total||0),0);
   const paid=orders.reduce((s,o)=>s+(o.paid||0),0);
-  const exp=expenses.reduce((s,e)=>s+(e.amount||0),0);
-  // استخدام الراتب المستحق (netAmount) إن وجد
-  const sal=salaries.reduce((s,v)=>s+(v.netAmount!==undefined?v.netAmount:v.amount||0),0);
-  const profit=rev-exp-sal;
+  const fin=computeNet();
+  const exp=fin.gen;            // المصروفات العامة (غير المرتبطة بطلبية)
+  const sal=fin.sal;            // الرواتب المستحقة
+  const profit=fin.net;         // صافي الربح = الطلبيات المقفلة − العام − الرواتب
   const pend=rev-paid;
   const pendCnt=orders.filter(o=>o.status!=='paid'&&o.status!=='cancel').length;
 
@@ -1051,6 +1068,9 @@ function renderOrders(filter){
         <div class="oc-mi"><div class="oc-ml">المدفوع</div><div class="oc-mv" style="color:var(--green)">${fmt(o.paid)}</div></div>
         <div class="oc-mi"><div class="oc-ml">المتبقي</div><div class="oc-mv" style="color:${(o.total-o.paid)>0?'var(--amber)':'var(--t3)'}">${fmt(o.total-o.paid)}</div></div>
       </div>
+      ${o.closed
+        ?`<div style="margin-top:8px;font-size:12px;font-weight:700;color:${orderProfit(o)>=0?'var(--green)':'#F87171'}">💎 صافي الربح: ${fmtD(orderProfit(o))}</div>`
+        :`<div style="margin-top:8px;font-size:11px;color:var(--t3)">💎 لم تُقفل بعد — لا تدخل في صافي الربح</div>`}
     </div>
     <div class="oc-act">
       <button class="ob ob-e" onclick="openOrdSheet('${o.id}')">✏️ تعديل</button>
@@ -1698,10 +1718,11 @@ function convertContractToOrder(id){
 async function closeAccount(){
   if(!orders.length&&!expenses.length&&!salaries.length){toast('⚠️ لا توجد بيانات حالية لإقفالها');return}
   const rev=orders.reduce((s,o)=>s+(o.total||0),0);
-  const opsExp=expenses.reduce((s,e)=>s+(e.amount||0),0);
-  const salExp=salaries.reduce((s,v)=>s+(v.netAmount!==undefined?v.netAmount:v.amount||0),0);
+  const fin=computeNet();
+  const opsExp=fin.ordCost+fin.gen;
+  const salExp=fin.sal;
   const paid=orders.reduce((s,o)=>s+(o.paid||0),0);
-  const net=rev-opsExp-salExp;
+  const net=fin.net;
 
   const warn=`سيتم أرشفة ${orders.length} طلبية و${expenses.length} مصروف و${salaries.length} راتب في سجل دائم بالأرشيف، ثم تصفير لوحة التحكم للبدء من جديد.\n\nصافي الربح الحالي: ${fmtD(net)}\n\nملاحظة: العقود المبدئية لن تتأثر.\n\nهل تريد المتابعة؟`;
   if(!confirm(warn))return;
@@ -1712,7 +1733,7 @@ async function closeAccount(){
     id:db.newId(),closedAt:new Date().toISOString(),
     fromDate:dates[0]||null,toDate:dates[dates.length-1]||today(),
     orders:[...orders],expenses:[...expenses],salaries:[...salaries],
-    totals:{revenue:rev,paid,opsExp,salExp,net,ordersCount:orders.length,expCount:expenses.length,salCount:salaries.length}
+    totals:{revenue:fin.rev,paid,opsExp,salExp,net,ordersCount:orders.length,expCount:expenses.length,salCount:salaries.length}
   };
   await db.saveArchive(archive);upsertLocal(archives,archive);
   await db.clearAllOrders();await db.clearAllExpenses();await db.clearAllSalaries();
