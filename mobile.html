@@ -888,6 +888,8 @@ RuqiDB.prototype.clearAllSalaries=async function(){
 /* STATE */
 const db=new RuqiDB();
 let orders=[],expenses=[],salaries=[],contracts=[],archives=[];
+// إضافة/تحديث حسب id دون تكرار (مستمع Firebase قد يضيفه قبل انتهاء await)
+function upsertLocal(arr,item){const i=arr.findIndex(x=>x.id===item.id);if(i>=0)arr[i]=item;else arr.push(item)}
 let editOrdId=null,editExpId=null,editSalId=null,eCatFilter='all';
 // خصومات مؤقتة لنموذج الإضافة والتعديل
 let addDedList=[],editDedList=[];
@@ -1094,7 +1096,13 @@ function renderKitchenList(){
     `<div style="font-size:10px;color:var(--t3);margin-bottom:4px">+ مطبخ إضافي واحد قيد الإدخال حالياً في الحقول أعلاه</div>`
 }
 
+let _savingOrder=false;
 async function saveOrder(){
+  if(_savingOrder)return;
+  _savingOrder=true;
+  try{await _saveOrderInner()}finally{_savingOrder=false}
+}
+async function _saveOrderInner(){
   const name=document.getElementById('n-name').value.trim();
   const total=parseFloat(document.getElementById('n-total').value)||0;
   if(!name){toast('⚠️ أدخل اسم العميل');return}
@@ -1129,7 +1137,7 @@ async function saveOrder(){
     dateAdded:new Date().toISOString()
   };
   try{
-    await db.saveOrder(o);orders.push(o);
+    await db.saveOrder(o);upsertLocal(orders,o);
     toast('✅ تم حفظ الطلبية #'+String(num).padStart(3,'0')+(kitchens.length>1?' بعدد '+kitchens.length+' مطابخ':''));
     if(confirm('هل تريد طباعة العقد الآن؟'))printOrder(o.id);
     clearForm();goTo('orders')
@@ -1263,7 +1271,7 @@ async function saveExp(){
   const exp={id:db.newId(),name,cat:document.getElementById('e-cat').value,amount,
     date:document.getElementById('e-date').value||today(),note:document.getElementById('e-note').value,
     dateAdded:new Date().toISOString()};
-  await db.saveExpense(exp);expenses.push(exp);
+  await db.saveExpense(exp);upsertLocal(expenses,exp);
   document.getElementById('e-name').value='';document.getElementById('e-amt').value='';document.getElementById('e-note').value='';
   document.getElementById('e-date').value=today();
   closeAddExp();popEY();popEM();renderExp();renderHome();toast('✅ تم تسجيل المصروف')
@@ -1349,7 +1357,7 @@ async function saveSal(){
   const netAmount=Math.max(amount-dedTotal,0);
   const sal={id:db.newId(),name,amount,deductions,dedTotal,netAmount,month,year,
     note:document.getElementById('s-note').value,dateAdded:new Date().toISOString()};
-  await db.saveSalary(sal);salaries.push(sal);
+  await db.saveSalary(sal);upsertLocal(salaries,sal);
   document.getElementById('s-name').value='';document.getElementById('s-amt').value='';document.getElementById('s-note').value='';
   addDedList=[];renderAddDedList();
   closeAddSal();popSY();popSM();renderSal();renderHome();toast('✅ تم تسجيل راتب '+name)
@@ -1577,7 +1585,7 @@ async function saveContract(){
     date:document.getElementById('c-date').value||today(),
     dateAdded:new Date().toISOString(),isPreliminary:true
   };
-  await db.saveContract(contract);contracts.push(contract);
+  await db.saveContract(contract);upsertLocal(contracts,contract);
   toast('✅ تم إصدار العقد المبدئي #'+contract.contractNum);
   clearContractForm();renderContracts();
 }
@@ -1706,7 +1714,7 @@ async function closeAccount(){
     orders:[...orders],expenses:[...expenses],salaries:[...salaries],
     totals:{revenue:rev,paid,opsExp,salExp,net,ordersCount:orders.length,expCount:expenses.length,salCount:salaries.length}
   };
-  await db.saveArchive(archive);archives.push(archive);
+  await db.saveArchive(archive);upsertLocal(archives,archive);
   await db.clearAllOrders();await db.clearAllExpenses();await db.clearAllSalaries();
   orders=[];expenses=[];salaries=[];
 
