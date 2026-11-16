@@ -16,7 +16,10 @@
  var ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
  var mob=ios||/android|mobile/i.test(ua);
  var sa=window.navigator.standalone===true||(window.matchMedia&&(matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: minimal-ui)').matches));
- window.__IOS=ios;window.__MOB=mob;window.__SA=sa;
+ window.__IOS=ios;window.__MOB=mob;window.__SA=sa;window.__dp=null;
+ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__dp=e;if(window.__gateRefresh)window.__gateRefresh()});
+ window.addEventListener('appinstalled',function(){window.__dp=null;if(window.__gateDone)window.__gateDone()});
+ if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){})});
  if(mob&&!sa)document.documentElement.classList.add('gate');
 })();
 </script>
@@ -933,6 +936,49 @@ html.gate .gate-ov{display:flex}
     </div>
   </div>
 </div>
+
+<script>
+(function(){
+  var ov=document.getElementById('gate-ov');if(!ov)return;
+  var $=function(id){return document.getElementById(id)};
+  var ua=navigator.userAgent||'',ios=!!window.__IOS;
+  var inApp=/FBAN|FBAV|Instagram|Line\/|Twitter|Snapchat|TikTok|MicroMessenger|; wv\)/i.test(ua);
+  var iosSafari=ios&&/Safari/i.test(ua)&&!/CriOS|FxiOS|EdgiOS|OPiOS|GSA/i.test(ua)&&!inApp;
+  var btn=$('gate-btn'),msg=$('gate-msg'),sIOS=$('gate-ios'),sAND=$('gate-and');
+  function done(){$('gate-main').style.display='none';$('gate-done').style.display='block'}
+  function refresh(){
+    msg.textContent='';
+    if(ios){
+      if(iosSafari){sIOS.classList.add('show');btn.style.display='none'}
+      else{btn.dataset.mode='copy';btn.textContent='📋 نسخ الرابط';msg.innerHTML='افتح الرابط في متصفح <strong>Safari</strong> لتتمكن من التثبيت.'}
+    }else if(inApp){
+      btn.dataset.mode='copy';btn.textContent='📋 نسخ الرابط';msg.innerHTML='افتح الرابط في متصفح <strong>Chrome</strong> لتتمكن من التثبيت.'
+    }else if(window.__dp){
+      sAND.classList.remove('show');btn.dataset.mode='install';btn.textContent='📲 تثبيت التطبيق الآن'
+    }else{
+      sAND.classList.add('show');btn.dataset.mode='manual';btn.textContent='📲 تثبيت التطبيق الآن'
+    }
+  }
+  window.__gateRefresh=refresh;window.__gateDone=done;
+  btn.addEventListener('click',function(){
+    var mode=btn.dataset.mode;
+    if(mode==='copy'){
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(location.href).then(function(){msg.textContent='✅ تم نسخ الرابط — الصقه في المتصفح المناسب'},function(){msg.textContent='انسخ الرابط من شريط العنوان يدوياً'})}
+      else msg.textContent='انسخ الرابط من شريط العنوان يدوياً';
+      return
+    }
+    var dp=window.__dp;
+    if(dp){
+      dp.prompt();
+      dp.userChoice.then(function(r){window.__dp=null;if(r.outcome==='accepted')done();else{msg.textContent='التثبيت مطلوب لاستخدام رُقي على الهاتف — اضغط الزر وأكّد التثبيت.';refresh()}});
+      return
+    }
+    sAND.classList.add('show');
+    msg.textContent='اتبع الخطوات أعلاه من قائمة المتصفح ⋮ . إن لم يظهر خيار «تثبيت التطبيق» فافتح الرابط عبر https في Chrome ثم حدّث الصفحة.'
+  });
+  refresh();
+})();
+</script>
 
 <div class="toast" id="toast"></div>
 
@@ -2224,48 +2270,6 @@ function printRep(){
   w.document.close();w.print()
 }
 
-/* ===== INSTALL GATE — التثبيت إجباري على الهاتف ===== */
-(function(){
-  const ov=document.getElementById('gate-ov');if(!ov)return;
-  const $=id=>document.getElementById(id);
-  const ua=navigator.userAgent||'',ios=!!window.__IOS;
-  const inApp=/FBAN|FBAV|Instagram|Line\/|Twitter|Snapchat|TikTok|MicroMessenger|; wv\)/i.test(ua);
-  const iosSafari=ios&&/Safari/i.test(ua)&&!/CriOS|FxiOS|EdgiOS|OPiOS|GSA/i.test(ua)&&!inApp;
-  const btn=$('gate-btn'),msg=$('gate-msg'),sIOS=$('gate-ios'),sAND=$('gate-and');
-  let dp=null;
-  function done(){$('gate-main').style.display='none';$('gate-done').style.display='block'}
-  function refresh(){
-    msg.textContent='';
-    if(ios){
-      if(iosSafari){sIOS.classList.add('show');btn.style.display='none'}
-      else{btn.dataset.mode='copy';btn.textContent='📋 نسخ الرابط';msg.innerHTML='افتح الرابط في متصفح <strong>Safari</strong> لتتمكن من التثبيت.'}
-    }else if(inApp){
-      btn.dataset.mode='copy';btn.textContent='📋 نسخ الرابط';msg.innerHTML='افتح الرابط في متصفح <strong>Chrome</strong> لتتمكن من التثبيت.'
-    }else if(dp){
-      sAND.classList.remove('show');btn.dataset.mode='install';btn.textContent='📲 تثبيت التطبيق الآن'
-    }else{
-      sAND.classList.add('show');btn.dataset.mode='manual';btn.textContent='📲 تثبيت التطبيق الآن'
-    }
-  }
-  btn.addEventListener('click',async()=>{
-    const mode=btn.dataset.mode;
-    if(mode==='copy'){
-      try{await navigator.clipboard.writeText(location.href);msg.textContent='✅ تم نسخ الرابط — الصقه في المتصفح المناسب'}
-      catch(e){msg.textContent='انسخ الرابط من شريط العنوان يدوياً'}
-      return
-    }
-    if(dp){
-      dp.prompt();const r=await dp.userChoice;dp=null;
-      if(r.outcome==='accepted')done();else{msg.textContent='التثبيت مطلوب لاستخدام رُقي على الهاتف — اضغط الزر وأكّد التثبيت.';refresh()}
-      return
-    }
-    sAND.classList.add('show');msg.textContent='اتبع الخطوات أعلاه من قائمة المتصفح ⋮ لإتمام التثبيت.'
-  });
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;refresh()});
-  window.addEventListener('appinstalled',()=>{dp=null;done()});
-  refresh();
-})();
-
 initProfitSelectors();
 
 /* INIT */
@@ -2278,6 +2282,9 @@ const _cd=document.getElementById('c-date');if(_cd)_cd.value=today();
 renderContractItemsList();
 renderKitchenList();
 loadAll();
+// اختصارات المانيفست: mobile.html#new / #exp / #sal / #orders / #profit / #reports ...
+function routeHash(){const h=(location.hash||'').replace('#','');if(h&&document.getElementById('pg-'+h))goTo(h)}
+routeHash();window.addEventListener('hashchange',routeHash);
 </script>
 </body>
 </html>
