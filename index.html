@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>رُقي — لوحة التحكم</title>
+<script>
+(function(){
+ var ua=navigator.userAgent||'';
+ var phone=/android.+mobile|iphone|ipod/i.test(ua)||(/android/i.test(ua)&&!/tablet/i.test(ua)&&Math.min(screen.width,screen.height)<700);
+ if(phone&&location.search.indexOf('desktop')<0)location.replace(new URL('mobile.html',location.href).href);
+})();
+</script>
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -1062,7 +1069,8 @@ let editCosts = [];
 const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
 setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('ar', {hour:'2-digit',minute:'2-digit'}); }, 1000);
-document.getElementById('mobile-url').textContent = location.href.replace('index.html','mobile.html');
+function mobileUrl(){return new URL('mobile.html',location.href).href}
+document.getElementById('mobile-url').textContent = mobileUrl();
 
 // ===== NAV =====
 function goTo(id, btn) {
@@ -2449,7 +2457,7 @@ function printRep(){
     </table></body></html>`);
   w.print();
 }
-function copyMobileLink(){const url=location.href.replace('index.html','mobile.html');navigator.clipboard.writeText(url).then(()=>toast('✅ تم نسخ رابط الجوال'));}
+function copyMobileLink(){const url=mobileUrl();navigator.clipboard.writeText(url).then(()=>toast('✅ تم نسخ رابط الجوال'));}
 
 // ===== INIT =====
 document.getElementById('e-date').value=today();
