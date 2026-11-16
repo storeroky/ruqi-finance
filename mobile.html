@@ -60,6 +60,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
 /* PAGES */
 .page{position:absolute;top:0;left:0;right:0;bottom:0;display:none;flex-direction:column;gap:11px;padding:13px 13px calc(var(--nav-h) + env(safe-area-inset-bottom,0) + 20px);overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scroll-behavior:smooth}
 .page.active{display:flex}
+.page>*{flex-shrink:0}
 
 /* BOTTOM NAV */
 .bnav{flex-shrink:0;background:var(--dark);border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(5,1fr);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0));padding-bottom:env(safe-area-inset-bottom,0)}
@@ -325,6 +326,8 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'Segoe UI',
 html.gate .app,html.gate .toast{display:none!important}
 .gate-ov{display:none;position:fixed;inset:0;z-index:99999;background:var(--dark);align-items:center;justify-content:center;padding:24px;overflow-y:auto}
 html.gate .gate-ov{display:flex}
+@keyframes gpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.gate-card .btn-g{animation:gpulse 1.6s infinite}
 .gate-card{width:100%;max-width:380px;text-align:center;color:#fff;margin:auto}
 .gate-title{font-size:21px;font-weight:800;margin:6px 0}
 .gate-sub{font-size:13px;color:rgba(255,255,255,.65);line-height:1.8;margin-bottom:16px}
@@ -976,6 +979,8 @@ html.gate .gate-ov{display:flex}
     sAND.classList.add('show');
     msg.textContent='اتبع الخطوات أعلاه من قائمة المتصفح ⋮ . إن لم يظهر خيار «تثبيت التطبيق» فافتح الرابط عبر https في Chrome ثم حدّث الصفحة.'
   });
+  // أي لمسة على الشاشة تفتح نافذة التثبيت مباشرة (المتصفح يشترط لمسة من المستخدم)
+  ov.addEventListener('click',function(e){if(e.target!==btn&&window.__dp&&btn.dataset.mode==='install')btn.click()});
   refresh();
 })();
 </script>
