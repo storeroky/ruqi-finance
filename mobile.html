@@ -997,14 +997,14 @@ RuqiDB.prototype.getSalaries=async function(){
   return JSON.parse(this.local.getItem('ruqi_salaries')||'[]')
 };
 RuqiDB.prototype.saveSalary=async function(sal){
-  const all=await this.getSalaries();const i=all.findIndex(s=>s.id===sal.id);
+  const all=this._loc('salaries');const i=all.findIndex(s=>s.id===sal.id);
   if(i>=0)all[i]=sal;else all.push(sal);
   this.local.setItem('ruqi_salaries',JSON.stringify(all));
   if(this.firebaseReady)await this.db.ref('salaries/'+sal.id).set(sal);
   return sal
 };
 RuqiDB.prototype.deleteSalary=async function(id){
-  let all=await this.getSalaries();all=all.filter(s=>s.id!==id);
+  let all=this._loc('salaries');all=all.filter(s=>s.id!==id);
   this.local.setItem('ruqi_salaries',JSON.stringify(all));
   if(this.firebaseReady)await this.db.ref('salaries/'+id).remove()
 };
@@ -1021,14 +1021,14 @@ RuqiDB.prototype.getContracts=async function(){
   return JSON.parse(this.local.getItem('ruqi_contracts')||'[]')
 };
 RuqiDB.prototype.saveContract=async function(c){
-  const all=await this.getContracts();const i=all.findIndex(x=>x.id===c.id);
+  const all=this._loc('contracts');const i=all.findIndex(x=>x.id===c.id);
   if(i>=0)all[i]=c;else all.push(c);
   this.local.setItem('ruqi_contracts',JSON.stringify(all));
   if(this.firebaseReady)await this.db.ref('contracts/'+c.id).set(c);
   return c
 };
 RuqiDB.prototype.deleteContract=async function(id){
-  let all=await this.getContracts();all=all.filter(x=>x.id!==id);
+  let all=this._loc('contracts');all=all.filter(x=>x.id!==id);
   this.local.setItem('ruqi_contracts',JSON.stringify(all));
   if(this.firebaseReady)await this.db.ref('contracts/'+id).remove()
 };
@@ -1045,13 +1045,13 @@ RuqiDB.prototype.getArchives=async function(){
   return JSON.parse(this.local.getItem('ruqi_archives')||'[]')
 };
 RuqiDB.prototype.saveArchive=async function(a){
-  const all=await this.getArchives();all.push(a);
+  const all=this._loc('archives');all.push(a);
   this.local.setItem('ruqi_archives',JSON.stringify(all));
   if(this.firebaseReady)await this.db.ref('archives/'+a.id).set(a);
   return a
 };
 RuqiDB.prototype.deleteArchive=async function(id){
-  let all=await this.getArchives();all=all.filter(x=>x.id!==id);
+  let all=this._loc('archives');all=all.filter(x=>x.id!==id);
   this.local.setItem('ruqi_archives',JSON.stringify(all));
   if(this.firebaseReady)await this.db.ref('archives/'+id).remove()
 };
@@ -1341,7 +1341,7 @@ async function _saveOrderInner(){
   if(!name){toast('⚠️ أدخل اسم العميل');return}
   if(!total){toast('⚠️ أدخل قيمة العقد');return}
   const dep=parseFloat(document.getElementById('n-dep').value)||0;
-  const num=db.nextOrderNum?db.nextOrderNum():Date.now();
+  const num=await db.nextOrderNum();
   const payments=dep>0?[{amount:dep,method:document.getElementById('n-pay').value,date:today(),note:'دفعة أولى'}]:[];
 
   // تجميع المطابخ: المطابخ المضافة مسبقاً + المطبخ الحالي في الحقول (إن وُجد)
@@ -1817,7 +1817,7 @@ async function saveContract(){
   const name=document.getElementById('c-name').value.trim();
   if(!name){toast('⚠️ أدخل اسم العميل');return}
   if(contractEditId){await saveContractEditIfEditing();return}
-  contractCounter++;localStorage.setItem('ruqi_contract_counter',contractCounter);
+  contractCounter=await db.nextCounter('contract');
   const items=[...tempContractItems];
   const itemsTotal=items.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
   const total=items.length?itemsTotal:(parseFloat(document.getElementById('c-value').value)||0);
