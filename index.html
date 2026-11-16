@@ -1046,6 +1046,8 @@ RuqiDB.prototype.clearAllSalaries = async function() {
 // ===== STATE =====
 const db = new RuqiDB();
 let orders = [], expenses = [], salaries = [], contracts = [], archives = [];
+// إضافة/تحديث عنصر حسب id دون تكرار (مستمع Firebase قد يضيفه قبل انتهاء await)
+function upsertLocal(arr,item){const i=arr.findIndex(x=>x.id===item.id);if(i>=0)arr[i]=item;else arr.push(item);}
 let editId = null, expEditId = null, salEditId = null, contractEditId = null;
 let tempDeductions = [];
 let editTempDeductions = [];
@@ -1353,7 +1355,13 @@ function pvUpdate(){
   document.getElementById('pv-rem').textContent=fmt(Math.max(t-d,0));
 }
 
+let _savingOrder=false;
 async function saveOrder(){
+  if(_savingOrder)return;
+  _savingOrder=true;
+  try{ await _saveOrderInner(); } finally { _savingOrder=false; }
+}
+async function _saveOrderInner(){
   const name=document.getElementById('n-name').value.trim();
   const total=parseFloat(document.getElementById('n-total').value)||0;
   if(!name){toast('⚠️ أدخل اسم العميل');return;}
@@ -1388,7 +1396,7 @@ async function saveOrder(){
     // حقول الربح (للإدارة فقط)
     costs:[],profit:0,closed:false
   };
-  await db.saveOrder(order);orders.push(order);
+  await db.saveOrder(order);upsertLocal(orders,order);
   fillOrderSelect('e-order');
   toast('✅ تم حفظ الطلبية #'+pad3(orderCounter)+(kitchens.length>1?' بعدد '+kitchens.length+' مطابخ':''));
   clearNew();goTo('orders',document.querySelectorAll('.tab')[1]);
@@ -1687,7 +1695,7 @@ async function saveContract(){
     dateAdded:new Date().toISOString(),
     isPreliminary:true
   };
-  await db.saveContract(contract); contracts.push(contract);
+  await db.saveContract(contract); upsertLocal(contracts,contract);
   toast('✅ تم إصدار العقد المبدئي #'+contract.contractNum);
   clearContractForm();
   renderContracts();
@@ -1820,7 +1828,7 @@ async function closeAccount(){
   };
 
   await db.saveArchive(archive);
-  archives.push(archive);
+  upsertLocal(archives,archive);
 
   await db.clearAllOrders();
   await db.clearAllExpenses();
@@ -2020,7 +2028,7 @@ async function saveExp(){
   if(!amount){toast('⚠️ أدخل المبلغ');return;}
   if(!codeValid('e')){toast('⚠️ كود الطلبية غير صحيح أو مكرر — صحّحه أو امسحه أو اختر الطلبية من القائمة',4000);return;}
   const exp={id:db.newId(),name,cat:document.getElementById('e-cat').value,orderId:document.getElementById('e-order').value||'',amount,date:document.getElementById('e-date').value||today(),note:document.getElementById('e-note').value,dateAdded:new Date().toISOString()};
-  await db.saveExpense(exp);expenses.push(exp);
+  await db.saveExpense(exp);upsertLocal(expenses,exp);
   ['e-name','e-amount','e-date','e-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-date').value=today();
   populateExpYears(); populateExpMonths(); refreshFin();
@@ -2220,7 +2228,7 @@ async function saveSalary(){
     month,year,note:document.getElementById('s-note').value,
     dateAdded:new Date().toISOString()
   };
-  await db.saveSalary(sal);salaries.push(sal);
+  await db.saveSalary(sal);upsertLocal(salaries,sal);
   ['s-name','s-amount','s-note'].forEach(id=>document.getElementById(id).value='');
   tempDeductions=[];
   renderDedList();
