@@ -952,7 +952,7 @@ RuqiDB.prototype.getSalaries = async function() {
   return JSON.parse(this.local.getItem('ruqi_salaries') || '[]');
 };
 RuqiDB.prototype.saveSalary = async function(sal) {
-  const sals = await this.getSalaries();
+  const sals = this._loc('salaries');
   const idx = sals.findIndex(s => s.id === sal.id);
   if (idx >= 0) sals[idx] = sal; else sals.push(sal);
   this.local.setItem('ruqi_salaries', JSON.stringify(sals));
@@ -960,7 +960,7 @@ RuqiDB.prototype.saveSalary = async function(sal) {
   return sal;
 };
 RuqiDB.prototype.deleteSalary = async function(id) {
-  let sals = await this.getSalaries();
+  let sals = this._loc('salaries');
   sals = sals.filter(s => s.id !== id);
   this.local.setItem('ruqi_salaries', JSON.stringify(sals));
   if (this.firebaseReady) await this.db.ref(`salaries/${id}`).remove();
@@ -984,7 +984,7 @@ RuqiDB.prototype.getContracts = async function() {
   return JSON.parse(this.local.getItem('ruqi_contracts') || '[]');
 };
 RuqiDB.prototype.saveContract = async function(c) {
-  const list = await this.getContracts();
+  const list = this._loc('contracts');
   const idx = list.findIndex(x => x.id === c.id);
   if (idx >= 0) list[idx] = c; else list.push(c);
   this.local.setItem('ruqi_contracts', JSON.stringify(list));
@@ -992,7 +992,7 @@ RuqiDB.prototype.saveContract = async function(c) {
   return c;
 };
 RuqiDB.prototype.deleteContract = async function(id) {
-  let list = await this.getContracts();
+  let list = this._loc('contracts');
   list = list.filter(x => x.id !== id);
   this.local.setItem('ruqi_contracts', JSON.stringify(list));
   if (this.firebaseReady) await this.db.ref(`contracts/${id}`).remove();
@@ -1016,14 +1016,14 @@ RuqiDB.prototype.getArchives = async function() {
   return JSON.parse(this.local.getItem('ruqi_archives') || '[]');
 };
 RuqiDB.prototype.saveArchive = async function(a) {
-  const list = await this.getArchives();
+  const list = this._loc('archives');
   list.push(a);
   this.local.setItem('ruqi_archives', JSON.stringify(list));
   if (this.firebaseReady) await this.db.ref(`archives/${a.id}`).set(a);
   return a;
 };
 RuqiDB.prototype.deleteArchive = async function(id) {
-  let list = await this.getArchives();
+  let list = this._loc('archives');
   list = list.filter(x => x.id !== id);
   this.local.setItem('ruqi_archives', JSON.stringify(list));
   if (this.firebaseReady) await this.db.ref(`archives/${id}`).remove();
@@ -1376,7 +1376,7 @@ async function _saveOrderInner(){
   if(!total){toast('⚠️ أدخل قيمة العقد');return;}
   const dep=parseFloat(document.getElementById('n-dep').value)||0;
   const status=dep>=total?'paid':dep>0?'partial':'pending';
-  orderCounter++;localStorage.setItem('ruqi_counter',orderCounter);
+  orderCounter=await db.nextOrderNum();
   const payments = dep > 0 ? [{amount: dep, method: document.getElementById('n-pay').value, date: today(), note: 'دفعة أولى'}] : [];
 
   const curType=document.getElementById('n-type').value;
@@ -1680,7 +1680,7 @@ async function saveContract(){
   const name=document.getElementById('c-name').value.trim();
   if(!name){toast('⚠️ أدخل اسم العميل');return;}
   if(contractEditId){ await saveContractEditIfEditing(); return; }
-  contractCounter++; localStorage.setItem('ruqi_contract_counter',contractCounter);
+  contractCounter=await db.nextCounter('contract');
   const items=[...tempContractItems];
   const itemsTotal=items.reduce((s,i)=>s+Math.max(i.qty*i.price-i.disc,0),0);
   const total = items.length ? itemsTotal : (parseFloat(document.getElementById('c-value').value)||0);
