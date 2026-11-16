@@ -22,7 +22,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:v
 .logo-t{font-size:14px;font-weight:600}
 .logo-s{font-size:10px;color:var(--gold-l)}
 .tabs{display:flex;gap:3px}
-.tab{padding:7px 14px;border-radius:8px;font-size:13px;cursor:pointer;color:#aaa;border:none;background:transparent;transition:.15s;font-family:inherit;display:flex;align-items:center;gap:5px}
+.tab{padding:7px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:#aaa;border:none;background:transparent;transition:.15s;font-family:inherit;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .tab:hover{color:#fff;background:rgba(255,255,255,.07)}
 .tab.active{background:rgba(184,134,11,.2);color:var(--gold-l);border:1px solid rgba(184,134,11,.35)}
 .topbar-end{margin-right:auto;display:flex;align-items:center;gap:12px;font-size:12px;color:#999}
@@ -220,13 +220,17 @@ tbody tr:hover td{background:#faf8f4}
 .kitchen-item .ki-title{font-weight:700;color:#B8860B}
 .kitchen-item .ki-sub{color:var(--t2);font-size:11px}
 
-/* PROFIT (جديد) */
+/* PROFIT */
 .cost-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.75rem;margin-bottom:8px}
 .cost-box .ded-row{border-bottom-color:#bbf7d0}
 .profit-box{background:linear-gradient(135deg,#14532d,#15803d);color:#fff;border-radius:8px;padding:.75rem 1rem;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
 .profit-box .lbl{font-size:12px;opacity:.9}
 .profit-box .val{font-size:18px;font-weight:800}
-.closed-badge{background:#dcfce7;color:#15803d;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:700;margin-right:4px}
+.profit-header{background:linear-gradient(135deg,#14532d,#15803d);color:#fff;border-radius:var(--rlg) var(--rlg) 0 0;padding:.8rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.profit-header h3{font-size:14px;font-weight:700;color:#fff}
+.profit-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden;margin-bottom:12px}
+.formula{margin-bottom:12px;padding:.6rem .9rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:12px;color:#14532d}
+.linked-tag{background:#e0f2fe;color:#075985;font-size:10px;padding:1px 6px;border-radius:8px;margin-right:4px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -248,6 +252,7 @@ tbody tr:hover td{background:#faf8f4}
     <button class="tab" onclick="goTo('contracts',this)">📄 عقود مبدئية</button>
     <button class="tab" onclick="goTo('expenses',this)">💸 المصروفات</button>
     <button class="tab" onclick="goTo('salaries',this)">👷 الرواتب</button>
+    <button class="tab" onclick="goTo('profit',this)">💎 صافي الربح</button>
     <button class="tab" onclick="goTo('reports',this)">📊 التقارير</button>
     <button class="tab" onclick="goTo('archive',this)">🗄️ الأرشيف</button>
   </div>
@@ -277,17 +282,17 @@ tbody tr:hover td{background:#faf8f4}
   </div>
 
   <div class="stats" id="dash-stats">
-    <div class="stat" style="--acc:#B8860B"><div class="st-ic">💰</div><div class="st-lbl">إجمالي الإيرادات</div><div class="st-val" id="d-rev">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">الكل</span></div></div>
+    <div class="stat" style="--acc:#B8860B"><div class="st-ic">💰</div><div class="st-lbl">إجمالي الإيرادات (كل الطلبيات)</div><div class="st-val" id="d-rev">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">الكل</span></div></div>
     <div class="stat" style="--acc:#16a34a"><div class="st-ic">✅</div><div class="st-lbl">طلبيات مكتملة</div><div class="st-val" id="d-done">0</div><div class="st-foot" id="d-done-s">من 0 طلبية</div></div>
     <div class="stat" style="--acc:#b45309"><div class="st-ic">⏳</div><div class="st-lbl">مدفوعات معلقة</div><div class="st-val" id="d-pend">0 د.ل</div><div class="st-foot" id="d-pend-s"></div></div>
-    <div class="stat" style="--acc:#dc2626"><div class="st-ic">📉</div><div class="st-lbl">المصروفات التشغيلية</div><div class="st-val" id="d-exp">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">بدون رواتب</span></div></div>
+    <div class="stat" style="--acc:#dc2626"><div class="st-ic">📉</div><div class="st-lbl">المصروفات العامة</div><div class="st-val" id="d-exp">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">غير مرتبطة بطلبية</span></div></div>
   </div>
 
   <div class="stats">
     <div class="stat" style="--acc:#7c3aed"><div class="st-ic">👷</div><div class="st-lbl">إجمالي الرواتب</div><div class="st-val" id="d-sal">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">كل الأشهر</span></div></div>
-    <div class="stat" style="--acc:#0891b2"><div class="st-ic">💎</div><div class="st-lbl">صافي الربح</div><div class="st-val" id="d-net">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">بعد كل المصروفات</span></div></div>
-    <div class="stat" style="--acc:#15803d"><div class="st-ic">📅</div><div class="st-lbl">ربح الشهر الحالي (طلبيات مقفلة)</div><div class="st-val" id="d-pm">0 د.ل</div><div class="st-foot" id="d-pm-s"></div></div>
-    <div class="stat" style="--acc:#15803d"><div class="st-ic">🏆</div><div class="st-lbl">ربح السنة الحالية (طلبيات مقفلة)</div><div class="st-val" id="d-py">0 د.ل</div><div class="st-foot" id="d-py-s"></div></div>
+    <div class="stat" style="--acc:#0891b2"><div class="st-ic">💎</div><div class="st-lbl">صافي الربح الإجمالي</div><div class="st-val" id="d-net">0 د.ل</div><div class="st-foot"><span class="pill pill-neu">طلبيات مقفلة − عامة − رواتب</span></div></div>
+    <div class="stat" style="--acc:#15803d"><div class="st-ic">📅</div><div class="st-lbl">صافي ربح الشهر الحالي</div><div class="st-val" id="d-pm">0 د.ل</div><div class="st-foot" id="d-pm-s"></div></div>
+    <div class="stat" style="--acc:#15803d"><div class="st-ic">🏆</div><div class="st-lbl">صافي ربح السنة الحالية</div><div class="st-val" id="d-py">0 د.ل</div><div class="st-foot" id="d-py-s"></div></div>
   </div>
 
   <div class="two-col">
@@ -313,11 +318,15 @@ tbody tr:hover td{background:#faf8f4}
       <div class="sec">💎 الأداء المالي</div>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>نسبة التحصيل</span><strong id="p-c">0%</strong></div><div class="prog"><div class="pf" id="pb-c" style="width:0%"></div></div></div>
-        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>هامش الربح</span><strong id="p-m">0%</strong></div><div class="prog"><div class="pf" id="pb-m" style="width:0%;background:#16a34a"></div></div></div>
-        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>المصروفات / الإيرادات</span><strong id="p-e">0%</strong></div><div class="prog"><div class="pf" id="pb-e" style="width:0%;background:#dc2626"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>هامش الربح (على الطلبيات المقفلة)</span><strong id="p-m">0%</strong></div><div class="prog"><div class="pf" id="pb-m" style="width:0%;background:#16a34a"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>إجمالي التكاليف / إيراد المقفلة</span><strong id="p-e">0%</strong></div><div class="prog"><div class="pf" id="pb-e" style="width:0%;background:#dc2626"></div></div></div>
         <div style="border-top:1px solid var(--border);padding-top:10px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-size:12px;color:var(--t2)">مصروفات تشغيلية</span>
+            <span style="font-size:12px;color:var(--t2)">ربح الطلبيات المقفلة</span>
+            <strong id="d-ordprofit-foot" style="font-size:13px;color:#15803d">0 د.ل</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;color:var(--t2)">مصروفات عامة</span>
             <strong id="d-ops-foot" style="font-size:13px;color:#dc2626">0 د.ل</strong>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
@@ -491,7 +500,7 @@ tbody tr:hover td{background:#faf8f4}
   </div>
 </div>
 
-<!-- ===== EXPENSES (تشغيلية فقط) ===== -->
+<!-- ===== EXPENSES ===== -->
 <div id="pg-expenses" class="page">
   <div class="month-bar">
     <label>📅 الفترة:</label>
@@ -499,46 +508,53 @@ tbody tr:hover td{background:#faf8f4}
     <select id="exp-year-sel" onchange="populateExpMonths();renderExpenses()"></select>
     <div class="sep">|</div>
     <div class="month-summary">
-      <div class="ms-item"><div class="ms-lbl">إجمالي الفترة</div><div class="ms-val" id="exp-period-total" style="color:#dc2626">0 د.ل</div></div>
+      <div class="ms-item"><div class="ms-lbl">إجمالي مصروفات الفترة</div><div class="ms-val" id="exp-period-total" style="color:#dc2626">0 د.ل</div></div>
       <div class="ms-item"><div class="ms-lbl">المواد الخام</div><div class="ms-val" id="exp-period-mat" style="color:#b45309">0 د.ل</div></div>
-      <div class="ms-item"><div class="ms-lbl">مصروفات التشغيل</div><div class="ms-val" id="exp-period-ops" style="color:#0891b2">0 د.ل</div></div>
+      <div class="ms-item"><div class="ms-lbl">مرتبطة بطلبيات</div><div class="ms-val" id="exp-period-linked" style="color:#0369a1">0 د.ل</div></div>
       <div class="ms-item"><div class="ms-lbl">صافي الربح (الفترة)</div><div class="ms-val" id="exp-period-net" style="color:#15803d">0 د.ل</div></div>
     </div>
   </div>
 
   <div class="four-col">
-    <div class="stat" style="--acc:#dc2626"><div class="st-ic">📉</div><div class="st-lbl">إجمالي التشغيلية</div><div class="st-val" id="e-total">0 د.ل</div></div>
+    <div class="stat" style="--acc:#dc2626"><div class="st-ic">📉</div><div class="st-lbl">إجمالي المصروفات</div><div class="st-val" id="e-total">0 د.ل</div></div>
     <div class="stat" style="--acc:#b45309"><div class="st-ic">📦</div><div class="st-lbl">مواد خام</div><div class="st-val" id="e-mat">0 د.ل</div></div>
     <div class="stat" style="--acc:#0891b2"><div class="st-ic">⚡</div><div class="st-lbl">تشغيل ونقل</div><div class="st-val" id="e-ops">0 د.ل</div></div>
-    <div class="stat" style="--acc:#6b7280"><div class="st-ic">📎</div><div class="st-lbl">مصروفات العامل</div><div class="st-val" id="e-other">0 د.ل</div></div>
+    <div class="stat" style="--acc:#6b7280"><div class="st-ic">📎</div><div class="st-lbl">أجور ومصروفات العامل</div><div class="st-val" id="e-other">0 د.ل</div></div>
   </div>
 
   <div class="two-col" style="align-items:start">
     <div class="card">
-      <div class="sec">📋 سجل المصروفات التشغيلية</div>
+      <div class="sec">📋 سجل المصروفات</div>
       <div class="tw"><table>
-        <thead><tr><th>البند</th><th>الفئة</th><th>المبلغ</th><th>التاريخ</th><th>ملاحظة</th><th></th></tr></thead>
+        <thead><tr><th>البند</th><th>الفئة</th><th>الطلبية</th><th>المبلغ</th><th>التاريخ</th><th>ملاحظة</th><th></th></tr></thead>
         <tbody id="exp-body"></tbody>
       </table></div>
       <div id="exp-empty" style="display:none;text-align:center;padding:1.5rem;color:var(--t3);font-size:13px">لا توجد مصروفات</div>
     </div>
     <div class="card">
-      <div class="sec">➕ مصروف تشغيلي جديد</div>
+      <div class="sec">➕ مصروف جديد</div>
       <div class="fg"><label>البند *</label><input id="e-name" type="text" placeholder="مثال: خشب MDF"></div>
       <div class="fg"><label>الفئة</label>
         <select id="e-cat">
-          <option>مواد خام</option><option>تشغيل</option><option>نقل</option><option>مصروفات العامل</option>
+          <option>مواد خام</option><option>أجور عمال</option><option>تشغيل</option><option>نقل</option><option>مصروفات العامل</option>
         </select>
+      </div>
+      <div class="fg"><label>🔗 كود الطلبية (اختياري — رقم الطلبية مثل 012)</label>
+        <input id="e-code" type="text" inputmode="numeric" placeholder="اكتب كود الطلبية ليُحسب المصروف في تكلفتها" oninput="codeInput('e')">
+        <div id="e-code-hint" style="font-size:11px;min-height:14px"></div>
+      </div>
+      <div class="fg"><label>أو اختر من القائمة</label>
+        <select id="e-order" onchange="orderSelChanged('e')"></select>
       </div>
       <div class="fg"><label>المبلغ (د.ل) *</label><input id="e-amount" type="number" placeholder="0"></div>
       <div class="fg"><label>التاريخ</label><input id="e-date" type="date"></div>
       <div class="fg"><label>ملاحظة</label><input id="e-note" type="text" placeholder="اختياري"></div>
       <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="saveExp()">✅ حفظ المصروف</button>
-      <div style="margin-top:.75rem;padding:.6rem;background:#fff8e1;border-radius:8px;font-size:11px;color:#7a5a08;border:1px solid #f5d78e">
-        💡 لتسجيل رواتب الموظفين انتقل إلى تبويب <strong>👷 الرواتب</strong>
+      <div style="margin-top:.75rem;padding:.6rem;background:#f0fdf4;border-radius:8px;font-size:11px;color:#14532d;border:1px solid #bbf7d0">
+        💡 <strong>قاعدة الحساب:</strong> المصروف المرتبط بطلبية (مواد، أجور بالقطعة، نقل، تركيب) يُحسب في تكلفة تلك الطلبية فقط. والمصروف غير المرتبط (إيجار، كهرباء، وقود...) يُعدّ مصروفًا عامًا يُخصم من صافي ربح شهره. لا يُحسب أي مصروف مرتين.
       </div>
-      <div style="margin-top:.5rem;padding:.6rem;background:#f0fdf4;border-radius:8px;font-size:11px;color:#14532d;border:1px solid #bbf7d0">
-        ⚠️ تكاليف كل طلبية (مواد، أجور، نقل، تركيب) تُسجَّل داخل الطلبية نفسها من زر ✏️ في تبويب الطلبيات لحساب ربحها. هنا سجّل فقط المصروفات العامة (إيجار، كهرباء...) لتفادي احتساب التكلفة مرتين.
+      <div style="margin-top:.5rem;padding:.6rem;background:#fff8e1;border-radius:8px;font-size:11px;color:#7a5a08;border:1px solid #f5d78e">
+        💡 لتسجيل رواتب الموظفين الثابتة انتقل إلى تبويب <strong>👷 الرواتب</strong>. أجور العمال بالقطعة تُسجَّل هنا مرتبطة بالطلبية.
       </div>
     </div>
   </div>
@@ -597,7 +613,6 @@ tbody tr:hover td{background:#faf8f4}
         <div class="fg"><label>السنة</label><input id="s-year-inp" type="number" placeholder="2025"></div>
       </div>
 
-      <!-- قسم المصروفات المخصومة -->
       <div class="ded-box">
         <div class="ded-title">💸 مصروفات مُخصومة من الراتب</div>
         <div id="ded-list"></div>
@@ -608,7 +623,6 @@ tbody tr:hover td{background:#faf8f4}
         </div>
       </div>
 
-      <!-- صافي الراتب -->
       <div class="net-sal-box">
         <div class="lbl">الراتب المستحق (بعد الخصم)</div>
         <div class="val" id="s-net-display">0 د.ل</div>
@@ -625,6 +639,29 @@ tbody tr:hover td{background:#faf8f4}
   </div>
 </div>
 
+<!-- ===== PROFIT (صافي الربح) ===== -->
+<div id="pg-profit" class="page">
+  <div class="month-bar" style="flex-wrap:wrap">
+    <label>💎 الفترة:</label>
+    <select id="pf-year" onchange="renderProfit()"></select>
+    <select id="pf-month" onchange="renderProfit()"></select>
+    <div class="sep">|</div>
+    <label>العرض:</label>
+    <select id="pf-view" onchange="renderProfit()">
+      <option value="month">كل طلبيات الفترة + مصروفاتها</option>
+      <option value="order">طلبية واحدة</option>
+    </select>
+    <div id="pf-order-wrap" style="display:none;align-items:center;gap:6px">
+      <select id="pf-order" onchange="renderProfit()" style="max-width:300px"></select>
+    </div>
+  </div>
+  <div id="profit-content"></div>
+  <div class="formula">
+    🧮 <strong>صافي ربح الشهر</strong> = ربح الطلبيات المقفلة في الشهر (العقد − تكاليفها − المصروفات المرتبطة بها) − المصروفات العامة لنفس الشهر − الرواتب المستحقة لنفس الشهر.
+    تُنسب الطلبية إلى شهر <strong>إقفالها</strong>. هذه الصفحة للإدارة فقط ولا تظهر للزبون.
+  </div>
+</div>
+
 <!-- ===== REPORTS ===== -->
 <div id="pg-reports" class="page">
   <div class="month-bar">
@@ -634,7 +671,7 @@ tbody tr:hover td{background:#faf8f4}
   </div>
 
   <div class="stats">
-    <div class="stat" style="--acc:#B8860B"><div class="st-ic">💎</div><div class="st-lbl">صافي الربح</div><div class="st-val" id="r-net">0 د.ل</div></div>
+    <div class="stat" style="--acc:#B8860B"><div class="st-ic">💎</div><div class="st-lbl">صافي الربح (الفترة)</div><div class="st-val" id="r-net">0 د.ل</div></div>
     <div class="stat" style="--acc:#16a34a"><div class="st-ic">📈</div><div class="st-lbl">متوسط الطلبية</div><div class="st-val" id="r-avg">0 د.ل</div></div>
     <div class="stat" style="--acc:#7c3aed"><div class="st-ic">🔄</div><div class="st-lbl">إجمالي الطلبيات</div><div class="st-val" id="r-cnt">0</div></div>
     <div class="stat" style="--acc:#b45309"><div class="st-ic">💳</div><div class="st-lbl">نسبة التحصيل</div><div class="st-val" id="r-col">0%</div></div>
@@ -642,15 +679,17 @@ tbody tr:hover td{background:#faf8f4}
 
   <div class="two-col">
     <div class="card">
-      <div class="sec">💰 التفاصيل المالية</div>
+      <div class="sec">💰 التفاصيل المالية (الطلبيات المقفلة في الفترة)</div>
       <table>
         <tbody>
-          <tr><td style="color:var(--t2)">إجمالي الإيرادات</td><td style="font-weight:700;text-align:left" id="r-rev">0 د.ل</td></tr>
-          <tr><td style="color:var(--t2)">مصروفات تشغيلية</td><td style="font-weight:700;text-align:left;color:#dc2626" id="r-ops">0 د.ل</td></tr>
+          <tr><td style="color:var(--t2)">إيرادات الطلبيات المقفلة</td><td style="font-weight:700;text-align:left" id="r-rev">0 د.ل</td></tr>
+          <tr><td style="color:var(--t2)">تكاليف الطلبيات (مواد، أجور، نقل...)</td><td style="font-weight:700;text-align:left;color:#dc2626" id="r-ocost">0 د.ل</td></tr>
+          <tr><td style="color:var(--t2)">مصروفات عامة للفترة</td><td style="font-weight:700;text-align:left;color:#dc2626" id="r-ops">0 د.ل</td></tr>
           <tr><td style="color:var(--t2)">رواتب الموظفين (مستحقة)</td><td style="font-weight:700;text-align:left;color:#7c3aed" id="r-sal">0 د.ل</td></tr>
           <tr style="background:#f9f7f0"><td style="font-weight:700">صافي الربح</td><td style="font-weight:800;text-align:left;font-size:16px" id="r-net2">0 د.ل</td></tr>
         </tbody>
       </table>
+      <div style="margin-top:.6rem"><button class="btn btn-sm" onclick="goTo('profit',document.querySelectorAll('.tab')[6])">💎 تفاصيل صافي الربح لكل طلبية</button></div>
     </div>
     <div class="card">
       <div class="sec">🏆 أفضل العملاء</div>
@@ -659,15 +698,6 @@ tbody tr:hover td{background:#faf8f4}
         <tbody id="top-body"></tbody>
       </table></div>
     </div>
-  </div>
-
-  <div class="card">
-    <div class="sec">💎 صافي ربح الطلبيات المقفلة — حسب الشهر (للإدارة فقط)</div>
-    <div class="tw"><table>
-      <thead><tr><th>الشهر</th><th>عدد الطلبيات</th><th>الإيرادات</th><th>التكاليف</th><th>صافي الربح</th><th>الهامش</th></tr></thead>
-      <tbody id="profit-month-body"></tbody>
-      <tfoot id="profit-year-foot"></tfoot>
-    </table></div>
   </div>
 
   <div class="card">
@@ -706,12 +736,11 @@ tbody tr:hover td{background:#faf8f4}
 </div><!-- /body -->
 </div><!-- /app -->
 
-<!-- ===== EDIT ORDER MODAL (محدّث) ===== -->
+<!-- ===== EDIT ORDER MODAL ===== -->
 <div class="overlay" id="edit-ov" onclick="if(event.target===this)closeEdit()">
   <div class="modal">
-    <div class="mh"><span class="mt">✏️ تعديل الطلبية</span><button class="mc" onclick="closeEdit()">✕</button></div>
+    <div class="mh"><span class="mt" id="em-title">✏️ تعديل الطلبية</span><button class="mc" onclick="closeEdit()">✕</button></div>
 
-    <!-- قيمة العقد -->
     <div class="modal-sec">📝 تعديل قيمة العقد</div>
     <div class="form-grid">
       <div class="fg">
@@ -724,11 +753,9 @@ tbody tr:hover td{background:#faf8f4}
       </div>
     </div>
 
-    <!-- سجل الدفعات -->
     <div class="modal-sec">💳 سجل الدفعات</div>
     <div class="pay-hist" id="em-pay-hist"></div>
 
-    <!-- إضافة دفعة جديدة -->
     <div class="modal-sec">➕ إضافة دفعة جديدة</div>
     <div class="form-grid">
       <div class="fg">
@@ -743,7 +770,6 @@ tbody tr:hover td{background:#faf8f4}
       </div>
     </div>
 
-    <!-- الملخص المالي -->
     <div style="background:var(--s2);border-radius:8px;padding:.75rem;margin-bottom:10px;border:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
         <span style="color:var(--t2)">قيمة العقد</span>
@@ -771,6 +797,7 @@ tbody tr:hover td{background:#faf8f4}
         <input id="em-cost-amount" type="number" placeholder="المبلغ" style="width:90px;padding:7px 9px;border-radius:7px;border:1px solid var(--b2);font-size:12px;font-family:inherit">
         <button class="btn btn-sm" style="background:#15803d;color:#fff;border-color:#15803d" onclick="addOrderCost()">➕</button>
       </div>
+      <div id="em-linked-box"></div>
     </div>
     <div class="profit-box">
       <div><div class="lbl">صافي ربح الطلبية</div><div style="font-size:11px;opacity:.8" id="em-profit-sub"></div></div>
@@ -781,7 +808,6 @@ tbody tr:hover td{background:#faf8f4}
       <button class="btn btn-sm" id="em-reopen-btn" style="display:none" onclick="reopenOrder()">🔓 إعادة فتح</button>
     </div>
 
-    <!-- الحالة والملاحظة -->
     <div class="modal-sec">⚙️ الحالة</div>
     <div class="fg"><label>الحالة</label>
       <select id="em-status">
@@ -807,9 +833,14 @@ tbody tr:hover td{background:#faf8f4}
     <div class="fg"><label>البند *</label><input id="ee-name" type="text"></div>
     <div class="fg"><label>الفئة</label>
       <select id="ee-cat">
-        <option>مواد خام</option><option>تشغيل</option><option>نقل</option><option>مصروفات العامل</option>
+        <option>مواد خام</option><option>أجور عمال</option><option>تشغيل</option><option>نقل</option><option>مصروفات العامل</option>
       </select>
     </div>
+    <div class="fg"><label>🔗 كود الطلبية (اختياري)</label>
+      <input id="ee-code" type="text" inputmode="numeric" placeholder="رقم الطلبية مثل 012" oninput="codeInput('ee')">
+      <div id="ee-code-hint" style="font-size:11px;min-height:14px"></div>
+    </div>
+    <div class="fg"><label>أو اختر من القائمة</label><select id="ee-order" onchange="orderSelChanged('ee')"></select></div>
     <div class="fg"><label>المبلغ (د.ل) *</label><input id="ee-amount" type="number"></div>
     <div class="fg"><label>التاريخ</label><input id="ee-date" type="date"></div>
     <div class="fg"><label>ملاحظة</label><input id="ee-note" type="text"></div>
@@ -820,7 +851,7 @@ tbody tr:hover td{background:#faf8f4}
   </div>
 </div>
 
-<!-- EDIT SALARY MODAL (محدّث) -->
+<!-- EDIT SALARY MODAL -->
 <div class="overlay" id="sal-edit-ov" onclick="if(event.target===this)closeSalEdit()">
   <div class="modal">
     <div class="mh"><span class="mt">✏️ تعديل الراتب</span><button class="mc" onclick="closeSalEdit()">✕</button></div>
@@ -840,7 +871,6 @@ tbody tr:hover td{background:#faf8f4}
       <div class="fg"><label>السنة</label><input id="se-year" type="number"></div>
     </div>
 
-    <!-- المصروفات المخصومة في التعديل -->
     <div class="ded-box">
       <div class="ded-title">💸 مصروفات مُخصومة من الراتب</div>
       <div id="se-ded-list"></div>
@@ -939,7 +969,6 @@ RuqiDB.prototype.onSalariesChange = function(cb) {
 };
 
 // ===== RuqiDB preliminary-contract extensions =====
-// عقود مبدئية: كيان منفصل تماماً عن الطلبيات (orders)، لا تُحتسب قيمتها في أي حساب مالي
 RuqiDB.prototype.getContracts = async function() {
   if (this.firebaseReady) {
     const snap = await this.db.ref('contracts').once('value');
@@ -972,7 +1001,6 @@ RuqiDB.prototype.onContractsChange = function(cb) {
 };
 
 // ===== RuqiDB archive extensions =====
-// إقفال الحساب: أرشفة الطلبيات/المصروفات/الرواتب الحالية دفعة واحدة، ثم تصفير المنظومة
 RuqiDB.prototype.getArchives = async function() {
   if (this.firebaseReady) {
     const snap = await this.db.ref('archives').once('value');
@@ -1002,7 +1030,6 @@ RuqiDB.prototype.onArchivesChange = function(cb) {
     });
   }
 };
-// تصفير جماعي — يُستخدم فقط عند إقفال الحساب بعد نجاح الأرشفة
 RuqiDB.prototype.clearAllOrders = async function() {
   this.local.setItem('ruqi_orders', '[]');
   if (this.firebaseReady) await this.db.ref('orders').remove();
@@ -1020,19 +1047,14 @@ RuqiDB.prototype.clearAllSalaries = async function() {
 const db = new RuqiDB();
 let orders = [], expenses = [], salaries = [], contracts = [], archives = [];
 let editId = null, expEditId = null, salEditId = null, contractEditId = null;
-// قائمة الخصومات المؤقتة في نموذج إضافة الراتب
 let tempDeductions = [];
-// قائمة الخصومات المؤقتة في نموذج تعديل الراتب
 let editTempDeductions = [];
-// بنود منتجات العقد المبدئي (نموذج الإضافة/التعديل معًا لأنهما نفس الفورم)
 let tempContractItems = [];
 let contractValueManual = false;
-// فهرس البند الجاري تعديله حالياً داخل tempContractItems (null = إضافة بند جديد)
 let editingItemIndex = null;
-// المطابخ المتعددة لنفس الطلبية (نموذج طلبية جديدة)
 let tempKitchens = [];
 let viewingArchiveId = null;
-// تكاليف الطلبية الجاري تعديلها (لحساب صافي ربح الطلبية)
+// تكاليف الطلبية الجاري تعديلها (التكاليف الداخلية فقط، أما المصروفات المرتبطة فتأتي من تبويب المصروفات)
 let editCosts = [];
 
 const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -1046,10 +1068,15 @@ function goTo(id, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('pg-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
+  else {
+    const map={dash:0,orders:1,new:2,contracts:3,expenses:4,salaries:5,profit:6,reports:7,archive:8};
+    const t=document.querySelectorAll('.tab')[map[id]]; if(t) t.classList.add('active');
+  }
   if (id === 'orders')   renderOrders('all');
   if (id === 'reports')  { populateRepYears(); populateRepMonths(); renderReports(); }
-  if (id === 'expenses') { populateExpYears(); populateExpMonths(); renderExpenses(); }
+  if (id === 'expenses') { populateExpYears(); populateExpMonths(); fillOrderSelect('e-order'); renderExpenses(); }
   if (id === 'salaries') { populateSalYears(); populateSalMonths(); renderSalaries(); }
+  if (id === 'profit')   renderProfit();
   if (id === 'contracts') renderContracts();
   if (id === 'archive')  renderArchives();
   if (id === 'dash')     renderDash();
@@ -1061,26 +1088,70 @@ function fmtN(n){return Math.round(n||0).toLocaleString('ar-LY')}
 function today(){return new Date().toISOString().slice(0,10)}
 function toast(msg,d=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
 function setSync(s){const d=document.getElementById('sync-dot'),l=document.getElementById('sync-lbl');d.className='sync-dot '+(s==='on'?'on':'off');l.textContent=s==='on'?'متصل — مزامنة فورية':'أوف لاين — محلي'}
-// تهريب النصوص لمنع XSS عند الإدراج في innerHTML
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-// تهريب خلايا CSV
 function csv(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function pad3(n){return String(n||'').padStart(3,'0')}
+
+// ===== FINANCE ENGINE (قلب حساب الأرباح) =====
+// تكلفة الطلبية = التكاليف الداخلية + المصروفات المرتبطة بها من تبويب المصروفات
+function orderCostTotal(arr){ return (arr||[]).reduce((s,c)=>s+(c.amount||0),0); }
+function orderLinkedExp(o,list){ list=list||expenses; return list.filter(e=>e.orderId && e.orderId===o.id); }
+function orderCostAll(o,list){ return orderCostTotal(o.costs)+orderLinkedExp(o,list).reduce((s,e)=>s+(e.amount||0),0); }
+function orderProfit(o,list){ return (o.total||0)-orderCostAll(o,list); }
+// المصروف المرتبط فقط إن كانت طلبيته موجودة، وإلا يُعامل كمصروف عام
+function isLinkedExp(e){ return !!e.orderId && orders.some(o=>o.id===e.orderId); }
+function salNet(s){ return s.netAmount!==undefined?s.netAmount:s.amount; }
+function matchClosed(o,yr,mo){
+  if(!o.closed||!o.closedAt) return false;
+  const d=new Date(o.closedAt);
+  if(yr && String(d.getFullYear())!==String(yr)) return false;
+  if(mo && mo!=='all' && String(d.getMonth()+1)!==String(mo)) return false;
+  return true;
+}
+function matchDate(str,yr,mo){
+  const d=str||'';
+  if(yr && d.slice(0,4)!==String(yr)) return false;
+  if(mo && mo!=='all' && String(parseInt(d.slice(5,7))||0)!==String(mo)) return false;
+  return true;
+}
+function matchSal(s,yr,mo){
+  if(yr && String(s.year)!==String(yr)) return false;
+  if(mo && mo!=='all' && String(s.month)!==String(mo)) return false;
+  return true;
+}
+// صافي ربح فترة: yr=null يعني كل الفترات، mo='all' يعني كل أشهر السنة
+function computeNet(yr,mo){
+  const closed=orders.filter(o=>matchClosed(o,yr,mo));
+  const rev=closed.reduce((s,o)=>s+(o.total||0),0);
+  const ordCost=closed.reduce((s,o)=>s+orderCostAll(o),0);
+  const orderProfitSum=rev-ordCost;
+  const general=expenses.filter(e=>!isLinkedExp(e)&&matchDate(e.date,yr,mo));
+  const gen=general.reduce((s,e)=>s+(e.amount||0),0);
+  const sals=salaries.filter(s=>matchSal(s,yr,mo));
+  const sal=sals.reduce((s,x)=>s+salNet(x),0);
+  return {closed,rev,ordCost,orderProfit:orderProfitSum,general,gen,sals,sal,net:orderProfitSum-gen-sal};
+}
 
 // ===== LOAD =====
 async function load() {
   [orders, expenses, salaries, contracts, archives] = await Promise.all([db.getOrders(), db.getExpenses(), db.getSalaries(), db.getContracts(), db.getArchives()]);
+  refreshAll();
+}
+function refreshAll(){
   renderDash();
   renderOrders('all');
-  populateExpYears(); populateExpMonths(); renderExpenses();
+  populateExpYears(); populateExpMonths(); fillOrderSelect('e-order'); renderExpenses();
   populateSalYears(); populateSalMonths(); renderSalaries();
   populateRepYears(); populateRepMonths(); renderReports();
+  renderProfit();
   renderContracts();
   renderArchives();
 }
+function refreshFin(){ renderOrders('all'); renderDash(); renderReports(); renderProfit(); renderExpenses(); }
 
-db.onOrdersChange(d=>{orders=d;setSync('on');renderDash();renderOrders('all');renderReports();});
-db.onExpensesChange(d=>{expenses=d;renderExpenses();renderDash();renderReports();});
-db.onSalariesChange(d=>{salaries=d;renderSalaries();renderDash();renderReports();});
+db.onOrdersChange(d=>{orders=d;setSync('on');fillOrderSelect('e-order');refreshFin();});
+db.onExpensesChange(d=>{expenses=d;refreshFin();});
+db.onSalariesChange(d=>{salaries=d;renderSalaries();renderDash();renderReports();renderProfit();renderExpenses();});
 db.onContractsChange(d=>{contracts=d;renderContracts();});
 db.onArchivesChange(d=>{archives=d;renderArchives();});
 window.addEventListener('online',()=>{setSync('on');load();});
@@ -1098,7 +1169,6 @@ function getYears(arr, dateField) {
   });
   return [...yrs].sort((a,b)=>b-a);
 }
-
 function populateYearSel(selId, arr, dateField) {
   const sel = document.getElementById(selId);
   const cur = sel.value;
@@ -1106,7 +1176,6 @@ function populateYearSel(selId, arr, dateField) {
   sel.innerHTML = yrs.map(y=>`<option value="${y}" ${y===cur?'selected':''}>${y}</option>`).join('');
   if (!sel.value) sel.value = String(new Date().getFullYear());
 }
-
 function populateMonthSel(selId, yearSelId, arr, dateField) {
   const sel = document.getElementById(selId);
   const cur = sel.value;
@@ -1117,7 +1186,6 @@ function populateMonthSel(selId, yearSelId, arr, dateField) {
     }).join('');
   if (!sel.value) sel.value = 'all';
 }
-
 function populateExpYears()  { populateYearSel('exp-year-sel', expenses, 'date'); }
 function populateExpMonths() { populateMonthSel('exp-month-sel','exp-year-sel', expenses, 'date'); }
 function populateSalYears()  { populateYearSel('sal-year-sel', salaries, 'sal'); }
@@ -1125,53 +1193,43 @@ function populateSalMonths() { populateMonthSel('sal-month-sel','sal-year-sel', 
 function populateRepYears()  { populateYearSel('rep-year-sel', orders, 'date'); }
 function populateRepMonths() { populateMonthSel('rep-month-sel','rep-year-sel', orders, 'date'); }
 
-// ===== PROFIT HELPERS =====
-function orderCostTotal(arr){ return (arr||[]).reduce((s,c)=>s+(c.amount||0),0); }
-
 // ===== DASHBOARD =====
 function renderDash(){
   const rev=orders.reduce((s,o)=>s+o.total,0);
   const paid=orders.reduce((s,o)=>s+o.paid,0);
   const pend=rev-paid;
-  const opsExp=expenses.reduce((s,e)=>s+e.amount,0);
-  // الرواتب: استخدام الراتب المستحق (بعد الخصم) وليس الأساسي
-  const salExp=salaries.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
-  const totalExp=opsExp+salExp;
-  const net=rev-totalExp;
+  const all=computeNet(null,null);
+  const salExp=salaries.reduce((s,x)=>s+salNet(x),0);
   const cp=rev>0?Math.round(paid/rev*100):0;
-  const mp=rev>0?Math.round(net/rev*100):0;
-  const er=rev>0?Math.round(totalExp/rev*100):0;
+  const mp=all.rev>0?Math.round(all.net/all.rev*100):0;
+  const er=all.rev>0?Math.round((all.ordCost+all.gen+all.sal)/all.rev*100):0;
 
   document.getElementById('d-rev').textContent=fmt(rev);
   document.getElementById('d-done').textContent=orders.filter(o=>o.status==='paid').length;
   document.getElementById('d-done-s').textContent='من '+orders.length+' طلبية';
   document.getElementById('d-pend').textContent=fmt(pend);
   document.getElementById('d-pend-s').innerHTML=orders.filter(o=>o.status!=='paid').length+' فاتورة';
-  document.getElementById('d-exp').textContent=fmt(opsExp);
+  document.getElementById('d-exp').textContent=fmt(all.gen);
   document.getElementById('d-sal').textContent=fmt(salExp);
-  document.getElementById('d-net').textContent=fmt(net);
-  document.getElementById('d-net').style.color=net>=0?'#15803d':'#dc2626';
+  document.getElementById('d-net').textContent=fmt(all.net);
+  document.getElementById('d-net').style.color=all.net>=0?'#15803d':'#dc2626';
   document.getElementById('p-c').textContent=cp+'%'; document.getElementById('pb-c').style.width=cp+'%';
-  document.getElementById('p-m').textContent=mp+'%'; document.getElementById('pb-m').style.width=Math.max(mp,0)+'%';
+  document.getElementById('p-m').textContent=mp+'%'; document.getElementById('pb-m').style.width=Math.max(Math.min(mp,100),0)+'%';
   document.getElementById('p-e').textContent=er+'%'; document.getElementById('pb-e').style.width=Math.min(er,100)+'%';
-  document.getElementById('d-ops-foot').textContent=fmt(opsExp);
+  document.getElementById('d-ordprofit-foot').textContent=fmt(all.orderProfit);
+  document.getElementById('d-ops-foot').textContent=fmt(all.gen);
   document.getElementById('d-sal-foot').textContent=fmt(salExp);
-  document.getElementById('d-net2').textContent=fmt(net);
-  document.getElementById('d-net2').style.color=net>=0?'#15803d':'#dc2626';
+  document.getElementById('d-net2').textContent=fmt(all.net);
+  document.getElementById('d-net2').style.color=all.net>=0?'#15803d':'#dc2626';
 
-  // ربح الشهر والسنة الحالية من الطلبيات المقفلة
-  const nowD=new Date(), cy=String(nowD.getFullYear()), cm=nowD.getMonth();
-  const closedOrders=orders.filter(o=>o.closed&&o.closedAt);
-  const yearClosed=closedOrders.filter(o=>o.closedAt.slice(0,4)===cy);
-  const monthClosed=yearClosed.filter(o=>new Date(o.closedAt).getMonth()===cm);
-  const pm=monthClosed.reduce((s,o)=>s+(o.profit||0),0);
-  const py=yearClosed.reduce((s,o)=>s+(o.profit||0),0);
-  document.getElementById('d-pm').textContent=fmt(pm);
-  document.getElementById('d-pm').style.color=pm>=0?'#15803d':'#dc2626';
-  document.getElementById('d-pm-s').textContent=monthClosed.length+' طلبية مقفلة';
-  document.getElementById('d-py').textContent=fmt(py);
-  document.getElementById('d-py').style.color=py>=0?'#15803d':'#dc2626';
-  document.getElementById('d-py-s').textContent=yearClosed.length+' طلبية مقفلة';
+  const nowD=new Date(), cy=nowD.getFullYear(), cm=nowD.getMonth()+1;
+  const m=computeNet(cy,cm), y=computeNet(cy,'all');
+  document.getElementById('d-pm').textContent=fmt(m.net);
+  document.getElementById('d-pm').style.color=m.net>=0?'#15803d':'#dc2626';
+  document.getElementById('d-pm-s').textContent=m.closed.length+' طلبية مقفلة هذا الشهر';
+  document.getElementById('d-py').textContent=fmt(y.net);
+  document.getElementById('d-py').style.color=y.net>=0?'#15803d':'#dc2626';
+  document.getElementById('d-py-s').textContent=y.closed.length+' طلبية مقفلة هذه السنة';
 
   renderChart(); renderDonut(); renderActivity();
 }
@@ -1208,7 +1266,7 @@ function renderActivity(){
   if(!all.length){el.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--t3);font-size:13px">لا توجد عمليات</div>';return;}
   el.innerHTML=all.map(a=>{
     if(a._t==='o') return `<div class="ai"><div class="a-ic" style="background:#dcfce7">📋</div><div class="a-b"><div class="a-t">${esc(a.name)}</div><div class="a-m">${esc(a.type)}</div></div><div class="a-amt" style="color:#15803d">+${fmt(a.total)}</div></div>`;
-    if(a._t==='s') return `<div class="ai"><div class="a-ic" style="background:#f3e8ff">👷</div><div class="a-b"><div class="a-t">${esc(a.name)}</div><div class="a-m">راتب · ${MONTHS_AR[(a.month||1)-1]} ${a.year||''}</div></div><div class="a-amt" style="color:#7c3aed">-${fmt(a.netAmount!==undefined?a.netAmount:a.amount)}</div></div>`;
+    if(a._t==='s') return `<div class="ai"><div class="a-ic" style="background:#f3e8ff">👷</div><div class="a-b"><div class="a-t">${esc(a.name)}</div><div class="a-m">راتب · ${MONTHS_AR[(a.month||1)-1]} ${a.year||''}</div></div><div class="a-amt" style="color:#7c3aed">-${fmt(salNet(a))}</div></div>`;
     return `<div class="ai"><div class="a-ic" style="background:#fee2e2">💸</div><div class="a-b"><div class="a-t">${esc(a.name)}</div><div class="a-m">${esc(a.cat)}</div></div><div class="a-amt" style="color:#dc2626">-${fmt(a.amount)}</div></div>`;
   }).join('');
 }
@@ -1222,20 +1280,22 @@ function renderOrders(f){
   const tb=document.getElementById('orders-body'),em=document.getElementById('orders-empty');
   if(!data.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  tb.innerHTML=data.map(o=>`<tr>
-    <td style="color:var(--t3)">#${String(o.orderNum||'').padStart(3,'0')}</td>
+  tb.innerHTML=data.map(o=>{
+    const p=orderProfit(o);
+    return `<tr>
+    <td style="color:var(--t3)">#${pad3(o.orderNum)}</td>
     <td style="font-weight:600">${esc(o.name)}</td><td>${esc(o.type)}${o.kitchens&&o.kitchens.length>1?` <span class="sb sb-prelim" style="padding:1px 7px">+${o.kitchens.length-1}</span>`:''}</td>
     <td>${fmt(o.total)}</td>
     <td style="color:#15803d">${fmt(o.paid)}</td>
     <td style="color:${o.total-o.paid>0?'#dc2626':'var(--t3)'}">${fmt(o.total-o.paid)}</td>
     <td><span class="sb ${sm[o.status]||''}">${sl[o.status]||''}</span></td>
-    <td style="font-weight:700;color:${o.closed?((o.profit||0)>=0?'#15803d':'#dc2626'):'var(--t3)'}">${o.closed?fmt(o.profit):'—'}</td>
+    <td style="font-weight:700;color:${o.closed?(p>=0?'#15803d':'#dc2626'):'var(--t3)'}">${o.closed?fmt(p):'—'}</td>
     <td style="color:var(--t3);font-size:12px">${esc(o.date||'')}</td>
     <td style="display:flex;gap:4px">
       <button class="btn btn-sm" onclick="openEdit('${o.id}')">✏️</button>
       <button class="btn btn-sm" style="color:#B8860B;border-color:#B8860B" onclick="printOrder('${o.id}')">🖨️</button>
       <button class="btn btn-sm" style="color:#dc2626" onclick="confirmDel('${o.id}')">🗑</button>
-    </td></tr>`).join('');
+    </td></tr>`;}).join('');
 }
 
 function filterO(f,btn){document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderOrders(f);}
@@ -1244,7 +1304,7 @@ function filterO(f,btn){document.querySelectorAll('.fb').forEach(b=>b.classList.
 let orderCounter=parseInt(localStorage.getItem('ruqi_counter')||'0');
 function nCalc(){const t=parseFloat(document.getElementById('n-total').value)||0,d=parseFloat(document.getElementById('n-dep').value)||0;document.getElementById('n-rem').value=Math.max(t-d,0);}
 
-// ===== MULTI-KITCHEN (أكثر من مطبخ لنفس العميل) =====
+// ===== MULTI-KITCHEN =====
 function addAnotherKitchen(){
   const type=document.getElementById('n-type').value;
   const facade=document.getElementById('n-facade').value.trim();
@@ -1258,13 +1318,11 @@ function addAnotherKitchen(){
   pvUpdate();
   toast('✅ تمت إضافة المطبخ ('+tempKitchens.length+') — أدخل بيانات المطبخ التالي');
 }
-
 function removeKitchen(id){
   tempKitchens=tempKitchens.filter(k=>k.id!==id);
   renderKitchenList();
   pvUpdate();
 }
-
 function renderKitchenList(){
   const el=document.getElementById('kitchen-list');
   if(!el) return;
@@ -1281,7 +1339,7 @@ function renderKitchenList(){
 
 function pvUpdate(){
   const nn=orderCounter+1;
-  document.getElementById('pv-n').textContent='#'+String(nn).padStart(3,'0');
+  document.getElementById('pv-n').textContent='#'+pad3(nn);
   document.getElementById('pv-dt').textContent=new Date().toLocaleDateString('ar-LY');
   document.getElementById('pv-name').textContent=document.getElementById('n-name').value||'—';
   document.getElementById('pv-phone').textContent=document.getElementById('n-phone').value||'—';
@@ -1303,10 +1361,8 @@ async function saveOrder(){
   const dep=parseFloat(document.getElementById('n-dep').value)||0;
   const status=dep>=total?'paid':dep>0?'partial':'pending';
   orderCounter++;localStorage.setItem('ruqi_counter',orderCounter);
-  // حفظ الدفعات كمصفوفة
   const payments = dep > 0 ? [{amount: dep, method: document.getElementById('n-pay').value, date: today(), note: 'دفعة أولى'}] : [];
 
-  // تجميع المطابخ: المطابخ المضافة مسبقاً + المطبخ الحالي في الحقول (إن وُجد)
   const curType=document.getElementById('n-type').value;
   const curFacade=document.getElementById('n-facade').value.trim();
   const curFrame=document.getElementById('n-frame').value.trim();
@@ -1320,7 +1376,6 @@ async function saveOrder(){
   const order={
     id:db.newId(),orderNum:orderCounter,
     name,phone:document.getElementById('n-phone').value,addr:document.getElementById('n-addr').value,
-    // الحقول العلوية تعكس المطبخ الأول للتوافق مع الإحصائيات والتصنيفات القديمة
     type:kitchens[0].type,facade:kitchens[0].facade,
     frame:kitchens[0].frame,height:kitchens[0].height,
     acc:kitchens[0].acc,notes:document.getElementById('n-notes').value,
@@ -1334,7 +1389,8 @@ async function saveOrder(){
     costs:[],profit:0,closed:false
   };
   await db.saveOrder(order);orders.push(order);
-  toast('✅ تم حفظ الطلبية #'+String(orderCounter).padStart(3,'0')+(kitchens.length>1?' بعدد '+kitchens.length+' مطابخ':''));
+  fillOrderSelect('e-order');
+  toast('✅ تم حفظ الطلبية #'+pad3(orderCounter)+(kitchens.length>1?' بعدد '+kitchens.length+' مطابخ':''));
   clearNew();goTo('orders',document.querySelectorAll('.tab')[1]);
 }
 
@@ -1345,7 +1401,7 @@ function clearNew(){
   pvUpdate();
 }
 
-// ===== EDIT ORDER (محدّث) =====
+// ===== EDIT ORDER =====
 // الطباعة: نحذف حقول الربح والتكاليف حتى لا تظهر للزبون
 function printOrder(id){
   const o=orders.find(o=>o.id===id); if(!o)return;
@@ -1358,19 +1414,14 @@ function openEdit(id){
   editId=id;
   const o=orders.find(o=>o.id===id);
   if(!o)return;
-
-  // ملء الحقول
+  document.getElementById('em-title').textContent='✏️ تعديل الطلبية #'+pad3(o.orderNum)+' — كود الربط: '+pad3(o.orderNum);
   document.getElementById('em-total').value = o.total;
   document.getElementById('em-paid-display').value = o.paid;
   document.getElementById('em-status').value = o.status;
   document.getElementById('em-note').value = o.notes||'';
   document.getElementById('em-new-pay').value = '';
   document.getElementById('em-pay-method').value = 'كاش';
-
-  // تحميل التكاليف
   editCosts = (o.costs||[]).map(c=>({...c}));
-
-  // عرض سجل الدفعات
   renderPayHistory(o);
   editCalcRemaining();
   document.getElementById('edit-ov').classList.add('open');
@@ -1380,7 +1431,6 @@ function renderPayHistory(o) {
   const payments = o.payments || [];
   const el = document.getElementById('em-pay-hist');
   if (!payments.length) {
-    // إذا كان هناك مبلغ مدفوع لكن بدون سجل دفعات (بيانات قديمة)
     if (o.paid > 0) {
       el.innerHTML = `<div class="pay-hist-row"><span style="color:var(--t2)">دفعة سابقة</span><span style="color:#15803d;font-weight:600">${fmt(o.paid)}</span></div>`;
     } else {
@@ -1408,7 +1458,6 @@ function editCalcRemaining() {
   document.getElementById('em-summary-rem').textContent = fmt(remaining);
   document.getElementById('em-paid-display').value = totalPaid;
 
-  // تحديث الحالة تلقائياً
   let autoStatus = 'pending';
   if (totalPaid >= currentTotal) autoStatus = 'paid';
   else if (totalPaid > 0) autoStatus = 'partial';
@@ -1439,9 +1488,20 @@ function renderOrderCosts(){
     ? editCosts.map(c=>`<div class="ded-row"><span>${esc(c.name)} <span style="color:var(--t3)">(${esc(c.cat)})</span></span>
         <div style="display:flex;align-items:center;gap:6px"><strong style="color:#dc2626">${fmt(c.amount)}</strong>
         <button onclick="removeOrderCost(${c.id})" style="background:none;border:none;cursor:pointer;color:#dc2626">✕</button></div></div>`).join('')
-    : '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد تكاليف مسجلة</div>';
+    : '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد تكاليف داخلية مسجلة</div>';
+
+  // المصروفات المرتبطة بهذه الطلبية (للعرض فقط — تُدار من تبويب المصروفات)
+  const linked=orderLinkedExp(o);
+  const linkedTotal=linked.reduce((s,e)=>s+(e.amount||0),0);
+  document.getElementById('em-linked-box').innerHTML = linked.length
+    ? `<div style="margin-top:8px;padding-top:6px;border-top:1px dashed #86efac">
+        <div style="font-size:11px;font-weight:700;color:#075985;margin-bottom:4px">🔗 مصروفات مرتبطة بالطلبية (من تبويب المصروفات)</div>
+        ${linked.map(e=>`<div class="ded-row"><span>${esc(e.name)} <span style="color:var(--t3)">(${esc(e.cat)} · ${esc(e.date||'')})</span></span><strong style="color:#dc2626">${fmt(e.amount)}</strong></div>`).join('')}
+       </div>`
+    : '';
+
   const total=parseFloat(document.getElementById('em-total').value)||o.total;
-  const costTotal=orderCostTotal(editCosts);
+  const costTotal=orderCostTotal(editCosts)+linkedTotal;
   const profit=total-costTotal;
   document.getElementById('em-profit').textContent=fmt(profit);
   document.getElementById('em-profit-sub').textContent='العقد '+fmt(total)+' − التكاليف '+fmt(costTotal);
@@ -1451,25 +1511,27 @@ function renderOrderCosts(){
 
 async function closeOrderProfit(){
   const o=orders.find(o=>o.id===editId); if(!o) return;
-  if(!editCosts.length && !confirm('لم تُدخل أي تكاليف، سيكون الربح = قيمة العقد كاملة. متابعة؟')) return;
+  const linked=orderLinkedExp(o);
+  if(!editCosts.length && !linked.length && !confirm('لم تُدخل أي تكاليف أو مصروفات مرتبطة، سيكون الربح = قيمة العقد كاملة. متابعة؟')) return;
   const total=parseFloat(document.getElementById('em-total').value)||o.total;
   const newPay=parseFloat(document.getElementById('em-new-pay').value)||0;
   if(total-(o.paid+newPay)>0 && !confirm('ما زال هناك مبلغ متبقٍ على الزبون. هل تريد إقفال الطلبية رغم ذلك؟')) return;
-  await saveEdit(true);            // يحفظ العقد والدفعات أولاً
+  await saveEdit(true);
   o.costs=[...editCosts];
-  o.profit=o.total-orderCostTotal(o.costs);
+  o.profit=orderProfit(o);
   o.closed=true;
   o.closedAt=new Date().toISOString();
   await db.saveOrder(o);
-  closeEdit(); renderOrders('all'); renderDash(); renderReports();
-  toast('🔒 تم إقفال الطلبية — صافي الربح '+fmt(o.profit));
+  const p=o.profit;
+  closeEdit(); refreshFin();
+  toast('🔒 تم إقفال الطلبية — صافي الربح '+fmt(p));
 }
 
 async function reopenOrder(){
   const o=orders.find(o=>o.id===editId); if(!o) return;
   o.closed=false; delete o.closedAt;
   await db.saveOrder(o);
-  renderOrderCosts(); renderOrders('all'); renderDash(); renderReports();
+  renderOrderCosts(); refreshFin();
   toast('🔓 أُعيد فتح الطلبية');
 }
 
@@ -1481,10 +1543,8 @@ async function saveEdit(silent){
   const newPay = parseFloat(document.getElementById('em-new-pay').value) || 0;
   const payMethod = document.getElementById('em-pay-method').value;
 
-  // تحديث قيمة العقد
   o.total = newTotal;
 
-  // إضافة الدفعة الجديدة إن وجدت
   if (newPay > 0) {
     if (!o.payments) o.payments = o.paid > 0 ? [{amount:o.paid, method:o.pay||'كاش', date:o.date||today(), note:'دفعة سابقة'}] : [];
     o.payments.push({amount: newPay, method: payMethod, date: today(), note: ''});
@@ -1496,24 +1556,21 @@ async function saveEdit(silent){
   o.status = document.getElementById('em-status').value;
   o.notes = document.getElementById('em-note').value;
 
-  // التكاليف والربح
   o.costs=[...editCosts];
-  if(o.closed) o.profit=o.total-orderCostTotal(o.costs);
+  o.profit=orderProfit(o);
 
   await db.saveOrder(o);
-  if(silent===true) return;   // عند الإقفال لا نغلق النافذة مرتين
+  if(silent===true) return;
   closeEdit();
-  renderOrders('all');
-  renderDash();
-  renderReports();
+  refreshFin();
   toast('✅ تم تحديث الطلبية');
 }
 
 function closeEdit(){document.getElementById('edit-ov').classList.remove('open');editId=null;editCosts=[];}
-async function confirmDel(id){if(!confirm('حذف هذه الطلبية؟'))return;await db.deleteOrder(id);orders=orders.filter(o=>o.id!==id);renderOrders('all');renderDash();renderReports();toast('🗑 تم الحذف');}
-async function delOrder(){if(!confirm('حذف الطلبية نهائياً؟'))return;await db.deleteOrder(editId);orders=orders.filter(o=>o.id!==editId);closeEdit();renderOrders('all');renderDash();renderReports();toast('🗑 تم الحذف');}
+async function confirmDel(id){if(!confirm('حذف هذه الطلبية؟ (المصروفات المرتبطة بها ستتحول إلى مصروفات عامة)'))return;await db.deleteOrder(id);orders=orders.filter(o=>o.id!==id);fillOrderSelect('e-order');refreshFin();toast('🗑 تم الحذف');}
+async function delOrder(){if(!confirm('حذف الطلبية نهائياً؟ (المصروفات المرتبطة بها ستتحول إلى مصروفات عامة)'))return;const id=editId;await db.deleteOrder(id);orders=orders.filter(o=>o.id!==id);closeEdit();fillOrderSelect('e-order');refreshFin();toast('🗑 تم الحذف');}
 
-// ===== PRELIMINARY CONTRACTS (منفصلة تماماً عن الطلبيات — لا تدخل أي حساب مالي) =====
+// ===== PRELIMINARY CONTRACTS =====
 let contractCounter=parseInt(localStorage.getItem('ruqi_contract_counter')||'0');
 
 function addContractItem(){
@@ -1523,7 +1580,6 @@ function addContractItem(){
   const disc=parseFloat(document.getElementById('ci-disc').value)||0;
   if(!name){toast('⚠️ أدخل اسم المنتج');return;}
   if(editingItemIndex!==null && tempContractItems[editingItemIndex]){
-    // تحديث بند موجود بدل إضافة بند جديد
     const existingId = tempContractItems[editingItemIndex].id;
     tempContractItems[editingItemIndex] = {id:existingId,name,qty,price,disc};
     editingItemIndex = null;
@@ -1685,7 +1741,6 @@ function openContractEdit(id){
 }
 
 async function saveContractEditIfEditing(){
-  // إن كان هناك عقد قيد التعديل، حدّثه بدل إنشاء عقد جديد
   if(!contractEditId) return false;
   const c=contracts.find(x=>x.id===contractEditId); if(!c) return false;
   c.name=document.getElementById('c-name').value.trim()||c.name;
@@ -1743,13 +1798,13 @@ async function closeAccount(){
     toast('⚠️ لا توجد بيانات حالية لإقفالها');
     return;
   }
-  const rev=orders.reduce((s,o)=>s+o.total,0);
   const paid=orders.reduce((s,o)=>s+o.paid,0);
-  const opsExp=expenses.reduce((s,e)=>s+e.amount,0);
-  const salExp=salaries.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
-  const net=rev-opsExp-salExp;
+  const c=computeNet(null,null);
+  const openCount=orders.filter(o=>!o.closed).length;
 
-  const warn=`سيتم أرشفة ${orders.length} طلبية و${expenses.length} مصروف و${salaries.length} راتب في سجل دائم بالأرشيف، ثم تصفير لوحة التحكم (الطلبيات/المصروفات/الرواتب) للبدء من جديد.\n\nصافي الربح الحالي قبل الإقفال: ${fmt(net)}\n\nملاحظة: العقود المبدئية لن تتأثر، وترقيم الطلبيات الجديدة سيستمر تصاعدياً بدون تكرار.\n\nهل تريد المتابعة؟`;
+  let warn=`سيتم أرشفة ${orders.length} طلبية و${expenses.length} مصروف و${salaries.length} راتب في سجل دائم بالأرشيف، ثم تصفير لوحة التحكم (الطلبيات/المصروفات/الرواتب) للبدء من جديد.\n\nصافي الربح الحالي قبل الإقفال: ${fmt(c.net)}\n\n`;
+  if(openCount) warn+=`⚠️ يوجد ${openCount} طلبية غير مقفلة (لم يُحسب ربحها) وسيتم أرشفتها ولن تظهر في لوحة التحكم. يُفضّل إقفالها أولاً.\n\n`;
+  warn+=`ملاحظة: العقود المبدئية لن تتأثر، وترقيم الطلبيات الجديدة سيستمر تصاعدياً بدون تكرار.\n\nهل تريد المتابعة؟`;
   if(!confirm(warn)) return;
   if(!confirm('تأكيد نهائي: هل أنت متأكد من إقفال الحساب الحالي وتصفير لوحة التحكم؟ لا يمكن التراجع عن هذه الخطوة (لكن يمكنك مراجعة كل البيانات لاحقاً من الأرشيف).')) return;
 
@@ -1760,7 +1815,8 @@ async function closeAccount(){
     fromDate:dates[0]||null,
     toDate:dates[dates.length-1]||today(),
     orders:[...orders], expenses:[...expenses], salaries:[...salaries],
-    totals:{revenue:rev, paid, opsExp, salExp, net, ordersCount:orders.length, expCount:expenses.length, salCount:salaries.length}
+    // الإيرادات = الطلبيات المقفلة، المصروفات = تكاليف الطلبيات + المصروفات العامة
+    totals:{revenue:c.rev, paid, opsExp:c.ordCost+c.gen, salExp:c.sal, net:c.net, ordersCount:orders.length, expCount:expenses.length, salCount:salaries.length, openOrders:openCount}
   };
 
   await db.saveArchive(archive);
@@ -1771,11 +1827,7 @@ async function closeAccount(){
   await db.clearAllSalaries();
   orders=[]; expenses=[]; salaries=[];
 
-  renderDash(); renderOrders('all');
-  populateExpYears(); populateExpMonths(); renderExpenses();
-  populateSalYears(); populateSalMonths(); renderSalaries();
-  populateRepYears(); populateRepMonths(); renderReports();
-  renderArchives();
+  refreshAll();
   toast('🔒 تم إقفال الحساب وأرشفته — لوحة التحكم جاهزة لدورة جديدة');
 }
 
@@ -1810,7 +1862,7 @@ function openArchiveView(id){
   document.getElementById('av-summary').innerHTML=`
     <div><div style="color:var(--t3);font-size:10px">الفترة</div><div style="font-weight:600">${esc(a.fromDate||'—')} → ${esc(a.toDate||'—')}</div></div>
     <div><div style="color:var(--t3);font-size:10px">الإيرادات</div><div style="font-weight:700;color:#15803d">${fmt(t.revenue)}</div></div>
-    <div><div style="color:var(--t3);font-size:10px">مصروفات تشغيلية</div><div style="font-weight:700;color:#dc2626">${fmt(t.opsExp)}</div></div>
+    <div><div style="color:var(--t3);font-size:10px">مصروفات وتكاليف</div><div style="font-weight:700;color:#dc2626">${fmt(t.opsExp)}</div></div>
     <div><div style="color:var(--t3);font-size:10px">رواتب</div><div style="font-weight:700;color:#7c3aed">${fmt(t.salExp)}</div></div>
     <div class="full"><div style="color:var(--t3);font-size:10px">صافي الربح</div><div style="font-weight:800;font-size:15px;color:${(t.net||0)>=0?'#15803d':'#dc2626'}">${fmt(t.net)}</div></div>
   `;
@@ -1818,19 +1870,21 @@ function openArchiveView(id){
   document.getElementById('av-exp-count').textContent=(a.expenses||[]).length;
   document.getElementById('av-sal-count').textContent=(a.salaries||[]).length;
 
-  document.getElementById('av-orders-body').innerHTML=(a.orders||[]).map(o=>`<tr>
-    <td>#${String(o.orderNum||'').padStart(3,'0')}</td><td>${esc(o.name)}</td><td>${esc(o.type)}</td>
+  document.getElementById('av-orders-body').innerHTML=(a.orders||[]).map(o=>{
+    const p=orderProfit(o,a.expenses||[]);
+    return `<tr>
+    <td>#${pad3(o.orderNum)}</td><td>${esc(o.name)}</td><td>${esc(o.type)}</td>
     <td>${fmt(o.total)}</td><td style="color:#15803d">${fmt(o.paid)}</td>
-    <td style="font-weight:700;color:${o.closed?((o.profit||0)>=0?'#15803d':'#dc2626'):'var(--t3)'}">${o.closed?fmt(o.profit):'—'}</td>
+    <td style="font-weight:700;color:${o.closed?(p>=0?'#15803d':'#dc2626'):'var(--t3)'}">${o.closed?fmt(p):'—'}</td>
     <td>${esc(o.date||'')}</td>
-  </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--t3)">لا توجد طلبيات</td></tr>';
+  </tr>`;}).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--t3)">لا توجد طلبيات</td></tr>';
 
   document.getElementById('av-exp-body').innerHTML=(a.expenses||[]).map(e=>`<tr>
     <td>${esc(e.name)}</td><td>${esc(e.cat)}</td><td style="color:#dc2626">${fmt(e.amount)}</td><td>${esc(e.date||'')}</td>
   </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--t3)">لا توجد مصروفات</td></tr>';
 
   document.getElementById('av-sal-body').innerHTML=(a.salaries||[]).map(s=>`<tr>
-    <td>${esc(s.name)}</td><td style="color:#7c3aed">${fmt(s.netAmount!==undefined?s.netAmount:s.amount)}</td><td>${MONTHS_AR[(s.month||1)-1]}</td><td>${s.year||''}</td>
+    <td>${esc(s.name)}</td><td style="color:#7c3aed">${fmt(salNet(s))}</td><td>${MONTHS_AR[(s.month||1)-1]}</td><td>${s.year||''}</td>
   </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--t3)">لا توجد رواتب</td></tr>';
 
   document.getElementById('archive-view-ov').classList.add('open');
@@ -1843,7 +1897,7 @@ function exportArchiveCSV(){
   const orders_=a.orders||[];
   if(!orders_.length){toast('لا توجد طلبيات في هذا الأرشيف');return;}
   dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','صافي الربح','التاريخ'].join(','),
-      ...orders_.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.closed?o.profit:'',o.date].map(csv).join(','))].join('\n'),
+      ...orders_.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.closed?orderProfit(o,a.expenses||[]):'',o.date].map(csv).join(','))].join('\n'),
      'ruqi-archive-orders-'+(a.closedAt||today()).slice(0,10)+'.csv','text/csv');
   toast('✅ تم التصدير');
 }
@@ -1859,24 +1913,69 @@ async function delArchive(){
 }
 
 // ===== EXPENSES =====
+// قائمة الطلبيات لربط المصروف بها
+function fillOrderSelect(selId, selected){
+  const sel=document.getElementById(selId); if(!sel) return;
+  const cur=selected!==undefined?selected:sel.value;
+  sel.innerHTML='<option value="">— مصروف عام (غير مرتبط بطلبية) —</option>'+
+    [...orders].reverse().map(o=>`<option value="${esc(o.id)}">#${pad3(o.orderNum)} — ${esc(o.name)} · ${esc(o.type)}${o.closed?' (مقفلة)':''}</option>`).join('');
+  sel.value=cur||'';
+  if(sel.value!==(cur||'')) sel.value='';
+}
+// ===== ربط المصروف بالطلبية عن طريق الكود (رقم الطلبية) =====
+function findOrdersByCode(code){
+  const n=parseInt(String(code).replace(/\D/g,''),10);
+  if(!n) return [];
+  return orders.filter(o=>parseInt(o.orderNum,10)===n);
+}
+function setCodeHint(prefix,msg,color){
+  const h=document.getElementById(prefix+'-code-hint'); if(!h) return;
+  h.textContent=msg; h.style.color=color||'var(--t3)';
+}
+function codeInput(prefix){
+  const inp=document.getElementById(prefix+'-code'), sel=document.getElementById(prefix+'-order');
+  const v=inp.value.trim();
+  if(!v){ sel.value=''; setCodeHint(prefix,''); return; }
+  const m=findOrdersByCode(v);
+  if(m.length===1){
+    sel.value=m[0].id;
+    setCodeHint(prefix,'✔ #'+pad3(m[0].orderNum)+' — '+m[0].name+' · عقد '+fmt(m[0].total)+' · سيُخصم من ربح هذه الطلبية','#15803d');
+  } else if(m.length>1){
+    sel.value='';
+    setCodeHint(prefix,'⚠️ هذا الكود مكرر في أكثر من طلبية — اختر الطلبية من القائمة','#b45309');
+  } else {
+    sel.value='';
+    setCodeHint(prefix,'✖ لا توجد طلبية بهذا الكود','#dc2626');
+  }
+}
+function orderSelChanged(prefix){
+  const sel=document.getElementById(prefix+'-order'), inp=document.getElementById(prefix+'-code');
+  const o=orders.find(x=>x.id===sel.value);
+  inp.value=o?pad3(o.orderNum):'';
+  setCodeHint(prefix,o?('✔ #'+pad3(o.orderNum)+' — '+o.name+' · عقد '+fmt(o.total)+' · سيُخصم من ربح هذه الطلبية'):'', '#15803d');
+}
+// تحقق: إن كُتب كود ولم يتطابق مع طلبية فلا نحفظ كمصروف عام بالخطأ
+function codeValid(prefix){
+  const v=document.getElementById(prefix+'-code').value.trim();
+  return !v || !!document.getElementById(prefix+'-order').value;
+}
+function orderLabel(id){
+  const o=orders.find(x=>x.id===id);
+  return o?`#${pad3(o.orderNum)} ${esc(o.name)}`:'';
+}
+
 function getFilteredExpenses() {
   const yr = document.getElementById('exp-year-sel')?.value;
   const mo = document.getElementById('exp-month-sel')?.value;
   if (!yr) return expenses;
-  return expenses.filter(e => {
-    const d = e.date || '';
-    const iy = d.slice(0,4), im = String(parseInt(d.slice(5,7))||0);
-    return iy === yr && (mo === 'all' || im === mo);
-  });
+  return expenses.filter(e => matchDate(e.date,yr,mo));
 }
 
 function renderExpenses(){
   const filtered = getFilteredExpenses();
   const tot=filtered.reduce((s,e)=>s+e.amount,0);
   const mat=filtered.filter(e=>e.cat==='مواد خام').reduce((s,e)=>s+e.amount,0);
-  const ops=filtered.filter(e=>e.cat==='تشغيل').reduce((s,e)=>s+e.amount,0);
-  const nql=filtered.filter(e=>e.cat==='نقل').reduce((s,e)=>s+e.amount,0);
-  const oth=filtered.filter(e=>!['مواد خام','تشغيل','نقل'].includes(e.cat)).reduce((s,e)=>s+e.amount,0);
+  const linked=filtered.filter(isLinkedExp).reduce((s,e)=>s+e.amount,0);
 
   const allTot=expenses.reduce((s,e)=>s+e.amount,0);
   const allMat=expenses.filter(e=>e.cat==='مواد خام').reduce((s,e)=>s+e.amount,0);
@@ -1889,27 +1988,21 @@ function renderExpenses(){
 
   const yr = document.getElementById('exp-year-sel')?.value;
   const mo = document.getElementById('exp-month-sel')?.value;
-  const revFiltered = orders.filter(o => {
-    const d=o.date||''; const iy=d.slice(0,4), im=String(parseInt(d.slice(5,7))||0);
-    return iy===yr && (mo==='all'||im===mo);
-  });
-  const salFiltered = salaries.filter(s => String(s.year)===yr && (mo==='all'||String(s.month)===mo));
-  const periodRev = revFiltered.reduce((s,o)=>s+o.total,0);
-  const periodSal = salFiltered.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
-  const periodNet = periodRev - tot - periodSal;
+  const net = computeNet(yr,mo).net;
   document.getElementById('exp-period-total').textContent=fmt(tot);
   document.getElementById('exp-period-mat').textContent=fmt(mat);
-  document.getElementById('exp-period-ops').textContent=fmt(ops+nql+oth);
-  document.getElementById('exp-period-net').textContent=fmt(periodNet);
-  document.getElementById('exp-period-net').style.color=periodNet>=0?'#15803d':'#dc2626';
+  document.getElementById('exp-period-linked').textContent=fmt(linked);
+  document.getElementById('exp-period-net').textContent=fmt(net);
+  document.getElementById('exp-period-net').style.color=net>=0?'#15803d':'#dc2626';
 
-  const catCls={'مواد خام':'sb-partial','تشغيل':'sb-ops','نقل':'sb-pending','مصروفات العامل':'sb-cancel'};
+  const catCls={'مواد خام':'sb-partial','أجور عمال':'sb-salary','تشغيل':'sb-ops','نقل':'sb-pending','مصروفات العامل':'sb-cancel'};
   const tb=document.getElementById('exp-body'),em=document.getElementById('exp-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
   tb.innerHTML=[...filtered].sort((a,b)=>new Date(b.dateAdded||b.date)-new Date(a.dateAdded||a.date)).map(e=>`<tr>
     <td style="font-weight:500">${esc(e.name)}</td>
     <td><span class="sb ${catCls[e.cat]||'sb-pending'}">${esc(e.cat)}</span></td>
+    <td style="font-size:12px">${isLinkedExp(e)?`<span class="linked-tag">${orderLabel(e.orderId)}</span>`:'<span style="color:var(--t3)">عام</span>'}</td>
     <td style="color:#dc2626;font-weight:600">${fmt(e.amount)}</td>
     <td style="color:var(--t3);font-size:12px">${esc(e.date||'')}</td>
     <td style="color:var(--t2);font-size:12px">${esc(e.note||'—')}</td>
@@ -1925,20 +2018,25 @@ async function saveExp(){
   const amount=parseFloat(document.getElementById('e-amount').value)||0;
   if(!name){toast('⚠️ أدخل اسم البند');return;}
   if(!amount){toast('⚠️ أدخل المبلغ');return;}
-  const exp={id:db.newId(),name,cat:document.getElementById('e-cat').value,amount,date:document.getElementById('e-date').value||today(),note:document.getElementById('e-note').value,dateAdded:new Date().toISOString()};
+  if(!codeValid('e')){toast('⚠️ كود الطلبية غير صحيح أو مكرر — صحّحه أو امسحه أو اختر الطلبية من القائمة',4000);return;}
+  const exp={id:db.newId(),name,cat:document.getElementById('e-cat').value,orderId:document.getElementById('e-order').value||'',amount,date:document.getElementById('e-date').value||today(),note:document.getElementById('e-note').value,dateAdded:new Date().toISOString()};
   await db.saveExpense(exp);expenses.push(exp);
   ['e-name','e-amount','e-date','e-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-date').value=today();
-  populateExpYears(); populateExpMonths(); renderExpenses();renderDash();toast('✅ تم تسجيل المصروف');
+  populateExpYears(); populateExpMonths(); refreshFin();
+  const lo=orders.find(o=>o.id===exp.orderId);
+  toast(lo?('✅ تم تسجيل المصروف على الطلبية #'+pad3(lo.orderNum)+' — '+lo.name+' (الكود محفوظ للإدخال التالي)'):'✅ تم تسجيل المصروف العام',3500);
 }
 
-async function delExp(id){if(!confirm('حذف هذا المصروف؟'))return;await db.deleteExpense(id);expenses=expenses.filter(e=>e.id!==id);renderExpenses();renderDash();toast('🗑 تم الحذف');}
+async function delExp(id){if(!confirm('حذف هذا المصروف؟'))return;await db.deleteExpense(id);expenses=expenses.filter(e=>e.id!==id);refreshFin();toast('🗑 تم الحذف');}
 
 function openExpEdit(id){
   expEditId=id;
   const e=expenses.find(e=>e.id===id);if(!e)return;
   document.getElementById('ee-name').value=e.name;
   document.getElementById('ee-cat').value=e.cat;
+  fillOrderSelect('ee-order',e.orderId||'');
+  { const lo=orders.find(o=>o.id===e.orderId); document.getElementById('ee-code').value=lo?pad3(lo.orderNum):''; if(lo) orderSelChanged('ee'); else setCodeHint('ee',''); }
   document.getElementById('ee-amount').value=e.amount;
   document.getElementById('ee-date').value=e.date||'';
   document.getElementById('ee-note').value=e.note||'';
@@ -1947,19 +2045,19 @@ function openExpEdit(id){
 function closeExpEdit(){document.getElementById('exp-edit-ov').classList.remove('open');expEditId=null;}
 async function saveExpEdit(){
   const e=expenses.find(e=>e.id===expEditId);if(!e)return;
+  if(!codeValid('ee')){toast('⚠️ كود الطلبية غير صحيح أو مكرر — صحّحه أو امسحه',4000);return;}
   e.name=document.getElementById('ee-name').value.trim()||e.name;
   e.cat=document.getElementById('ee-cat').value;
+  e.orderId=document.getElementById('ee-order').value||'';
   e.amount=parseFloat(document.getElementById('ee-amount').value)||e.amount;
   e.date=document.getElementById('ee-date').value||e.date;
   e.note=document.getElementById('ee-note').value;
   await db.saveExpense(e);
-  closeExpEdit();populateExpYears();populateExpMonths();renderExpenses();renderDash();toast('✅ تم تعديل المصروف');
+  closeExpEdit();populateExpYears();populateExpMonths();refreshFin();toast('✅ تم تعديل المصروف');
 }
-async function delExpFromModal(){if(!confirm('حذف هذا المصروف؟'))return;await db.deleteExpense(expEditId);expenses=expenses.filter(e=>e.id!==expEditId);closeExpEdit();renderExpenses();renderDash();toast('🗑 تم الحذف');}
+async function delExpFromModal(){if(!confirm('حذف هذا المصروف؟'))return;await db.deleteExpense(expEditId);expenses=expenses.filter(e=>e.id!==expEditId);closeExpEdit();refreshFin();toast('🗑 تم الحذف');}
 
 // ===== SALARIES + DEDUCTIONS =====
-
-// حساب صافي الراتب في نموذج الإضافة
 function calcSalNet() {
   const base = parseFloat(document.getElementById('s-amount').value) || 0;
   const totalDed = tempDeductions.reduce((s,d)=>s+d.amount, 0);
@@ -1967,7 +2065,6 @@ function calcSalNet() {
   document.getElementById('s-net-display').textContent = fmt(net);
 }
 
-// إضافة خصم جديد في نموذج الإضافة
 function addDeduction() {
   const name = document.getElementById('ded-name').value.trim();
   const amount = parseFloat(document.getElementById('ded-amount').value) || 0;
@@ -1979,7 +2076,6 @@ function addDeduction() {
   calcSalNet();
 }
 
-// عرض قائمة الخصومات في نموذج الإضافة
 function renderDedList() {
   const el = document.getElementById('ded-list');
   if (!tempDeductions.length) { el.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:11px;padding:4px">لا توجد خصومات</div>'; return; }
@@ -1991,10 +2087,8 @@ function renderDedList() {
         <button onclick="removeDed(${d.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0">✕</button>
       </div>
     </div>`).join('');
-  if (tempDeductions.length) {
-    const total = tempDeductions.reduce((s,d)=>s+d.amount,0);
-    el.innerHTML += `<div class="ded-total-row"><span>إجمالي الخصومات</span><span style="color:#dc2626">-${fmt(total)}</span></div>`;
-  }
+  const total = tempDeductions.reduce((s,d)=>s+d.amount,0);
+  el.innerHTML += `<div class="ded-total-row"><span>إجمالي الخصومات</span><span style="color:#dc2626">-${fmt(total)}</span></div>`;
 }
 
 function removeDed(id) {
@@ -2003,7 +2097,6 @@ function removeDed(id) {
   calcSalNet();
 }
 
-// حساب صافي الراتب في نموذج التعديل
 function calcEditSalNet() {
   const base = parseFloat(document.getElementById('se-amount').value) || 0;
   const totalDed = editTempDeductions.reduce((s,d)=>s+d.amount, 0);
@@ -2047,22 +2140,22 @@ function getFilteredSalaries() {
   const yr = document.getElementById('sal-year-sel')?.value;
   const mo = document.getElementById('sal-month-sel')?.value;
   if (!yr) return salaries;
-  return salaries.filter(s => String(s.year)===yr && (mo==='all'||String(s.month)===mo));
+  return salaries.filter(s => matchSal(s,yr,mo));
 }
 
 function renderSalaries(){
   const filtered = getFilteredSalaries();
-  const tot=salaries.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
+  const tot=salaries.reduce((s,x)=>s+salNet(x),0);
   const now=new Date();
-  const thisMonth=salaries.filter(s=>s.month===now.getMonth()+1 && s.year===now.getFullYear()).reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
+  const thisMonth=salaries.filter(s=>s.month===now.getMonth()+1 && s.year===now.getFullYear()).reduce((s,x)=>s+salNet(x),0);
   const months=new Set(salaries.map(s=>`${s.year}-${s.month}`));
   const avg=months.size?Math.round(tot/months.size):0;
   document.getElementById('s-total').textContent=fmt(tot);
   document.getElementById('s-month').textContent=fmt(thisMonth);
   document.getElementById('s-avg').textContent=fmt(avg);
 
-  const periodTot=filtered.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
-  const periodBase=filtered.reduce((s,s2)=>s+s2.amount,0);
+  const periodTot=filtered.reduce((s,x)=>s+salNet(x),0);
+  const periodBase=filtered.reduce((s,x)=>s+x.amount,0);
   const periodDue=periodBase-periodTot;
   const employees=new Set(filtered.map(s=>s.name));
   document.getElementById('sal-period-total').textContent=fmt(periodBase);
@@ -2070,17 +2163,15 @@ function renderSalaries(){
   document.getElementById('sal-period-due').textContent=fmt(periodDue);
   document.getElementById('sal-period-count').textContent=employees.size;
 
-  // ملخص الشهر الحالي
-  const now2=new Date();
-  const curMonthSals=salaries.filter(s=>s.month===now2.getMonth()+1&&s.year===now2.getFullYear());
+  const curMonthSals=salaries.filter(s=>s.month===now.getMonth()+1&&s.year===now.getFullYear());
   if(curMonthSals.length){
     const empTots={};
     curMonthSals.forEach(s=>{
       if(!empTots[s.name]) empTots[s.name]={base:0,net:0};
       empTots[s.name].base+=s.amount;
-      empTots[s.name].net+=(s.netAmount!==undefined?s.netAmount:s.amount);
+      empTots[s.name].net+=salNet(s);
     });
-    const totNet=curMonthSals.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
+    const totNet=curMonthSals.reduce((s,x)=>s+salNet(x),0);
     document.getElementById('sal-month-summary').innerHTML=
       Object.entries(empTots).map(([n,d])=>`
         <div style="padding:4px 0;border-bottom:1px solid #e9d5ff">
@@ -2096,7 +2187,7 @@ function renderSalaries(){
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
   tb.innerHTML=[...filtered].sort((a,b)=>b.year-a.year||b.month-a.month).map(s=>{
-    const net=s.netAmount!==undefined?s.netAmount:s.amount;
+    const net=salNet(s);
     const dedTotal=s.deductions?s.deductions.reduce((x,d)=>x+d.amount,0):0;
     return `<tr>
       <td style="font-weight:600">${esc(s.name)}</td>
@@ -2134,11 +2225,11 @@ async function saveSalary(){
   tempDeductions=[];
   renderDedList();
   document.getElementById('s-net-display').textContent='0 د.ل';
-  populateSalYears();populateSalMonths();renderSalaries();renderDash();renderReports();
+  populateSalYears();populateSalMonths();renderSalaries();renderDash();renderReports();renderProfit();
   toast('✅ تم تسجيل راتب '+name);
 }
 
-async function delSal(id){if(!confirm('حذف هذا الراتب؟'))return;await db.deleteSalary(id);salaries=salaries.filter(s=>s.id!==id);renderSalaries();renderDash();renderReports();toast('🗑 تم الحذف');}
+async function delSal(id){if(!confirm('حذف هذا الراتب؟'))return;await db.deleteSalary(id);salaries=salaries.filter(s=>s.id!==id);renderSalaries();renderDash();renderReports();renderProfit();toast('🗑 تم الحذف');}
 
 function openSalEdit(id){
   salEditId=id;
@@ -2148,7 +2239,6 @@ function openSalEdit(id){
   document.getElementById('se-month').value=s.month;
   document.getElementById('se-year').value=s.year;
   document.getElementById('se-note').value=s.note||'';
-  // تحميل الخصومات الموجودة
   editTempDeductions = s.deductions ? [...s.deductions].map(d=>({...d, id:d.id||Date.now()+Math.random()})) : [];
   renderEditDedList();
   calcEditSalNet();
@@ -2167,93 +2257,187 @@ async function saveSalEdit(){
   s.dedTotal=s.deductions.reduce((x,d)=>x+d.amount,0);
   s.netAmount=Math.max(s.amount-s.dedTotal,0);
   await db.saveSalary(s);
-  closeSalEdit();populateSalYears();populateSalMonths();renderSalaries();renderDash();renderReports();toast('✅ تم تعديل الراتب');
+  closeSalEdit();populateSalYears();populateSalMonths();renderSalaries();renderDash();renderReports();renderProfit();toast('✅ تم تعديل الراتب');
 }
-async function delSalFromModal(){if(!confirm('حذف هذا الراتب؟'))return;await db.deleteSalary(salEditId);salaries=salaries.filter(s=>s.id!==salEditId);closeSalEdit();renderSalaries();renderDash();renderReports();toast('🗑 تم الحذف');}
+async function delSalFromModal(){if(!confirm('حذف هذا الراتب؟'))return;await db.deleteSalary(salEditId);salaries=salaries.filter(s=>s.id!==salEditId);closeSalEdit();renderSalaries();renderDash();renderReports();renderProfit();toast('🗑 تم الحذف');}
+
+// ===== PROFIT PAGE (صافي الربح: شهر كامل أو طلبية واحدة) =====
+function initProfitSelectors(){
+  const ms=document.getElementById('pf-month');
+  ms.innerHTML='<option value="all">كل الأشهر</option>'+MONTHS_AR.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+  ms.value=String(new Date().getMonth()+1);
+}
+function populateProfitYears(){
+  const sel=document.getElementById('pf-year'); const cur=sel.value;
+  const yrs=new Set([String(new Date().getFullYear())]);
+  orders.forEach(o=>{ if(o.closedAt) yrs.add(String(new Date(o.closedAt).getFullYear())); });
+  expenses.forEach(e=>{ if(e.date) yrs.add(e.date.slice(0,4)); });
+  salaries.forEach(s=>{ if(s.year) yrs.add(String(s.year)); });
+  const list=[...yrs].filter(Boolean).sort((a,b)=>b-a);
+  sel.innerHTML=list.map(y=>`<option value="${y}">${y}</option>`).join('');
+  sel.value=list.includes(cur)?cur:String(new Date().getFullYear());
+}
+function populateProfitOrders(force){
+  const sel=document.getElementById('pf-order');
+  const cur=force||sel.value;
+  const yr=document.getElementById('pf-year').value, mo=document.getElementById('pf-month').value;
+  const list=orders.filter(o=>matchClosed(o,yr,mo)||!o.closed||o.id===force).sort((a,b)=>(b.orderNum||0)-(a.orderNum||0));
+  sel.innerHTML=list.length
+    ? list.map(o=>`<option value="${esc(o.id)}">#${pad3(o.orderNum)} — ${esc(o.name)} (${o.closed?'مقفلة':'مفتوحة'})</option>`).join('')
+    : '<option value="">لا توجد طلبيات في هذه الفترة</option>';
+  if(cur && list.some(o=>o.id===cur)) sel.value=cur;
+}
+function showOrderProfit(id){
+  document.getElementById('pf-view').value='order';
+  populateProfitOrders(id);
+  document.getElementById('pf-order').value=id;
+  renderProfit();
+}
+
+function renderProfit(){
+  const box=document.getElementById('profit-content'); if(!box) return;
+  populateProfitYears();
+  const yr=document.getElementById('pf-year').value;
+  const mo=document.getElementById('pf-month').value;
+  const view=document.getElementById('pf-view').value;
+  populateProfitOrders();
+  document.getElementById('pf-order-wrap').style.display=view==='order'?'flex':'none';
+
+  if(view==='order'){ box.innerHTML=profitOrderHTML(document.getElementById('pf-order').value); return; }
+
+  const c=computeNet(yr,mo);
+  const periodLbl=(mo==='all'?'سنة ':MONTHS_AR[mo-1]+' ')+yr;
+  const col=v=>v>=0?'#15803d':'#dc2626';
+  let html=`
+  <div class="stats">
+    <div class="stat" style="--acc:#15803d"><div class="st-ic">📋</div><div class="st-lbl">ربح الطلبيات المقفلة</div><div class="st-val" style="color:${col(c.orderProfit)}">${fmt(c.orderProfit)}</div><div class="st-foot">${c.closed.length} طلبية · إيراد ${fmt(c.rev)}</div></div>
+    <div class="stat" style="--acc:#dc2626"><div class="st-ic">💸</div><div class="st-lbl">مصروفات عامة (${esc(periodLbl)})</div><div class="st-val" style="color:#dc2626">${fmt(c.gen)}</div><div class="st-foot">${c.general.length} بند غير مرتبط بطلبية</div></div>
+    <div class="stat" style="--acc:#7c3aed"><div class="st-ic">👷</div><div class="st-lbl">رواتب (${esc(periodLbl)})</div><div class="st-val" style="color:#7c3aed">${fmt(c.sal)}</div><div class="st-foot">${c.sals.length} راتب</div></div>
+    <div class="stat" style="--acc:#0891b2"><div class="st-ic">💎</div><div class="st-lbl">صافي الربح (${esc(periodLbl)})</div><div class="st-val" style="color:${col(c.net)}">${fmt(c.net)}</div><div class="st-foot">${c.rev?'هامش '+Math.round(c.net/c.rev*100)+'%':'—'}</div></div>
+  </div>`;
+
+  if(mo==='all'){
+    // جدول الأشهر
+    let rows='';
+    for(let m=1;m<=12;m++){
+      const r=computeNet(yr,m);
+      if(!r.closed.length && !r.gen && !r.sal) continue;
+      rows+=`<tr><td style="font-weight:600">${MONTHS_AR[m-1]}</td><td>${r.closed.length}</td>
+        <td style="color:${col(r.orderProfit)}">${fmt(r.orderProfit)}</td>
+        <td style="color:#dc2626">${fmt(r.gen)}</td><td style="color:#7c3aed">${fmt(r.sal)}</td>
+        <td style="font-weight:800;color:${col(r.net)}">${fmt(r.net)}</td></tr>`;
+    }
+    html+=`<div class="profit-card"><div class="profit-header"><h3>💎 صافي الربح شهرًا بشهر — ${esc(yr)}</h3></div>
+      <div style="padding:1rem"><div class="tw"><table>
+      <thead><tr><th>الشهر</th><th>طلبيات مقفلة</th><th>ربح الطلبيات</th><th>مصروفات عامة</th><th>رواتب</th><th>صافي الربح</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد بيانات في هذه السنة</td></tr>'}</tbody>
+      <tfoot><tr style="background:#f9f7f0;font-weight:800"><td>إجمالي ${esc(yr)}</td><td>${c.closed.length}</td>
+        <td style="color:${col(c.orderProfit)}">${fmt(c.orderProfit)}</td><td style="color:#dc2626">${fmt(c.gen)}</td>
+        <td style="color:#7c3aed">${fmt(c.sal)}</td><td style="color:${col(c.net)}">${fmt(c.net)}</td></tr></tfoot>
+      </table></div></div></div>`;
+  } else {
+    // جدول طلبيات الشهر
+    const rows=c.closed.map(o=>{
+      const cost=orderCostAll(o), p=(o.total||0)-cost;
+      return `<tr><td style="color:var(--t3)">#${pad3(o.orderNum)}</td><td style="font-weight:600">${esc(o.name)}</td>
+        <td>${fmt(o.total)}</td><td style="color:#dc2626">${fmt(cost)}</td>
+        <td style="font-weight:700;color:${col(p)}">${fmt(p)}</td>
+        <td>${o.total?Math.round(p/o.total*100)+'%':'—'}</td>
+        <td style="color:var(--t3);font-size:12px">${new Date(o.closedAt).toLocaleDateString('ar-LY')}</td>
+        <td><button class="btn btn-sm" onclick="showOrderProfit('${o.id}')">🔍 تفاصيل</button></td></tr>`;
+    }).join('');
+    html+=`<div class="profit-card"><div class="profit-header"><h3>📋 الطلبيات المقفلة في ${esc(periodLbl)}</h3></div>
+      <div style="padding:1rem"><div class="tw"><table>
+      <thead><tr><th>#</th><th>العميل</th><th>العقد</th><th>التكاليف</th><th>صافي الربح</th><th>الهامش</th><th>تاريخ الإقفال</th><th></th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="8" style="text-align:center;color:var(--t3)">لا توجد طلبيات مقفلة في هذا الشهر</td></tr>'}</tbody>
+      </table></div></div></div>`;
+  }
+
+  // المصروفات العامة لنفس الفترة
+  const gRows=[...c.general].sort((a,b)=>(a.date||'')<(b.date||'')?1:-1).map(e=>`<tr>
+    <td style="font-weight:500">${esc(e.name)}</td><td>${esc(e.cat)}</td>
+    <td style="color:#dc2626;font-weight:600">${fmt(e.amount)}</td><td style="color:var(--t3);font-size:12px">${esc(e.date||'')}</td></tr>`).join('');
+  html+=`<div class="card"><div class="sec">💸 المصروفات العامة لنفس الفترة (غير المرتبطة بطلبية)</div>
+    <div class="tw"><table><thead><tr><th>البند</th><th>الفئة</th><th>المبلغ</th><th>التاريخ</th></tr></thead>
+    <tbody>${gRows||'<tr><td colspan="4" style="text-align:center;color:var(--t3)">لا توجد مصروفات عامة في هذه الفترة</td></tr>'}</tbody></table></div></div>`;
+
+  box.innerHTML=html;
+}
+
+function profitOrderHTML(id){
+  const o=orders.find(x=>x.id===id);
+  if(!o) return '<div class="card" style="text-align:center;color:var(--t3);padding:2rem">اختر طلبية من القائمة</div>';
+  const linked=orderLinkedExp(o);
+  const costs=o.costs||[];
+  const cost=orderCostAll(o), p=(o.total||0)-cost;
+  const col=p>=0?'#15803d':'#dc2626';
+  const rows=[
+    ...costs.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.cat)}</td><td style="color:#dc2626;font-weight:600">${fmt(c.amount)}</td></tr>`),
+    ...linked.map(e=>`<tr><td>${esc(e.name)} <span class="linked-tag">من المصروفات · ${esc(e.date||'')}</span></td><td>${esc(e.cat)}</td><td style="color:#dc2626;font-weight:600">${fmt(e.amount)}</td></tr>`)
+  ].join('');
+  return `<div class="profit-card">
+    <div class="profit-header"><h3>💎 ${esc(o.name)} — طلبية #${pad3(o.orderNum)}</h3>
+      <span class="sb ${o.closed?'sb-paid':'sb-pending'}">${o.closed?'مقفلة '+new Date(o.closedAt).toLocaleDateString('ar-LY'):'مفتوحة — الرقم مبدئي'}</span></div>
+    <div style="padding:1rem">
+      <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat" style="--acc:#B8860B"><div class="st-lbl">قيمة العقد</div><div class="st-val">${fmt(o.total)}</div></div>
+        <div class="stat" style="--acc:#dc2626"><div class="st-lbl">إجمالي التكاليف</div><div class="st-val" style="color:#dc2626">${fmt(cost)}</div></div>
+        <div class="stat" style="--acc:#15803d"><div class="st-lbl">صافي الربح</div><div class="st-val" style="color:${col}">${fmt(p)}</div></div>
+        <div class="stat" style="--acc:#0891b2"><div class="st-lbl">الهامش</div><div class="st-val">${o.total?Math.round(p/o.total*100)+'%':'—'}</div></div>
+      </div>
+      <div class="tw"><table><thead><tr><th>بند التكلفة</th><th>الفئة</th><th>المبلغ</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="3" style="text-align:center;color:var(--t3)">لا توجد تكاليف مسجلة لهذه الطلبية</td></tr>'}</tbody>
+      <tfoot><tr style="background:#f9f7f0;font-weight:800"><td colspan="2">إجمالي التكاليف</td><td style="color:#dc2626">${fmt(cost)}</td></tr></tfoot></table></div>
+      <div style="margin-top:.75rem"><button class="btn btn-sm" onclick="goTo('orders',document.querySelectorAll('.tab')[1]);openEdit('${o.id}')">✏️ فتح الطلبية لتعديل التكاليف</button></div>
+    </div></div>`;
+}
 
 // ===== REPORTS =====
 function renderReports(){
   const yr = document.getElementById('rep-year-sel')?.value;
   const mo = document.getElementById('rep-month-sel')?.value;
 
-  const filterByPeriod=(arr, dateField)=>!yr?arr:arr.filter(item=>{
-    const d=item[dateField]||''; const iy=d.slice(0,4), im=String(parseInt(d.slice(5,7))||0);
-    return iy===yr && (mo==='all'||im===mo);
-  });
-  const filterSalByPeriod=arr=>!yr?arr:arr.filter(s=>String(s.year)===yr&&(mo==='all'||String(s.month)===mo));
-
-  const fOrders=filterByPeriod(orders,'date');
-  const fExp=filterByPeriod(expenses,'date');
-  const fSal=filterSalByPeriod(salaries);
-
-  const rev=fOrders.reduce((s,o)=>s+o.total,0);
-  const exp=fExp.reduce((s,e)=>s+e.amount,0);
-  // استخدام الراتب المستحق في التقارير
-  const sal=fSal.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0);
+  const fOrders=orders.filter(o=>matchDate(o.date,yr,mo));
+  const c=computeNet(yr,mo);
   const paid=fOrders.reduce((s,o)=>s+o.paid,0);
-  const net=rev-exp-sal;
+  const revAll=fOrders.reduce((s,o)=>s+o.total,0);
 
-  document.getElementById('r-rev').textContent=fmt(rev);
-  document.getElementById('r-ops').textContent=fmt(exp);
-  document.getElementById('r-sal').textContent=fmt(sal);
-  document.getElementById('r-net').textContent=fmt(net);
-  document.getElementById('r-net').style.color=net>=0?'#15803d':'#dc2626';
-  document.getElementById('r-net2').textContent=fmt(net);
-  document.getElementById('r-net2').style.color=net>=0?'#15803d':'#dc2626';
-  document.getElementById('r-avg').textContent=fOrders.length?fmt(rev/fOrders.length):'0 د.ل';
+  document.getElementById('r-rev').textContent=fmt(c.rev);
+  document.getElementById('r-ocost').textContent=fmt(c.ordCost);
+  document.getElementById('r-ops').textContent=fmt(c.gen);
+  document.getElementById('r-sal').textContent=fmt(c.sal);
+  document.getElementById('r-net').textContent=fmt(c.net);
+  document.getElementById('r-net').style.color=c.net>=0?'#15803d':'#dc2626';
+  document.getElementById('r-net2').textContent=fmt(c.net);
+  document.getElementById('r-net2').style.color=c.net>=0?'#15803d':'#dc2626';
+  document.getElementById('r-avg').textContent=fOrders.length?fmt(revAll/fOrders.length):'0 د.ل';
   document.getElementById('r-cnt').textContent=fOrders.length;
-  document.getElementById('r-col').textContent=rev?Math.round(paid/rev*100)+'%':'0%';
+  document.getElementById('r-col').textContent=revAll?Math.round(paid/revAll*100)+'%':'0%';
 
   const clients={};fOrders.forEach(o=>{if(!clients[o.name])clients[o.name]={c:0,t:0};clients[o.name].c++;clients[o.name].t+=o.total;});
   const sorted=Object.entries(clients).sort((a,b)=>b[1].t-a[1].t).slice(0,5);
   document.getElementById('top-body').innerHTML=sorted.map(([n,d],i)=>`<tr><td style="color:var(--gold);font-weight:700">${i+1}</td><td style="font-weight:600">${esc(n)}</td><td style="text-align:center">${d.c}</td><td style="font-weight:700;color:#15803d">${fmt(d.t)}</td></tr>`).join('');
-
-  renderProfitByMonth();
-}
-
-// صافي ربح الطلبيات المقفلة حسب الشهر (حسب تاريخ الإقفال) للسنة المختارة
-function renderProfitByMonth(){
-  const body=document.getElementById('profit-month-body'), foot=document.getElementById('profit-year-foot');
-  if(!body||!foot) return;
-  const yr=document.getElementById('rep-year-sel')?.value || String(new Date().getFullYear());
-  const rows=Array.from({length:12},()=>({c:0,rev:0,cost:0,profit:0}));
-  orders.filter(o=>o.closed && (o.closedAt||'').slice(0,4)===yr).forEach(o=>{
-    const r=rows[new Date(o.closedAt).getMonth()];
-    r.c++; r.rev+=o.total; r.cost+=orderCostTotal(o.costs); r.profit+=o.profit||0;
-  });
-  const pc=r=>r.rev?Math.round(r.profit/r.rev*100)+'%':'—';
-  body.innerHTML=rows.map((r,i)=>r.c?`<tr>
-    <td style="font-weight:600">${MONTHS_AR[i]}</td><td>${r.c}</td><td>${fmt(r.rev)}</td>
-    <td style="color:#dc2626">${fmt(r.cost)}</td>
-    <td style="font-weight:700;color:${r.profit>=0?'#15803d':'#dc2626'}">${fmt(r.profit)}</td><td>${pc(r)}</td></tr>`:'').join('')
-    || '<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد طلبيات مقفلة في هذه السنة</td></tr>';
-  const t=rows.reduce((a,r)=>({c:a.c+r.c,rev:a.rev+r.rev,cost:a.cost+r.cost,profit:a.profit+r.profit}),{c:0,rev:0,cost:0,profit:0});
-  foot.innerHTML=`<tr style="background:#f9f7f0;font-weight:800">
-    <td>إجمالي سنة ${esc(yr)}</td><td>${t.c}</td><td>${fmt(t.rev)}</td><td>${fmt(t.cost)}</td>
-    <td style="color:${t.profit>=0?'#15803d':'#dc2626'}">${fmt(t.profit)}</td><td>${pc(t)}</td></tr>`;
 }
 
 // ===== EXPORT =====
 function dl(content,name,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+content],{type}));a.download=name;a.click();}
-function expCSV(){if(!orders.length){toast('لا توجد طلبيات');return;}dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','صافي الربح','التاريخ'].join(','),...orders.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.closed?o.profit:'',o.date].map(csv).join(','))].join('\n'),'ruqi-orders-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
-function expExpCSV(){if(!expenses.length){toast('لا توجد مصروفات');return;}dl([['البند','الفئة','المبلغ','التاريخ','ملاحظة'].join(','),...expenses.map(e=>[e.name,e.cat,e.amount,e.date,e.note].map(csv).join(','))].join('\n'),'ruqi-expenses-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
-function expSalCSV(){if(!salaries.length){toast('لا توجد رواتب');return;}dl([['الموظف','الراتب الأساسي','الخصومات','المستحق','الشهر','السنة','ملاحظة'].join(','),...salaries.map(s=>[s.name,s.amount,s.dedTotal||0,s.netAmount!==undefined?s.netAmount:s.amount,MONTHS_AR[(s.month||1)-1],s.year,s.note].map(csv).join(','))].join('\n'),'ruqi-salaries-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
+function expCSV(){if(!orders.length){toast('لا توجد طلبيات');return;}dl([['رقم','العميل','الهاتف','النوع','العقد','المدفوع','المتبقي','الحالة','صافي الربح','التاريخ'].join(','),...orders.map(o=>[o.orderNum,o.name,o.phone,o.type,o.total,o.paid,o.total-o.paid,o.status,o.closed?orderProfit(o):'',o.date].map(csv).join(','))].join('\n'),'ruqi-orders-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
+function expExpCSV(){if(!expenses.length){toast('لا توجد مصروفات');return;}dl([['البند','الفئة','الطلبية','المبلغ','التاريخ','ملاحظة'].join(','),...expenses.map(e=>{const o=orders.find(x=>x.id===e.orderId);return [e.name,e.cat,o?('#'+pad3(o.orderNum)+' '+o.name):'عام',e.amount,e.date,e.note].map(csv).join(',');})].join('\n'),'ruqi-expenses-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
+function expSalCSV(){if(!salaries.length){toast('لا توجد رواتب');return;}dl([['الموظف','الراتب الأساسي','الخصومات','المستحق','الشهر','السنة','ملاحظة'].join(','),...salaries.map(s=>[s.name,s.amount,s.dedTotal||0,salNet(s),MONTHS_AR[(s.month||1)-1],s.year,s.note].map(csv).join(','))].join('\n'),'ruqi-salaries-'+today()+'.csv','text/csv');toast('✅ تم التصدير');}
 function backupAll(){dl(JSON.stringify({orders,expenses,salaries,contracts,archives,exportDate:new Date().toISOString()},null,2),'ruqi-backup-'+today()+'.json','application/json');toast('💾 تم حفظ النسخة الاحتياطية');}
 function printRep(){
-  const rev=orders.reduce((s,o)=>s+o.total,0),
-        exp=expenses.reduce((s,e)=>s+e.amount,0),
-        sal=salaries.reduce((s,s2)=>s+(s2.netAmount!==undefined?s2.netAmount:s2.amount),0),
-        net=rev-exp-sal;
+  const c=computeNet(null,null);
   const w=window.open('','_blank');
   w.document.write(`<html dir="rtl"><body style="font-family:Arial;padding:2rem">
     <h1 style="color:#B8860B">رُقي — التقرير المالي</h1>
     <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-LY')}</p><hr>
     <table border="1" cellpadding="8" style="width:100%;border-collapse:collapse">
       <tr><th>البند</th><th>المبلغ</th></tr>
-      <tr><td>إجمالي الإيرادات</td><td>${fmt(rev)}</td></tr>
-      <tr><td>مصروفات تشغيلية</td><td>${fmt(exp)}</td></tr>
-      <tr><td>رواتب الموظفين (مستحقة)</td><td>${fmt(sal)}</td></tr>
-      <tr style="background:#f0f0f0"><td><strong>صافي الربح</strong></td><td><strong>${fmt(net)}</strong></td></tr>
+      <tr><td>إيرادات الطلبيات المقفلة</td><td>${fmt(c.rev)}</td></tr>
+      <tr><td>تكاليف الطلبيات</td><td>${fmt(c.ordCost)}</td></tr>
+      <tr><td>مصروفات عامة</td><td>${fmt(c.gen)}</td></tr>
+      <tr><td>رواتب الموظفين (مستحقة)</td><td>${fmt(c.sal)}</td></tr>
+      <tr style="background:#f0f0f0"><td><strong>صافي الربح</strong></td><td><strong>${fmt(c.net)}</strong></td></tr>
     </table></body></html>`);
   w.print();
 }
@@ -2264,7 +2448,8 @@ document.getElementById('e-date').value=today();
 const now=new Date();
 document.getElementById('s-month-inp').value=now.getMonth()+1;
 document.getElementById('s-year-inp').value=now.getFullYear();
-// تهيئة قائمة الخصومات الفارغة
+initProfitSelectors();
+fillOrderSelect('e-order');
 renderDedList();
 renderContractItemsList();
 renderKitchenList();
