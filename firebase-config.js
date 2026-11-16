@@ -24,12 +24,43 @@ class RuqiDB {
     try {
       if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
       this.db = firebase.database();
+      this._patchRef();
       this.firebaseReady = true;
       console.log('✅ Firebase متصل — ruqi-finance');
     } catch (e) {
       console.warn('⚠️ Firebase غير متاح — وضع أوف لاين', e);
     }
   }
+
+  // يمنع تعليق التطبيق عند انقطاع الإنترنت:
+  //  - قراءة مجموعة كاملة (orders/expenses/...) تنتظر 5 ثوانٍ ثم تعود للنسخة المحلية
+  //  - الكتابة تنتظر تأكيد الخادم 3 ثوانٍ فقط (SDK يحتفظ بالكتابة ويرسلها عند عودة الاتصال)
+  //  - رفض الصلاحيات (Permission denied) يظهر كخطأ حقيقي ولا يُخفى
+  _patchRef() {
+    const realRef = this.db.ref.bind(this.db);
+    const local = this.local;
+    const wait = (ms, v) => new Promise(res => setTimeout(() => res(v), ms));
+    this.db.ref = (path) => {
+      const r = realRef(path);
+      if (typeof path !== 'string') return r;
+      const once = r.once.bind(r), set = r.set.bind(r), remove = r.remove.bind(r);
+      const isColl = path.indexOf('/') < 0;
+      r.once = (ev, ...a) => {
+        if (ev !== 'value' || !isColl) return once(ev, ...a);
+        return Promise.race([once(ev, ...a), wait(5000, null).then(() => {
+          let v = null;
+          try { v = JSON.parse(local.getItem('ruqi_' + path) || 'null'); } catch (e) {}
+          if (Array.isArray(v) && !v.length) v = null;
+          return { val: () => v, exists: () => v != null };
+        })]);
+      };
+      r.set = (v) => Promise.race([set(v), wait(3000)]);
+      r.remove = () => Promise.race([remove(), wait(3000)]);
+      return r;
+    };
+  }
+
+  _loc(n) { try { return JSON.parse(this.local.getItem('ruqi_' + n) || '[]'); } catch (e) { return []; } }
 
   async getOrders() {
     if (this.firebaseReady) {
@@ -48,7 +79,7 @@ class RuqiDB {
   }
 
   async saveOrder(order) {
-    const orders = await this.getOrders();
+    const orders = this._loc('orders');
     const idx = orders.findIndex(o => o.id === order.id);
     if (idx >= 0) orders[idx] = order; else orders.push(order);
     this.local.setItem('ruqi_orders', JSON.stringify(orders));
@@ -59,7 +90,7 @@ class RuqiDB {
   }
 
   async saveExpense(expense) {
-    const exps = await this.getExpenses();
+    const exps = this._loc('expenses');
     const idx = exps.findIndex(e => e.id === expense.id);
     if (idx >= 0) exps[idx] = expense; else exps.push(expense);
     this.local.setItem('ruqi_expenses', JSON.stringify(exps));
@@ -70,14 +101,14 @@ class RuqiDB {
   }
 
   async deleteOrder(id) {
-    let orders = await this.getOrders();
+    let orders = this._loc('orders');
     orders = orders.filter(o => o.id !== id);
     this.local.setItem('ruqi_orders', JSON.stringify(orders));
     if (this.firebaseReady) await this.db.ref(`orders/${id}`).remove();
   }
 
   async deleteExpense(id) {
-    let exps = await this.getExpenses();
+    let exps = this._loc('expenses');
     exps = exps.filter(e => e.id !== id);
     this.local.setItem('ruqi_expenses', JSON.stringify(exps));
     if (this.firebaseReady) await this.db.ref(`expenses/${id}`).remove();
@@ -107,10 +138,29 @@ class RuqiDB {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
 
-  nextOrderNum() {
-    const n = parseInt(this.local.getItem('ruqi_counter') || '0') + 1;
-    this.local.setItem('ruqi_counter', n);
-    if (this.firebaseReady) this.db.ref('meta/counter').set(n);
+  // عدّاد مشترك بين الجوال واللابتوب (معاملة ذرّية على Firebase) لمنع تكرار أرقام الطلبيات/العقود
+  async nextCounter(name) {
+    const isOrder = name === 'order';
+    const lk = isOrder ? 'ruqi_counter' : 'ruqi_' + name + '_counter';
+    let floor = parseInt(this.local.getItem(lk) || '0') || 0;
+    try {
+      const arr = JSON.parse(this.local.getItem(isOrder ? 'ruqi_orders' : 'ruqi_contracts') || '[]');
+      arr.forEach(x => { const n = parseInt(isOrder ? x.orderNum : x.contractNum, 10); if (n > floor) floor = n; });
+    } catch (e) {}
+    let n = floor + 1;
+    if (this.firebaseReady) {
+      try {
+        const ref = this.db.ref('meta/' + (isOrder ? 'counter' : name + 'Counter'));
+        const res = await Promise.race([
+          ref.transaction(cur => Math.max(parseInt(cur) || 0, floor) + 1),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000))
+        ]);
+        if (res && res.committed) n = res.snapshot.val();
+      } catch (e) { console.warn('عدّاد محلي (أوف لاين)', e); }
+    }
+    this.local.setItem(lk, n);
     return n;
   }
+
+  nextOrderNum() { return this.nextCounter('order'); }
 }
